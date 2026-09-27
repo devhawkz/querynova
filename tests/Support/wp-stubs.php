@@ -126,7 +126,9 @@ if ( ! function_exists( 'wp_get_environment_type' ) ) {
 
 if ( ! function_exists( 'wp_timezone' ) ) {
     function wp_timezone(): DateTimeZone {
-        return new DateTimeZone( 'UTC' );
+        $name = $GLOBALS['qn_timezone'] ?? 'UTC'; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- test bootstrap stores the timezone under this key.
+
+        return new DateTimeZone( is_string( $name ) && $name !== '' ? $name : 'UTC' );
     }
 }
 

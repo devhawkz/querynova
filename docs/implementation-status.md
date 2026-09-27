@@ -49,6 +49,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Test categories | IN_PROGRESS | Unit, schema, REST permissions, provider fixtures, security, frontend Vitest, and synthetic scale tests exist. WordPress and WooCommerce releases are not booted. End-to-end browser tests are not run |
 | Admin accessibility | COMPLETE | The admin has a labeled navigation landmark and a main landmark. Buttons have accessible names. Fields sit in labels or have an accessible name. Setup and schema messages use a status or alert role. No stylesheet removes the focus outline. Contrast is the browser default because the admin ships no custom colors. This is not a certified WCAG audit |
 | Internationalization | IN_PROGRESS | The text domain is querynova. The admin script depends on wp-i18n and loads translations from languages. Navigation, headings, empty states, provenance labels, and the primary screen copy go through that helper and stay in English until a translation is loaded. Schema field labels and some setup field labels are still source strings |
+| Timezone | COMPLETE | The clock and stored timestamps use UTC. Display converts a UTC instant into the WordPress timezone. In January, 12:00 UTC is 13:00 in Europe/Belgrade. In July it is 14:00. The stored instant stays 12:00 UTC. With no WordPress timezone, display stays UTC |
 | Staging and production builds | NOT_STARTED | Docs describe the intended builds |
 | Release ZIP | NOT_STARTED | |
 | Definition of Done | NOT_STARTED | The product is not complete |
