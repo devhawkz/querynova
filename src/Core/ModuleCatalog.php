@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Core;
 
 use QueryNova\Core\Contracts\ModuleInterface;
+use QueryNova\Modules\Ai\AiModule;
 use QueryNova\Modules\Analytics\AnalyticsModule;
 use QueryNova\Modules\Backlinks\BacklinkModule;
 use QueryNova\Modules\Commerce\CommerceModule;
@@ -51,6 +52,7 @@ final class ModuleCatalog {
         $modules[] = new ContentModule();
         $modules[] = new AnalyticsModule();
         $modules[] = new OpportunityModule();
+        $modules[] = new AiModule();
 
         return $modules;
     }

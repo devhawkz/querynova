@@ -207,6 +207,7 @@ final class Plugin {
         delete_transient( 'querynova_lock_' . md5( 'analytics-sync' ) );
         delete_transient( 'querynova_lock_' . md5( 'serp-batch' ) );
         delete_transient( 'querynova_lock_' . md5( 'backlink-batch' ) );
+        delete_transient( 'querynova_lock_' . md5( 'ai-batch' ) );
     }
 
     private static function bootModule(
