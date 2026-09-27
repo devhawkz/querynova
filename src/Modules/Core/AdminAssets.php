@@ -46,6 +46,7 @@ final class AdminAssets implements HookSubscriberInterface {
             return;
         }
 
+        $briefing = $this->briefing();
         wp_enqueue_script( 'querynova-admin', QUERYNOVA_URL . 'build/admin.js', [], QUERYNOVA_VERSION, true );
         wp_add_inline_script(
             'querynova-admin',
@@ -56,10 +57,33 @@ final class AdminAssets implements HookSubscriberInterface {
                     'version'           => QUERYNOVA_VERSION,
                     'environment'       => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
                     'wooCommerceActive' => class_exists( 'WooCommerce' ),
-                    'actions'           => [],
+                    'actions'           => $briefing['actions'],
+                    'sections'          => $briefing['sections'],
                 ]
             ) . ';',
             'before'
         );
+    }
+
+    /**
+     * Stored rows only. A read failure leaves every section empty.
+     *
+     * @return array{actions: list<array<string, mixed>>, sections: array<string, list<array<string, mixed>>>}
+     */
+    private function briefing(): array {
+        $empty = [
+            'actions'  => [],
+            'sections' => DashboardBriefing::emptySections(),
+        ];
+        if ( ! isset( $GLOBALS['wpdb'] ) ) {
+            return $empty;
+        }
+        try {
+            return ( new DashboardBriefing() )->fromDatabase( new \QueryNova\Infrastructure\Database\WpdbConnection() );
+        } catch ( \Throwable $exception ) {
+            unset( $exception );
+
+            return $empty;
+        }
     }
 }

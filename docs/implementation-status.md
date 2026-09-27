@@ -14,7 +14,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Jobs | COMPLETE | Idempotency and non-retry of validation tested |
 | Cache, HTTP, locks, SSRF | COMPLETE | SSRF tests cover private and metadata addresses |
 | REST permission model | IN_PROGRESS | Registrar exists. Feature routes are not all registered |
-| Admin React app | IN_PROGRESS | Shell, provenance labels, schema builder, and asset enqueue exist. Feature screens are not all built |
+| Admin React app | IN_PROGRESS | What Matters Now shows revenue, search, technical, commerce, AI, and recent-change sections from stored rows. Empty sections stay empty. An estimate is labeled estimated. Advanced fields stay off that primary view. Simple mode lists at most ten actions and does not pad. Product, category, and advanced screens are not built |
 | Core SEO metadata | COMPLETE | Titles, descriptions, canonical, robots, and social tags. Templates and validation are tested |
 | Sitemaps | COMPLETE | Paged XML for posts, pages, products, categories, brands, CPTs, taxonomies, images, and video. News is optional and off until a publication name is set. Inclusion rules are tested |
 | Schema graph | COMPLETE | Connected JSON-LD for the supported types, including product offers and ratings only when measured. The builder stores type, field mappings, WooCommerce fields, custom fields, conditions, and templates |

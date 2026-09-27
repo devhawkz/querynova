@@ -12,6 +12,7 @@ declare global {
       environment?: string;
       wooCommerceActive?: boolean;
       actions?: TodayAction[];
+      sections?: unknown;
     };
   }
 }
@@ -32,7 +33,11 @@ export function App() {
       {view === 'schema' ? (
         <SchemaBuilder restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} />
       ) : (
-        <WhatMattersNow actions={boot.actions ?? []} wooCommerceActive={boot.wooCommerceActive === true} />
+        <WhatMattersNow
+          actions={boot.actions ?? []}
+          sections={boot.sections}
+          wooCommerceActive={boot.wooCommerceActive === true}
+        />
       )}
     </ErrorBoundary>
   );

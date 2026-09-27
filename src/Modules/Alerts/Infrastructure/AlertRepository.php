@@ -62,6 +62,15 @@ final class AlertRepository {
         return count( $this->database->select( $this->table(), [ 'status' => 'open' ], 100 ) );
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function open( int $limit = 20 ): array {
+        $limit = max( 1, min( 20, $limit ) );
+
+        return $this->database->select( $this->table(), [ 'status' => 'open' ], $limit, 0, [ 'id' => 'ASC' ] );
+    }
+
     private function table(): string {
         return $this->database->prefix() . 'qn_alerts';
     }
