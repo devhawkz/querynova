@@ -17,8 +17,9 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: none
+          tools: composer
       - name: Composer validate
-        run: composer validate --no-check-publish
+        run: composer validate --strict
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist
       - name: PHP syntax

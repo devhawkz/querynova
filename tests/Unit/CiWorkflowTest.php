@@ -18,7 +18,8 @@ final class CiWorkflowTest extends TestCase {
 
         foreach (
             [
-                'composer validate --no-check-publish',
+                'composer validate --strict',
+                'tools: composer',
                 'php -l',
                 'composer lint',
                 'composer analyse',
