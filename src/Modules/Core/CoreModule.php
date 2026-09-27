@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Modules\Core;
 
 use QueryNova\Core\Container\ContainerInterface;
+use QueryNova\Core\ProductVersions;
 use QueryNova\Core\Health\HealthReport;
 use QueryNova\Core\Health\HealthStatus;
 use QueryNova\Core\Hooks\HookRegistrar;
@@ -79,6 +80,7 @@ final class CoreModule extends AbstractModule {
             'name'           => 'QueryNova',
             'version'        => QUERYNOVA_VERSION,
             'schema_version' => (string) get_option( 'querynova_db_version', '0' ),
+            'versions'       => ( new ProductVersions() )->describe(),
         ];
     }
 

@@ -17,6 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class ContentRepository {
 
+    public const METHODOLOGY         = 'querynova.content_observations';
+    public const METHODOLOGY_VERSION = 'v1';
+
     public function __construct( private readonly DatabaseConnection $database ) {
     }
 
@@ -36,8 +39,8 @@ final class ContentRepository {
                 'entities_json'       => wp_json_encode( $report['entities'] ?? null ),
                 'information_gain'    => null,
                 'eeat_json'           => wp_json_encode( $report['evidence'] ?? null ),
-                'methodology'         => 'querynova.content_observations',
-                'methodology_version' => 'v1',
+                'methodology'         => self::METHODOLOGY,
+                'methodology_version' => self::METHODOLOGY_VERSION,
                 'confidence'          => null,
                 'source'              => 'supplied_document',
             ]

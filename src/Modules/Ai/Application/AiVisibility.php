@@ -18,7 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class AiVisibility {
 
-    public const DISCLAIMER = 'Not an official OpenAI, Google, Gemini or other provider ranking metric.';
+    public const DISCLAIMER  = 'Not an official OpenAI, Google, Gemini or other provider ranking metric.';
+    public const METHODOLOGY = 'querynova.ai_visibility_index';
+    public const VERSION     = 'v1';
 
     /**
      * @param list<array{brand: bool, product: bool, cited: bool, commercial: bool, competitors: list<string>}>|null $runs
@@ -107,8 +109,8 @@ final class AiVisibility {
             'status'      => ProvenanceKind::Estimated->value,
             'value'       => round( $total / $count, 4 ),
             'confidence'  => ConfidenceBand::Low->value,
-            'methodology' => 'querynova.ai_visibility_index',
-            'version'     => 'v1',
+            'methodology' => self::METHODOLOGY,
+            'version'     => self::VERSION,
             'disclaimer'  => self::DISCLAIMER,
             'note'        => 'Equal-weight average of the supplied observational inputs.',
         ];
