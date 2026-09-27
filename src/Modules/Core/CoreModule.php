@@ -53,6 +53,7 @@ final class CoreModule extends AbstractModule {
 
     public function registerHooks( HookRegistrar $hooks ): void {
         $hooks->add( new AdminAssets() );
+        $hooks->add( new StagingDataNotice( new StagingDataWarning(), new SetupWizard( new \QueryNova\Infrastructure\WordPress\OptionStore() ) ) );
     }
 
     public function registerAdminPages( AdminPageRegistrar $admin ): void {
