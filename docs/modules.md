@@ -24,7 +24,7 @@
 | page-experience | Implemented | Provider timings for desktop and mobile. Not an SEO score |
 | opportunities | Implemented | Supplied-input opportunities. No numeric score. Missing money stays null |
 | recommendations | Implemented | Today's suggested actions. Nothing is applied automatically |
-| experiments | Not started | Before/after measurement |
+| experiments | Implemented | Before/after movement. Causation is not claimed |
 | reports | Not started | CSV, JSON, PDF |
 | diagnostics | Not started | Health, logs, jobs, system report |
 

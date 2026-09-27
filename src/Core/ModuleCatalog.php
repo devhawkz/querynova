@@ -16,6 +16,7 @@ use QueryNova\Modules\Backlinks\BacklinkModule;
 use QueryNova\Modules\Commerce\CommerceModule;
 use QueryNova\Modules\Content\ContentModule;
 use QueryNova\Modules\Experience\ExperienceModule;
+use QueryNova\Modules\Experiments\ExperimentModule;
 use QueryNova\Modules\Core\CoreModule;
 use QueryNova\Modules\Keywords\KeywordModule;
 use QueryNova\Modules\Opportunities\OpportunityModule;
@@ -55,6 +56,7 @@ final class ModuleCatalog {
         $modules[] = new OpportunityModule();
         $modules[] = new AiModule();
         $modules[] = new ExperienceModule();
+        $modules[] = new ExperimentModule();
 
         return $modules;
     }
