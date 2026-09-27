@@ -22,12 +22,14 @@ use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Redirects\Application\RedirectEngine;
 use QueryNova\Modules\Redirects\Infrastructure\RedirectRepository;
+use QueryNova\Modules\Seo\Application\SeoConflictDetector;
 use QueryNova\Modules\Seo\Application\SeoImporter;
 use QueryNova\Modules\Seo\Application\SeoMetaService;
 use QueryNova\Modules\Seo\Domain\TemplateRenderer;
 use QueryNova\Modules\Seo\Infrastructure\WordPressForeignMetaReader;
 use QueryNova\Modules\Seo\Infrastructure\WordPressMetaStore;
 use QueryNova\Modules\Seo\Presentation\FrontendSeoSubscriber;
+use QueryNova\Modules\Seo\Presentation\SeoConflictNotice;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -61,6 +63,7 @@ final class SeoModule extends AbstractModule {
 
     public function registerHooks( HookRegistrar $hooks ): void {
         $hooks->add( new FrontendSeoSubscriber( new SeoMetaService( new WordPressMetaStore(), new TemplateRenderer() ) ) );
+        $hooks->add( new SeoConflictNotice( new SeoConflictDetector() ) );
     }
 
     public function registerRoutes( RestRegistrar $rest ): void {
