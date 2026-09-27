@@ -25,6 +25,7 @@ final class HttpRequest {
         public readonly array $headers = [],
         public readonly ?array $json = null,
         public readonly int $timeout = 15,
+        public readonly int $redirection = 3,
     ) {
     }
 }

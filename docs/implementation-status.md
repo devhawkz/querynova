@@ -19,7 +19,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Sitemaps | COMPLETE | Paged XML for posts, pages, products, categories, brands, CPTs, taxonomies, images, and video. News is optional and off until a publication name is set. Inclusion rules are tested |
 | Schema graph | COMPLETE | Connected JSON-LD for the supported types, including product offers and ratings only when measured. The builder stores type, field mappings, WooCommerce fields, custom fields, conditions, and templates |
 | Redirects and 404s | COMPLETE | 301, 302, 307, 410, and 451, including regex, CSV import and export, chain collapsing, and loop rejection. 404s record hits, referrer, and user agent, and may suggest a target. They never create a redirect |
-| Crawler | NOT_STARTED | |
+| Crawler | COMPLETE | Batched jobs record status, redirects, canonicals, robots, headings, titles, descriptions, broken links, orphans, duplicates, thin pages, depth, sitemap inclusion, schema, HTTPS, pagination, and hreflang. A public request only enqueues the next batch. A page under 100 words is QueryNova's thin-page rule, not a search-engine score. Uncrawled links stay unknown |
 | WooCommerce SEO | NOT_STARTED | |
 | Analytics and attribution | NOT_STARTED | Provenance type is in place and tested |
 | Keyword intelligence | NOT_STARTED | |

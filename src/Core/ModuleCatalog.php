@@ -11,6 +11,7 @@ namespace QueryNova\Core;
 
 use QueryNova\Core\Contracts\ModuleInterface;
 use QueryNova\Modules\Core\CoreModule;
+use QueryNova\Modules\Crawler\CrawlerModule;
 use QueryNova\Modules\Redirects\RedirectModule;
 use QueryNova\Modules\Schema\SchemaModule;
 use QueryNova\Modules\Seo\SeoModule;
@@ -35,6 +36,7 @@ final class ModuleCatalog {
         $modules[] = new SitemapModule();
         $modules[] = new SchemaModule();
         $modules[] = new RedirectModule();
+        $modules[] = new CrawlerModule();
 
         return $modules;
     }

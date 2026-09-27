@@ -8,7 +8,7 @@
 | schema | Implemented | Connected JSON-LD graph and schema builder |
 | sitemap | Implemented | XML sitemaps. News is optional |
 | redirects | Implemented | Redirects and 404 monitor. Misses are not auto-redirected |
-| crawler | Not started | Bounded internal crawl |
+| crawler | Implemented | Bounded internal crawl in batches. A public request does not crawl the site |
 | keywords | Not started | Research, discovery, clusters, gap, difficulty |
 | serp | Not started | Provider-backed SERP snapshots |
 | rankings | Not started | Rank history |

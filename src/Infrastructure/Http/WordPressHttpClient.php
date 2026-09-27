@@ -30,13 +30,13 @@ final class WordPressHttpClient implements HttpClientInterface {
         $args = [
             'method'      => strtoupper( $request->method ),
             'timeout'     => $request->timeout,
+            'redirection' => $request->redirection,
             'headers'     => array_merge(
                 $request->headers,
                 [
-					'X-QueryNova-Correlation' => $this->correlation->correlationId(),
-				]
+                    'X-QueryNova-Correlation' => $this->correlation->correlationId(),
+                ]
             ),
-            'redirection' => 3,
         ];
         if ( $request->json !== null ) {
             $encoded                         = wp_json_encode( $request->json );
@@ -67,7 +67,7 @@ final class WordPressHttpClient implements HttpClientInterface {
             ]
         );
 
-        return new HttpResponse( $status, $body );
+        return new HttpResponse( $status, $body, $this->headers( $result ) );
     }
 
     private static function host( string $url ): string {
@@ -77,5 +77,36 @@ final class WordPressHttpClient implements HttpClientInterface {
         }
 
         return (string) ( $parts['host'] ?? '' );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function headers( mixed $result ): array {
+        if ( ! function_exists( 'wp_remote_retrieve_headers' ) ) {
+            return [];
+        }
+        $raw  = wp_remote_retrieve_headers( $result );
+        $list = [];
+        if ( is_array( $raw ) ) {
+            $list = $raw;
+        } elseif ( is_object( $raw ) && method_exists( $raw, 'getAll' ) ) {
+            $all  = $raw->getAll();
+            $list = is_array( $all ) ? $all : [];
+        }
+        $headers = [];
+        foreach ( $list as $name => $value ) {
+            if ( ! is_string( $name ) ) {
+                continue;
+            }
+            if ( is_array( $value ) ) {
+                $value = end( $value );
+            }
+            if ( is_string( $value ) || is_int( $value ) || is_float( $value ) ) {
+                $headers[ strtolower( $name ) ] = (string) $value;
+            }
+        }
+
+        return $headers;
     }
 }
