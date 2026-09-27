@@ -15,6 +15,7 @@ use QueryNova\Core\Environment\WordPressEnvironment;
 use QueryNova\Core\Events\EventDispatcher;
 use QueryNova\Core\Features\FeatureRegistry;
 use QueryNova\Core\Health\HealthRegistry;
+use QueryNova\Core\Health\SiteHealthTests;
 use QueryNova\Core\Hooks\HookRegistrar;
 use QueryNova\Core\Logging\CorrelationContext;
 use QueryNova\Core\Logging\DebugMode;
@@ -157,6 +158,10 @@ final class Plugin {
         $hooks->register();
         $rest->register();
         $admin->register();
+        $healthRegistry = $container->get( HealthRegistry::class );
+        if ( $healthRegistry instanceof HealthRegistry ) {
+            ( new SiteHealthTests( $healthRegistry ) )->register();
+        }
         if ( defined( 'WP_CLI' ) && WP_CLI ) {
             $migrationManager = $container->get( MigrationManager::class );
             $healthRegistry   = $container->get( HealthRegistry::class );

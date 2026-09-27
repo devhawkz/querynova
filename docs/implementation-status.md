@@ -54,6 +54,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Multilingual adapters | COMPLETE | Content analysis stores a language context. A language on the request is used as given. Otherwise WPML is read when its current-language filter is present, then Polylang when pll_current_language exists, then the site locale. A missing language stays null. WPML and Polylang were not installed or executed in this suite |
 | Staging and production builds | COMPLETE | `npm run build` writes a production channel with diagnostics off and debug off. `npm run build:staging` writes a staging channel with diagnostics on and debug still off. Neither build emits a source map. The channel file is not a substitute for the WordPress environment type |
 | Release ZIP | COMPLETE | `npm run package` and `npm run package:staging` write `dist/querynova-production.zip` and `dist/querynova-staging.zip`. The archives include the compiled admin and channel file, and omit node_modules, tests, git metadata, source maps, and dev packages. Composer was not on PATH, so production vendor files were copied from the existing install with dev packages left out |
+| Site Health | COMPLETE | QueryNova health checks are registered as one direct Site Health test. Healthy is good, degraded or disabled is recommended, and unhealthy is critical. No checks stay recommended. Check details are not copied into the description. This suite did not open Tools → Site Health in WordPress |
 | Definition of Done | NOT_STARTED | The product is not complete |
 
 QueryNova is not complete.
