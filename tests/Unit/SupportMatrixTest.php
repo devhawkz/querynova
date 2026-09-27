@@ -48,7 +48,9 @@ final class SupportMatrixTest extends TestCase {
         self::assertStringContainsString( 'Requires at least: 6.4', $header );
         self::assertStringNotContainsString( 'WC tested up to', $header );
         self::assertStringContainsString( "QUERYNOVA_WP_VERSION: '7.1.2'", $ci );
+        self::assertStringContainsString( "QUERYNOVA_WC_VERSION: '11.1.2'", $ci );
         self::assertStringContainsString( 'bin/boot-release-tests.sh phpunit.wp-release.xml.dist', $ci );
+        self::assertStringContainsString( 'bin/boot-release-tests.sh phpunit.wc-release.xml.dist', $ci );
         self::assertNotSame( [], ( new Requirements() )->evaluate( '8.1.0', '6.3.2', true, true ) );
         self::assertFalse( ( new Requirements() )->requiresWooCommerce() );
     }
