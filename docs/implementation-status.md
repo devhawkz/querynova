@@ -45,6 +45,8 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Test matrix | COMPLETE | The supported floor is PHP 8.1 and WordPress 6.4. WooCommerce is not required, and orders stay on the WooCommerce API, including HPOS. CI names PHP 8.1 and 8.3. Only the PHP version running the suite is recorded as observed. No WordPress release and no WooCommerce release is marked tested |
 | Fake providers | COMPLETE | Keyword, SERP, backlink, analytics, and model fixtures return the supplied payload. A missing fixture stays null. The fakes do not call a remote API |
 | Security checks | COMPLETE | Routes deny a missing capability, and one capability does not grant another. A nonce string does not grant access. Stored titles cannot keep markup. SQL identifiers that are not plain names are rejected, and values stay in placeholders. SSRF blocks private and metadata addresses. Logs redact secrets and email addresses. WordPress cookie nonce verification is not reimplemented here |
+| Synthetic catalog scale | COMPLETE | In-memory fixtures of 1,000, 10,000, and 100,000 products return a 20-row page and one admin product. Raw SQL statement count stays zero on that store. A queue of 200 jobs runs 20 per batch. No production timing guarantee is claimed |
+| Test categories | IN_PROGRESS | Unit, schema, REST permissions, provider fixtures, security, frontend Vitest, and synthetic scale tests exist. WordPress and WooCommerce releases are not booted. End-to-end browser tests are not run |
 | Staging and production builds | NOT_STARTED | Docs describe the intended builds |
 | Release ZIP | NOT_STARTED | |
 | Definition of Done | NOT_STARTED | The product is not complete |
