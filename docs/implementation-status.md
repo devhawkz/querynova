@@ -42,6 +42,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Versioning and release channel | COMPLETE | Plugin version is semantic. Schema version, API v1, and published methodology versions are separate fields. A methodology without a published version is omitted. Channel is development for local and development, beta for staging, and stable otherwise |
 | Staging data warning | COMPLETE | On a staging site, a stored Search Console or GA4 property, cloud site id, or provider project raises an admin warning that the identifier may still point at production. Production stays quiet. No analytics request is made |
 | CI pipeline | COMPLETE | GitHub Actions runs strict Composer validate, PHP syntax, PHPCS, PHPStan, and PHPUnit on PHP 8.1 and 8.3, then ESLint, TypeScript, Vitest, and the production build. Those commands passed locally on PHP 8.5. WordPress and WooCommerce version combinations are not part of this workflow |
+| Test matrix | COMPLETE | The supported floor is PHP 8.1 and WordPress 6.4. WooCommerce is not required, and orders stay on the WooCommerce API, including HPOS. CI names PHP 8.1 and 8.3. Only the PHP version running the suite is recorded as observed. No WordPress release and no WooCommerce release is marked tested |
 | Staging and production builds | NOT_STARTED | Docs describe the intended builds |
 | Release ZIP | NOT_STARTED | |
 | Definition of Done | NOT_STARTED | The product is not complete |
