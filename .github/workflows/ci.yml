@@ -46,6 +46,8 @@ jobs:
           node-version: '22'
           cache: npm
       - name: Install admin dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
         run: npm ci
       - name: ESLint
         run: npm run lint
@@ -130,3 +132,54 @@ jobs:
         run: composer install --no-interaction --prefer-dist --no-dev
       - name: Boot WooCommerce on the WordPress release
         run: bash bin/boot-release-tests.sh phpunit.wc-release.xml.dist
+
+  admin-browser:
+    name: Admin browser pass
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      WP_CORE_DIR: /tmp/wordpress
+      WP_BASE_URL: http://127.0.0.1:8080
+      QUERYNOVA_DB_NAME: wordpress_test
+      QUERYNOVA_DB_USER: root
+      QUERYNOVA_DB_PASSWORD: root
+      QUERYNOVA_DB_HOST: 127.0.0.1:3306
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: mysqli
+          tools: composer, wp-cli
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install admin dependencies
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci
+      - name: Build the admin app
+        run: npm run build
+      - name: Install the plugin runtime
+        run: composer install --no-interaction --prefer-dist --no-dev
+      - name: Install the WordPress release
+        run: bash bin/install-wordpress-site.sh
+      - name: Install the browser driver
+        run: npx playwright install --with-deps chromium
+      - name: Open the admin app
+        run: npm run test:e2e

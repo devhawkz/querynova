@@ -51,6 +51,7 @@ final class SupportMatrixTest extends TestCase {
         self::assertStringContainsString( "QUERYNOVA_WC_VERSION: '11.1.2'", $ci );
         self::assertStringContainsString( 'bin/boot-release-tests.sh phpunit.wp-release.xml.dist', $ci );
         self::assertStringContainsString( 'bin/boot-release-tests.sh phpunit.wc-release.xml.dist', $ci );
+        self::assertStringContainsString( 'npx playwright install --with-deps chromium', $ci );
         self::assertNotSame( [], ( new Requirements() )->evaluate( '8.1.0', '6.3.2', true, true ) );
         self::assertFalse( ( new Requirements() )->requiresWooCommerce() );
     }

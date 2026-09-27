@@ -10,7 +10,7 @@ Pavle chose Option B. A real WordPress release, a real WooCommerce release, and 
 
 The runner provides MySQL, the WordPress test library, the WooCommerce plugin, and a browser driver. The existing PHPUnit and Vitest suites stay in place. They do not count as those three runs.
 
-A release is recorded as tested only after the job that boots it has passed. Adding the workflow is not a passing run.
+The jobs are `wordpress`, `woocommerce`, and `admin-browser` in `.github/workflows/ci.yml`. A release is recorded as tested only after the job that boots it has passed. Adding the workflow is not a passing run.
 
 ## Consequences
 

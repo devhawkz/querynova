@@ -11,6 +11,8 @@ QUERYNOVA_MASTER_SPEC.md
 .idea/
 .vscode/
 coverage/
+playwright-report/
+test-results/
 .phpunit.result.cache
 .phpunit.cache/
 .phpcs-cache
