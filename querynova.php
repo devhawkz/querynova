@@ -26,7 +26,7 @@ define( 'QUERYNOVA_FILE', __FILE__ );
 define( 'QUERYNOVA_PATH', plugin_dir_path( __FILE__ ) );
 define( 'QUERYNOVA_URL', plugin_dir_url( __FILE__ ) );
 define( 'QUERYNOVA_BASENAME', plugin_basename( __FILE__ ) );
-define( 'QUERYNOVA_DB_VERSION', '202609270001' );
+define( 'QUERYNOVA_DB_VERSION', '202609270002' );
 
 $querynovaAutoload = __DIR__ . '/vendor/autoload.php';
 if ( is_file( $querynovaAutoload ) ) {

@@ -18,6 +18,7 @@ use QueryNova\Core\Security\Capability;
 use QueryNova\Infrastructure\WordPress\AdminPageRegistrar;
 use QueryNova\Infrastructure\Database\MigrationRegistrar;
 use QueryNova\Infrastructure\Database\Migrations\InitialSchemaMigration;
+use QueryNova\Infrastructure\Database\Migrations\PageExperienceMigration;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -40,6 +41,7 @@ final class CoreModule extends AbstractModule {
 
     public function registerMigrations( MigrationRegistrar $migrations ): void {
         $migrations->add( new InitialSchemaMigration() );
+        $migrations->add( new PageExperienceMigration() );
     }
 
     public function registerRoutes( RestRegistrar $rest ): void {

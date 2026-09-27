@@ -69,6 +69,15 @@ final class Schema {
         return $statements;
     }
 
+    public function statementFor( string $prefix, string $charsetCollate, string $name ): string {
+        $definitions = $this->definitions();
+        if ( ! isset( $definitions[ $name ] ) ) {
+            throw new \InvalidArgumentException( 'Unknown table.' );
+        }
+
+        return $this->compile( $prefix . 'qn_' . $name, $definitions[ $name ], $charsetCollate );
+    }
+
     /**
      * @param array{columns: list<string>, keys: list<string>} $definition
      */
@@ -864,6 +873,26 @@ final class Schema {
                     'UNIQUE KEY url_hash (url_hash)',
                     'KEY hits (hits)',
                     'KEY last_seen (last_seen)',
+                ],
+            ],
+            'page_experience'         => [
+                'columns' => [
+                    'id bigint(20) unsigned NOT NULL AUTO_INCREMENT',
+                    'url text NOT NULL',
+                    'url_hash char(64) NOT NULL',
+                    'strategy varchar(16) NOT NULL',
+                    'lcp decimal(10,3) NULL',
+                    'inp decimal(10,3) NULL',
+                    'cls decimal(8,4) NULL',
+                    'ttfb decimal(10,3) NULL',
+                    'source varchar(32) NOT NULL',
+                    'observed_at datetime NOT NULL',
+                ],
+                'keys'    => [
+                    'PRIMARY KEY (id)',
+                    'UNIQUE KEY url_strategy (url_hash, strategy)',
+                    'KEY strategy (strategy)',
+                    'KEY observed_at (observed_at)',
                 ],
             ],
             'alerts'                  => [
