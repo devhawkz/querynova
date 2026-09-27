@@ -38,7 +38,7 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
       })
       .catch(() => {
         if (!cancelled) {
-          setMessage('Schema rules could not be loaded.');
+          setMessage(t('Schema rules could not be loaded.'));
         }
       });
     return () => {
@@ -58,9 +58,9 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
     try {
       const saved = await api.put<{ rules: unknown }>('/schema/rules', toPayload(rules));
       setRules(fromPayload(saved.rules));
-      setMessage('Schema rules saved.');
+      setMessage(t('Schema rules saved.'));
     } catch {
-      setMessage('Schema rules could not be saved.');
+      setMessage(t('Schema rules could not be saved.'));
     }
   }
 
@@ -68,14 +68,17 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
     <section aria-labelledby="qn-schema-builder">
       <h1 id="qn-schema-builder">{t('Schema builder')}</h1>
       <p>
-        WebSite, Organization, WebPage, article, product, offer, and breadcrumb entities are connected automatically.
-        Rules add more entities. Empty values are left out. They are not sent as zero.
+        {t(
+          'WebSite, Organization, WebPage, article, product, offer, and breadcrumb entities are connected automatically. Rules add more entities. Empty values are left out. They are not sent as zero.',
+        )}
       </p>
       {rules.map((rule, index) => (
         <fieldset key={rule.id}>
-          <legend>Rule {index + 1}</legend>
+          <legend>
+            {t('Rule')} {index + 1}
+          </legend>
           <label>
-            Schema type
+            {t('Schema type')}
             <select
               value={rule.type}
               onChange={(event) => {
@@ -85,13 +88,13 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
             >
               {SCHEMA_TYPES.map((type) => (
                 <option key={type} value={type}>
-                  {type}
+                  {t(type)}
                 </option>
               ))}
             </select>
           </label>
           <label>
-            @id template
+            {t('@id template')}
             <input
               value={rule.idTemplate}
               onChange={(event) => update(index, { ...rule, idTemplate: event.target.value })}
@@ -100,7 +103,7 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
           {rule.mappings.map((mapping, mappingIndex) => (
             <div key={`${rule.id}-mapping-${mappingIndex}`}>
               <label>
-                Property
+                {t('Property')}
                 <input
                   value={mapping.property}
                   onChange={(event) => {
@@ -112,7 +115,7 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
                 />
               </label>
               <label>
-                Source
+                {t('Source')}
                 <select
                   value={mapping.source}
                   onChange={(event) => {
@@ -125,13 +128,13 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
                 >
                   {SCHEMA_SOURCES.map((source) => (
                     <option key={source} value={source}>
-                      {source}
+                      {t(source)}
                     </option>
                   ))}
                 </select>
               </label>
               <label>
-                Field, template, or value
+                {t('Field, template, or value')}
                 <input
                   value={mapping.key}
                   onChange={(event) => {
@@ -153,10 +156,10 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
               })
             }
           >
-            Add property
+            {t('Add property')}
           </button>
           <label>
-            Condition source
+            {t('Condition source')}
             <select
               value={rule.conditions[0]?.source ?? 'custom'}
               onChange={(event) => {
@@ -177,15 +180,15 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
                 });
               }}
             >
-              <option value="wordpress">wordpress</option>
-              <option value="woocommerce">woocommerce</option>
-              <option value="custom">custom</option>
-              <option value="template">template</option>
-              <option value="literal">literal</option>
+              <option value="wordpress">{t('wordpress')}</option>
+              <option value="woocommerce">{t('woocommerce')}</option>
+              <option value="custom">{t('custom')}</option>
+              <option value="template">{t('template')}</option>
+              <option value="literal">{t('literal')}</option>
             </select>
           </label>
           <label>
-            Condition field
+            {t('Condition field')}
             <input
               value={rule.conditions[0]?.key ?? ''}
               onChange={(event) =>
@@ -204,7 +207,7 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
             />
           </label>
           <label>
-            Condition
+            {t('Condition')}
             <select
               value={rule.conditions[0]?.operator ?? 'exists'}
               onChange={(event) => {
@@ -224,21 +227,21 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
             >
               {SCHEMA_OPERATORS.map((operator) => (
                 <option key={operator} value={operator}>
-                  {operator}
+                  {t(operator)}
                 </option>
               ))}
             </select>
           </label>
           <button type="button" onClick={() => setRules((current) => current.filter((item) => item.id !== rule.id))}>
-            Remove rule
+            {t('Remove rule')}
           </button>
         </fieldset>
       ))}
       <button type="button" onClick={() => setRules((current) => [...current, emptyRule()])}>
-        Add schema type
+        {t('Add schema type')}
       </button>
       <button type="button" onClick={() => void save()}>
-        Save schema rules
+        {t('Save schema rules')}
       </button>
       {message !== '' ? <p role="status">{message}</p> : null}
     </section>

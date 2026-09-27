@@ -1,4 +1,5 @@
 import { formatMetric, provenanceLabel, type MetricPayload, type ProvenanceKind } from '../../core/provenance';
+import { t } from '../../i18n';
 
 export interface TodayAction {
   id: number;
@@ -82,10 +83,10 @@ export function metricLine(metric: MetricPayload | null): string | null {
     return null;
   }
   if (metric.value === null && metric.kind === 'ESTIMATED') {
-    return 'Estimated';
+    return t('Estimated');
   }
   if (metric.value === null) {
-    return 'Unavailable';
+    return t('Unavailable');
   }
   return formatMetric(metric);
 }

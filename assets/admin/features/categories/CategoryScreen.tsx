@@ -12,9 +12,9 @@ export function CategoryScreen({ category }: Props) {
   const items = screen.tabs[tab];
   return (
     <section aria-labelledby="qn-category">
-      <h1 id="qn-category">{screen.title ?? 'Category'}</h1>
+      <h1 id="qn-category">{screen.title ?? t('Category')}</h1>
       <p>{screen.title === null ? t('No stored category.') : t('Latest stored category.')}</p>
-      <nav aria-label="Category">
+      <nav aria-label={t('Category')}>
         {CATEGORY_TABS.map((id) => (
           <button key={id} type="button" aria-current={tab === id ? 'page' : undefined} onClick={() => setTab(id)}>
             {t(CATEGORY_TAB_TITLES[id])}

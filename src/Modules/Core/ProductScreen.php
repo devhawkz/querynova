@@ -77,7 +77,11 @@ final class ProductScreen {
         $tabs       = self::emptyTabs();
         $product_id = (int) ( $product['product_id'] ?? 0 );
         $sku        = trim( (string) ( $product['sku'] ?? '' ) );
-        $title      = $sku !== '' ? $sku : ( $product_id > 0 ? 'Product ' . (string) $product_id : null );
+        $title      = $sku !== '' ? $sku : ( $product_id > 0 ? sprintf(
+            /* translators: %s: product id. */
+            __( 'Product %s', 'querynova' ),
+            (string) $product_id
+        ) : null );
         $this->overview( $tabs, $product, $sku );
         if ( is_array( $metrics ) ) {
             $this->metrics( $tabs, $metrics );
@@ -126,24 +130,29 @@ final class ProductScreen {
      */
     private function overview( array &$tabs, array $product, string $sku ): void {
         if ( $sku !== '' ) {
-            $tabs['overview'][] = $this->item( 'sku', 'SKU', $sku, null );
+            $tabs['overview'][] = $this->item( 'sku', __( 'SKU', 'querynova' ), $sku, null );
         }
         $brand = trim( (string) ( $product['brand'] ?? '' ) );
         if ( $brand !== '' ) {
-            $tabs['overview'][] = $this->item( 'brand', 'Brand', $brand, null );
+            $tabs['overview'][] = $this->item( 'brand', __( 'Brand', 'querynova' ), $brand, null );
         }
         $availability = trim( (string) ( $product['availability'] ?? '' ) );
         if ( $availability !== '' ) {
-            $tabs['overview'][] = $this->item( 'availability', 'Availability', $availability, null );
+            $tabs['overview'][] = $this->item( 'availability', __( 'Availability', 'querynova' ), $availability, null );
         }
         $indexability = trim( (string) ( $product['indexability'] ?? '' ) );
         if ( $indexability !== '' && $indexability !== 'unknown' ) {
-            $tabs['overview'][] = $this->item( 'indexability', 'Indexability', $indexability, null );
+            $tabs['overview'][] = $this->item( 'indexability', __( 'Indexability', 'querynova' ), $indexability, null );
         }
         $price = $this->amount( $product['price'] ?? null );
         if ( $price !== null ) {
             $currency           = trim( (string) ( $product['currency'] ?? '' ) );
-            $tabs['overview'][] = $this->item( 'price', 'Price', trim( $price . ' ' . $currency ) . ' · Measured', null );
+            $tabs['overview'][] = $this->item(
+                'price',
+                __( 'Price', 'querynova' ),
+                trim( $price . ' ' . $currency ) . ' · ' . __( 'Measured', 'querynova' ),
+                null
+            );
         }
     }
 
@@ -155,16 +164,16 @@ final class ProductScreen {
      */
     private function metrics( array &$tabs, array $metrics ): void {
         $provenance = $this->provenance( $metrics['provenance_json'] ?? null );
-        $this->observation( $tabs, 'search', 'impressions', 'Impressions', $metrics['impressions'] ?? null, $provenance['impressions'] ?? 'MEASURED' );
-        $this->observation( $tabs, 'search', 'clicks', 'Clicks', $metrics['clicks'] ?? null, $provenance['clicks'] ?? 'MEASURED' );
-        $this->observation( $tabs, 'search', 'position', 'Position', $metrics['position'] ?? null, $provenance['position'] ?? 'MEASURED' );
-        $this->observation( $tabs, 'conversion', 'cvr', 'Conversion rate', $metrics['cvr'] ?? null, $provenance['cvr'] ?? 'MEASURED' );
+        $this->observation( $tabs, 'search', 'impressions', __( 'Impressions', 'querynova' ), $metrics['impressions'] ?? null, $provenance['impressions'] ?? 'MEASURED' );
+        $this->observation( $tabs, 'search', 'clicks', __( 'Clicks', 'querynova' ), $metrics['clicks'] ?? null, $provenance['clicks'] ?? 'MEASURED' );
+        $this->observation( $tabs, 'search', 'position', __( 'Position', 'querynova' ), $metrics['position'] ?? null, $provenance['position'] ?? 'MEASURED' );
+        $this->observation( $tabs, 'conversion', 'cvr', __( 'Conversion rate', 'querynova' ), $metrics['cvr'] ?? null, $provenance['cvr'] ?? 'MEASURED' );
         if ( isset( $provenance['revenue'] ) ) {
-            $this->observation( $tabs, 'revenue', 'product-revenue', 'Revenue', $metrics['revenue'] ?? null, $provenance['revenue'] );
+            $this->observation( $tabs, 'revenue', 'product-revenue', __( 'Revenue', 'querynova' ), $metrics['revenue'] ?? null, $provenance['revenue'] );
         }
         $referrals = $this->amount( $metrics['ai_referrals'] ?? null );
         if ( $referrals !== null ) {
-            $tabs['ai'][] = $this->item( 'ai-referrals', 'AI referrals', $referrals . ' · Measured. Not an official provider ranking.', null );
+            $tabs['ai'][] = $this->item( 'ai-referrals', __( 'AI referrals', 'querynova' ), $referrals . ' · ' . __( 'Measured. Not an official provider ranking.', 'querynova' ), null );
         }
     }
 
@@ -173,9 +182,9 @@ final class ProductScreen {
      * @param array<string, mixed>                      $revenue
      */
     private function revenue( array &$tabs, array $revenue ): void {
-        $this->money( $tabs, 'measured', 'Measured revenue', $revenue['measured_revenue'] ?? null, 'MEASURED' );
-        $this->money( $tabs, 'attributed', 'Attributed revenue', $revenue['attributed_revenue'] ?? null, 'ATTRIBUTED' );
-        $this->money( $tabs, 'estimated', 'Estimated revenue', $revenue['estimated_revenue'] ?? null, 'ESTIMATED' );
+        $this->money( $tabs, 'measured', __( 'Measured revenue', 'querynova' ), $revenue['measured_revenue'] ?? null, 'MEASURED' );
+        $this->money( $tabs, 'attributed', __( 'Attributed revenue', 'querynova' ), $revenue['attributed_revenue'] ?? null, 'ATTRIBUTED' );
+        $this->money( $tabs, 'estimated', __( 'Estimated revenue', 'querynova' ), $revenue['estimated_revenue'] ?? null, 'ESTIMATED' );
     }
 
     /**
@@ -223,10 +232,10 @@ final class ProductScreen {
 
     private function label( string $kind ): string {
         return match ( $kind ) {
-            'MEASURED' => 'Measured',
-            'ATTRIBUTED' => 'Attributed',
-            'ESTIMATED' => 'Estimated',
-            default => 'Unavailable',
+            'MEASURED' => __( 'Measured', 'querynova' ),
+            'ATTRIBUTED' => __( 'Attributed', 'querynova' ),
+            'ESTIMATED' => __( 'Estimated', 'querynova' ),
+            default => __( 'Unavailable', 'querynova' ),
         };
     }
 

@@ -1,3 +1,5 @@
+import { t } from '../../i18n';
+
 export const SETUP_STEPS = [
   'Site type',
   'Business type',
@@ -131,10 +133,10 @@ function propertyOnly(value: unknown): { property: string } | undefined {
 
 export function setupLine(value: string | boolean | null, empty = 'Nothing recorded.'): string {
   if (value === null || value === '') {
-    return empty;
+    return t(empty);
   }
   if (typeof value === 'boolean') {
-    return value ? 'Yes' : 'No';
+    return value ? t('Yes') : t('No');
   }
   return value;
 }

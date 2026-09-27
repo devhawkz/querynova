@@ -104,7 +104,7 @@ final class AdvancedBriefing {
      */
     private function snapshot( array $row ): array {
         $provider = trim( (string) ( $row['provider'] ?? '' ) );
-        $title    = $provider === '' ? 'SERP snapshot' : $provider;
+        $title    = $provider === '' ? __( 'SERP snapshot', 'querynova' ) : $provider;
         $status   = trim( (string) ( $row['status'] ?? '' ) );
 
         return $this->item( 'serp-' . $this->identity( $row, $title ), $title, $status, null );
@@ -127,16 +127,24 @@ final class AdvancedBriefing {
             $parts[] = $place;
         }
         if ( $difficulty !== null ) {
-            $parts[] = 'Organic difficulty ' . (string) $difficulty . ' · Estimated';
+            $parts[] = sprintf(
+                /* translators: %s: organic difficulty. */
+                __( 'Organic difficulty %s · Estimated', 'querynova' ),
+                (string) $difficulty
+            );
         }
         if ( $paid !== null ) {
-            $parts[] = 'Paid competition ' . $this->plainNumber( $paid );
+            $parts[] = sprintf(
+                /* translators: %s: paid competition. */
+                __( 'Paid competition %s', 'querynova' ),
+                $this->plainNumber( $paid )
+            );
         }
         $volume = $this->nullableInt( $row['volume'] ?? null );
         $metric = $volume === null ? null : [
             'value' => $volume,
             'kind'  => 'MEASURED',
-            'label' => 'Measured',
+            'label' => __( 'Measured', 'querynova' ),
         ];
 
         return $this->item( 'keyword-' . $this->identity( $row, $keyword ), $keyword, implode( '. ', $parts ), $metric );
@@ -158,7 +166,7 @@ final class AdvancedBriefing {
         $metric    = is_int( $authority ) || is_float( $authority ) ? [
             'value' => (float) $authority,
             'kind'  => 'MEASURED',
-            'label' => 'Measured',
+            'label' => __( 'Measured', 'querynova' ),
         ] : null;
 
         return $this->item( 'backlink-' . $this->identity( $row, $title ), $title, trim( (string) ( $row['rel'] ?? '' ) ), $metric );
@@ -210,26 +218,26 @@ final class AdvancedBriefing {
      */
     private function rank( array $row ): array {
         $url      = trim( (string) ( $row['url'] ?? '' ) );
-        $title    = $url === '' ? 'Rank' : $url;
+        $title    = $url === '' ? __( 'Rank', 'querynova' ) : $url;
         $place    = trim( trim( (string) ( $row['country'] ?? '' ) ) . ' ' . trim( (string) ( $row['device'] ?? '' ) ) );
         $position = $row['position'] ?? null;
         if ( $position === null || $position === '' ) {
             $metric = [
                 'value' => null,
                 'kind'  => 'UNAVAILABLE',
-                'label' => 'Unavailable',
+                'label' => __( 'Unavailable', 'querynova' ),
             ];
         } elseif ( is_int( $position ) || is_float( $position ) || ( is_string( $position ) && is_numeric( $position ) ) ) {
             $metric = [
                 'value' => (int) $position,
                 'kind'  => 'MEASURED',
-                'label' => 'Measured',
+                'label' => __( 'Measured', 'querynova' ),
             ];
         } else {
             $metric = [
                 'value' => null,
                 'kind'  => 'UNAVAILABLE',
-                'label' => 'Unavailable',
+                'label' => __( 'Unavailable', 'querynova' ),
             ];
         }
 

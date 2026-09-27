@@ -1,3 +1,5 @@
+import { t } from '../../i18n';
+
 export interface DiagnosticError {
   message: string;
   reference: string;
@@ -76,10 +78,10 @@ export function normalizeDiagnostics(input: unknown): DiagnosticsModel {
 
 export function displayValue(value: string | number | boolean | null): string {
   if (value === null || value === '') {
-    return 'Unavailable';
+    return t('Unavailable');
   }
   if (typeof value === 'boolean') {
-    return value ? 'Scheduled' : 'Not scheduled';
+    return value ? t('Scheduled') : t('Not scheduled');
   }
   return scrub(String(value));
 }
@@ -97,13 +99,13 @@ export function reportText(report: DiagnosticsModel): string {
       modules: report.modules.map(scrub),
       providers: report.providers.map((provider) => ({
         name: scrub(provider.name),
-        state: provider.state === 'not_configured' ? 'Not configured' : scrub(provider.state),
+        state: provider.state === 'not_configured' ? t('Not configured') : scrub(provider.state),
       })),
       queue: report.queue,
       cron: displayValue(report.cronScheduled),
       cache: {
         adapter: displayValue(report.cacheAdapter),
-        hits: 'Unavailable',
+        hits: t('Unavailable'),
       },
       pending_migrations: report.pendingMigrations.map(scrub),
       recent_errors: report.recentErrors.map((error) => ({

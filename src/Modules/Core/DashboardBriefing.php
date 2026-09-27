@@ -180,6 +180,19 @@ final class DashboardBriefing {
         ];
     }
 
+    private function changeTitle( string $action ): string {
+        return match ( $action ) {
+            'seo_changed' => __( 'SEO change', 'querynova' ),
+            'canonical_changed' => __( 'Canonical change', 'querynova' ),
+            'redirect_created' => __( 'Redirect created', 'querynova' ),
+            'integration_changed' => __( 'Integration change', 'querynova' ),
+            'debug_enabled' => __( 'Debug enabled', 'querynova' ),
+            'bulk_action' => __( 'Bulk action', 'querynova' ),
+            'feature_flag_changed' => __( 'Feature flag change', 'querynova' ),
+            default => '',
+        };
+    }
+
     /**
      * @param array<string, mixed> $row
      * @return array<string, mixed>|null
@@ -196,7 +209,7 @@ final class DashboardBriefing {
             $summary = trim( $summary . ' ' . (string) $object_id );
         }
 
-        return $this->item( 'change-' . $this->identity( $row, $action ), self::CHANGE_TITLES[ $action ], trim( $summary ), null );
+        return $this->item( 'change-' . $this->identity( $row, $action ), $this->changeTitle( $action ), trim( $summary ), null );
     }
 
     /**
@@ -310,7 +323,7 @@ final class DashboardBriefing {
         return [
             'value' => null,
             'kind'  => 'ESTIMATED',
-            'label' => 'Estimated',
+            'label' => __( 'Estimated', 'querynova' ),
         ];
     }
 

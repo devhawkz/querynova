@@ -23,4 +23,21 @@ describe('admin translations', () => {
 
     expect(t('Setup')).toBe('querynova:Setup');
   });
+
+  it('sends schema and setup field labels through the text domain', () => {
+    const sources = import.meta.glob('./features/{setup,schema}/*.tsx', {
+      query: '?raw',
+      eager: true,
+      import: 'default',
+    });
+    const setup = sources['./features/setup/SetupScreen.tsx'];
+    const schema = sources['./features/schema/SchemaBuilder.tsx'];
+    expect(setup).toContain("t('Site type')");
+    expect(setup).toContain("t('Organization')");
+    expect(setup).toContain("t('Search Console')");
+    expect(setup).toContain("t('Crawler origin')");
+    expect(schema).toContain("t('Schema type')");
+    expect(schema).toContain("t('Condition source')");
+    expect(schema).toContain("t('Field, template, or value')");
+  });
 });

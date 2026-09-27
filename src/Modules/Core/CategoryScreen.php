@@ -76,10 +76,14 @@ final class CategoryScreen {
     public function compose( array $category, ?array $metrics, ?array $revenue, ?array $keyword ): array {
         $tabs        = self::emptyTabs();
         $category_id = (int) ( $category['term_id'] ?? 0 );
-        $title       = $category_id > 0 ? 'Category ' . (string) $category_id : null;
-        $count       = (int) ( $category['product_count'] ?? 0 );
+        $title       = $category_id > 0 ? sprintf(
+            /* translators: %s: category id. */
+            __( 'Category %s', 'querynova' ),
+            (string) $category_id
+        ) : null;
+        $count = (int) ( $category['product_count'] ?? 0 );
         if ( $count > 0 ) {
-            $tabs['products'][] = $this->item( 'products', 'Products', (string) $count . ' · Measured', null );
+            $tabs['products'][] = $this->item( 'products', __( 'Products', 'querynova' ), (string) $count . ' · ' . __( 'Measured', 'querynova' ), null );
         }
         if ( is_array( $metrics ) ) {
             $this->metrics( $tabs, $metrics );
@@ -128,11 +132,11 @@ final class CategoryScreen {
      */
     private function metrics( array &$tabs, array $metrics ): void {
         $provenance = $this->provenance( $metrics['provenance_json'] ?? null );
-        $this->observation( $tabs, 'serp', 'impressions', 'Impressions', $metrics['impressions'] ?? null, $provenance['impressions'] ?? 'MEASURED' );
-        $this->observation( $tabs, 'serp', 'clicks', 'Clicks', $metrics['clicks'] ?? null, $provenance['clicks'] ?? 'MEASURED' );
-        $this->observation( $tabs, 'serp', 'position', 'Position', $metrics['position'] ?? null, $provenance['position'] ?? 'MEASURED' );
+        $this->observation( $tabs, 'serp', 'impressions', __( 'Impressions', 'querynova' ), $metrics['impressions'] ?? null, $provenance['impressions'] ?? 'MEASURED' );
+        $this->observation( $tabs, 'serp', 'clicks', __( 'Clicks', 'querynova' ), $metrics['clicks'] ?? null, $provenance['clicks'] ?? 'MEASURED' );
+        $this->observation( $tabs, 'serp', 'position', __( 'Position', 'querynova' ), $metrics['position'] ?? null, $provenance['position'] ?? 'MEASURED' );
         if ( isset( $provenance['revenue'] ) ) {
-            $this->observation( $tabs, 'revenue', 'category-revenue', 'Revenue', $metrics['revenue'] ?? null, $provenance['revenue'] );
+            $this->observation( $tabs, 'revenue', 'category-revenue', __( 'Revenue', 'querynova' ), $metrics['revenue'] ?? null, $provenance['revenue'] );
         }
     }
 
@@ -141,9 +145,9 @@ final class CategoryScreen {
      * @param array<string, mixed>                      $revenue
      */
     private function revenue( array &$tabs, array $revenue ): void {
-        $this->money( $tabs, 'measured', 'Measured revenue', $revenue['measured_revenue'] ?? null, 'MEASURED' );
-        $this->money( $tabs, 'attributed', 'Attributed revenue', $revenue['attributed_revenue'] ?? null, 'ATTRIBUTED' );
-        $this->money( $tabs, 'estimated', 'Estimated revenue', $revenue['estimated_revenue'] ?? null, 'ESTIMATED' );
+        $this->money( $tabs, 'measured', __( 'Measured revenue', 'querynova' ), $revenue['measured_revenue'] ?? null, 'MEASURED' );
+        $this->money( $tabs, 'attributed', __( 'Attributed revenue', 'querynova' ), $revenue['attributed_revenue'] ?? null, 'ATTRIBUTED' );
+        $this->money( $tabs, 'estimated', __( 'Estimated revenue', 'querynova' ), $revenue['estimated_revenue'] ?? null, 'ESTIMATED' );
     }
 
     /**
@@ -191,10 +195,10 @@ final class CategoryScreen {
 
     private function label( string $kind ): string {
         return match ( $kind ) {
-            'MEASURED' => 'Measured',
-            'ATTRIBUTED' => 'Attributed',
-            'ESTIMATED' => 'Estimated',
-            default => 'Unavailable',
+            'MEASURED' => __( 'Measured', 'querynova' ),
+            'ATTRIBUTED' => __( 'Attributed', 'querynova' ),
+            'ESTIMATED' => __( 'Estimated', 'querynova' ),
+            default => __( 'Unavailable', 'querynova' ),
         };
     }
 
