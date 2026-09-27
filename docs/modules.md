@@ -7,7 +7,7 @@
 | technical-seo | Not started | Indexability and technical issues |
 | schema | Implemented | Connected JSON-LD graph and schema builder |
 | sitemap | Implemented | XML sitemaps. News is optional |
-| redirects | Not started | Redirects and 404 monitor |
+| redirects | Implemented | Redirects and 404 monitor. Misses are not auto-redirected |
 | crawler | Not started | Bounded internal crawl |
 | keywords | Not started | Research, discovery, clusters, gap, difficulty |
 | serp | Not started | Provider-backed SERP snapshots |

@@ -853,6 +853,7 @@ final class Schema {
                     'url_hash char(64) NOT NULL',
                     'hits bigint(20) unsigned NOT NULL DEFAULT 1',
                     'referrer text NULL',
+                    'user_agent varchar(191) NOT NULL DEFAULT \'\'',
                     'user_agent_hash char(64) NOT NULL DEFAULT \'\'',
                     'first_seen datetime NOT NULL',
                     'last_seen datetime NOT NULL',
