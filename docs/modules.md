@@ -20,7 +20,7 @@
 | analytics | Implemented | GA4 and commerce aggregates behind providers. Query revenue is not assigned without a join |
 | woocommerce | Implemented | Product, category, brand, facet, and merchant SEO through a WooCommerce gateway |
 | commerce-analytics | Implemented | Orders, revenue, profit, and stock notes. Cost is not invented |
-| ai-visibility | Not started | Prompts, mentions, citations, index |
+| ai-visibility | Implemented | Provider observations, crawler audit, and an observational index with the required disclaimer |
 | opportunities | Implemented | Supplied-input opportunities. No numeric score. Missing money stays null |
 | recommendations | Implemented | Today's suggested actions. Nothing is applied automatically |
 | experiments | Not started | Before/after measurement |
