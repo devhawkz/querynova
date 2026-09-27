@@ -54,24 +54,27 @@ export function normalizeSections(input: unknown): DashboardSections {
   }
   const record = input as Record<string, unknown>;
   for (const id of SECTION_ORDER) {
-    const rows = record[id];
-    if (!Array.isArray(rows)) {
-      continue;
-    }
-    const items: DashboardItem[] = [];
-    for (const row of rows) {
-      const item = normalizeItem(row);
-      if (item === null) {
-        continue;
-      }
-      items.push(item);
-      if (items.length === SECTION_LIMIT) {
-        break;
-      }
-    }
-    sections[id] = items;
+    sections[id] = normalizeItemList(record[id], SECTION_LIMIT);
   }
   return sections;
+}
+
+export function normalizeItemList(rows: unknown, limit: number): DashboardItem[] {
+  if (!Array.isArray(rows)) {
+    return [];
+  }
+  const items: DashboardItem[] = [];
+  for (const row of rows) {
+    const item = normalizeItem(row);
+    if (item === null) {
+      continue;
+    }
+    items.push(item);
+    if (items.length === limit) {
+      break;
+    }
+  }
+  return items;
 }
 
 export function metricLine(metric: MetricPayload | null): string | null {

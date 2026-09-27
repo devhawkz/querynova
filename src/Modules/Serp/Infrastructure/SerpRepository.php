@@ -151,6 +151,24 @@ final class SerpRepository {
         return $this->database->select( $this->table( 'serp_snapshots' ), [ 'keyword_id' => $keywordId ], 20, 0, [ 'id' => 'DESC' ] );
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function recentSnapshots( int $limit = 20 ): array {
+        $limit = max( 1, min( 20, $limit ) );
+
+        return $this->database->select( $this->table( 'serp_snapshots' ), [], $limit, 0, [ 'id' => 'DESC' ] );
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function recentRanks( int $limit = 20 ): array {
+        $limit = max( 1, min( 20, $limit ) );
+
+        return $this->database->select( $this->table( 'rank_history' ), [], $limit, 0, [ 'id' => 'DESC' ] );
+    }
+
     private function table( string $name ): string {
         return $this->database->prefix() . 'qn_' . $name;
     }

@@ -90,6 +90,15 @@ final class KeywordRepository {
         return $rows;
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function recent( int $limit = 20 ): array {
+        $limit = max( 1, min( 20, $limit ) );
+
+        return $this->database->select( $this->table(), [], $limit, 0, [ 'id' => 'DESC' ] );
+    }
+
     private function table(): string {
         return $this->database->prefix() . 'qn_keywords';
     }

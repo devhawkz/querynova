@@ -59,6 +59,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'wooCommerceActive' => class_exists( 'WooCommerce' ),
                     'actions'           => $briefing['actions'],
                     'sections'          => $briefing['sections'],
+                    'advanced'          => $this->advanced(),
                 ]
             ) . ';',
             'before'
@@ -84,6 +85,24 @@ final class AdminAssets implements HookSubscriberInterface {
             unset( $exception );
 
             return $empty;
+        }
+    }
+
+    /**
+     * Detail rows only. A read failure leaves the advanced view empty.
+     *
+     * @return array<string, list<array<string, mixed>>>
+     */
+    private function advanced(): array {
+        if ( ! isset( $GLOBALS['wpdb'] ) ) {
+            return AdvancedBriefing::emptySections();
+        }
+        try {
+            return ( new AdvancedBriefing() )->fromDatabase( new \QueryNova\Infrastructure\Database\WpdbConnection() );
+        } catch ( \Throwable $exception ) {
+            unset( $exception );
+
+            return AdvancedBriefing::emptySections();
         }
     }
 }
