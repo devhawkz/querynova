@@ -16,10 +16,10 @@
 | backlinks | Implemented | Provider-backed snapshots, new and lost links, and the gap |
 | content-intelligence | Implemented | Supplied-document coverage, information gain, and entities. No content score |
 | internal-links | Implemented | Link graph and commerce suggestions from supplied edges. Suggestions are not inserted |
-| search-console | Not started | Google Search Console sync |
-| analytics | Not started | GA4 and fused analytics |
+| search-console | Implemented | Provider-backed search rows. A missing provider is unavailable, not zero |
+| analytics | Implemented | GA4 and commerce aggregates behind providers. Query revenue is not assigned without a join |
 | woocommerce | Implemented | Product, category, brand, facet, and merchant SEO through a WooCommerce gateway |
-| commerce-analytics | Not started | Revenue, profit, inventory |
+| commerce-analytics | Implemented | Orders, revenue, profit, and stock notes. Cost is not invented |
 | ai-visibility | Not started | Prompts, mentions, citations, index |
 | opportunities | Not started | Opportunity scoring |
 | recommendations | Not started | Today's actions |
