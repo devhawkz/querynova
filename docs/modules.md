@@ -23,7 +23,7 @@
 | ai-visibility | Implemented | Provider observations, crawler audit, and an observational index with the required disclaimer |
 | page-experience | Implemented | Provider timings for desktop and mobile. Not an SEO score |
 | opportunities | Implemented | Supplied-input opportunities. No numeric score. Missing money stays null |
-| recommendations | Implemented | Today's suggested actions. Nothing is applied automatically |
+| recommendations | Implemented | Today's suggested actions. Accepted and measured outcomes do not change the page by themselves |
 | experiments | Implemented | Before/after movement. Causation is not claimed |
 | reports | Not started | CSV, JSON, PDF |
 | diagnostics | Not started | Health, logs, jobs, system report |

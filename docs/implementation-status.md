@@ -30,7 +30,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | AI visibility | COMPLETE | Prompt observations use a provider interface. The connected adapter is null, and a public request only enqueues. Mentions, citations, crawler access, and referrals stay null until supplied. The visibility index is an equal-weight observational average, stays null when an input is missing, and carries the disclaimer that it is not an official provider ranking. llms.txt is experimental, is generated only when enabled, and is not described as a ranking solution |
 | Page experience | COMPLETE | LCP, INP, CLS, and TTFB come from a provider interface for desktop and mobile. The connected adapter is null. A missing timing stays null. There is no performance score and no SEO score. A public request only enqueues |
 | Experiments | COMPLETE | Title, description, category content, internal links, and schema changes store before and after rank, CTR, clicks, traffic, and revenue. A missing side stays null. Improved, declined, mixed, and inconclusive describe the movement only. Causation is not claimed |
-| Recommendation outcomes | NOT_STARTED | |
+| Recommendation outcomes | COMPLETE | Suggested recommendations can be accepted and marked applied. Marking one applied does not change the page. Improved or declined is stored only after measured before and after values. Conflicting movement stays inconclusive. Causation is not claimed |
 | Audit log and change history | NOT_STARTED | |
 | Alerts | NOT_STARTED | |
 | Reports | NOT_STARTED | |
