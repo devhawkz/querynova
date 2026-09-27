@@ -44,6 +44,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | CI pipeline | COMPLETE | GitHub Actions runs strict Composer validate, PHP syntax, PHPCS, PHPStan, and PHPUnit on PHP 8.1 and 8.3, then ESLint, TypeScript, Vitest, and the production build. Those commands passed locally on PHP 8.5. WordPress and WooCommerce version combinations are not part of this workflow |
 | Test matrix | COMPLETE | The supported floor is PHP 8.1 and WordPress 6.4. WooCommerce is not required, and orders stay on the WooCommerce API, including HPOS. CI names PHP 8.1 and 8.3. Only the PHP version running the suite is recorded as observed. No WordPress release and no WooCommerce release is marked tested |
 | Fake providers | COMPLETE | Keyword, SERP, backlink, analytics, and model fixtures return the supplied payload. A missing fixture stays null. The fakes do not call a remote API |
+| Security checks | COMPLETE | Routes deny a missing capability, and one capability does not grant another. A nonce string does not grant access. Stored titles cannot keep markup. SQL identifiers that are not plain names are rejected, and values stay in placeholders. SSRF blocks private and metadata addresses. Logs redact secrets and email addresses. WordPress cookie nonce verification is not reimplemented here |
 | Staging and production builds | NOT_STARTED | Docs describe the intended builds |
 | Release ZIP | NOT_STARTED | |
 | Definition of Done | NOT_STARTED | The product is not complete |
