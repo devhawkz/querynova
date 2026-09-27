@@ -29,6 +29,8 @@ use QueryNova\Core\SafeMode\SafeMode;
 use QueryNova\Core\Security\RoleMap;
 use QueryNova\Core\Support\SystemClock;
 use QueryNova\Infrastructure\Cache\CacheInvalidator;
+use QueryNova\Infrastructure\Cli\CliCommands;
+use QueryNova\Infrastructure\Cli\WpCliRegistrar;
 use QueryNova\Infrastructure\Cache\WordPressObjectCache;
 use QueryNova\Infrastructure\Database\ArrayDatabase;
 use QueryNova\Infrastructure\Database\LogRepository;
@@ -155,6 +157,29 @@ final class Plugin {
         $hooks->register();
         $rest->register();
         $admin->register();
+        if ( defined( 'WP_CLI' ) && WP_CLI ) {
+            $migrationManager = $container->get( MigrationManager::class );
+            $healthRegistry   = $container->get( HealthRegistry::class );
+            if ( $migrationManager instanceof MigrationManager && $healthRegistry instanceof HealthRegistry ) {
+                $cronScheduled = function_exists( 'wp_next_scheduled' ) ? wp_next_scheduled( 'querynova_process_jobs' ) !== false : null;
+                WpCliRegistrar::register(
+                    new CliCommands(
+                        QUERYNOVA_VERSION,
+                        $environment->getName(),
+                        isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : null,
+                        defined( 'WC_VERSION' ) ? (string) WC_VERSION : null,
+                        $migrationManager,
+                        $healthRegistry,
+                        $registry,
+                        $jobRepository,
+                        $runner,
+                        $cache,
+                        $logs,
+                        $cronScheduled,
+                    )
+                );
+            }
+        }
         add_action(
             'init',
             static function () use ( $capabilities ): void {

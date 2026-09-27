@@ -86,4 +86,19 @@ final class MigrationManager {
     public function currentVersion(): string {
         return (string) $this->options->get( self::OPTION, '0' );
     }
+
+    /**
+     * @return list<string>
+     */
+    public function pendingVersions(): array {
+        $current = $this->currentVersion();
+        $pending = [];
+        foreach ( $this->registrar->all() as $migration ) {
+            if ( strcmp( $migration->version(), $current ) > 0 ) {
+                $pending[] = $migration->version();
+            }
+        }
+
+        return $pending;
+    }
 }

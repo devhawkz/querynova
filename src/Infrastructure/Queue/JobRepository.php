@@ -199,6 +199,43 @@ final class JobRepository {
         return $this->db->select( $this->table(), $where, $limit, $offset, [ 'id' => 'DESC' ] );
     }
 
+    /**
+     * @return array<string, int>
+     */
+    public function statusCounts(): array {
+        $counts = [];
+        foreach ( JobStatus::cases() as $status ) {
+            $counts[ $status->value ] = $this->db->count( $this->table(), [ 'status' => $status->value ] );
+        }
+
+        return $counts;
+    }
+
+    /**
+     * Puts a failed job back in the queue. It does not run the handler.
+     */
+    public function requeue( int $id, \DateTimeImmutable $now ): bool {
+        $job = $this->find( $id );
+        if ( $job === null ) {
+            return false;
+        }
+        $status = (string) ( $job['status'] ?? '' );
+        if ( ! in_array( $status, [ JobStatus::Failed->value, JobStatus::Dead->value, JobStatus::Retrying->value ], true ) ) {
+            return false;
+        }
+
+        return $this->db->update(
+            $this->table(),
+            [
+                'status'       => JobStatus::Pending->value,
+                'scheduled_at' => $now->format( 'Y-m-d H:i:s' ),
+                'started_at'   => null,
+                'completed_at' => null,
+            ],
+            [ 'id' => $id ]
+        ) > 0;
+    }
+
     private function table(): string {
         return $this->db->prefix() . 'qn_jobs';
     }

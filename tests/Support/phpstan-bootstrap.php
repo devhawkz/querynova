@@ -48,3 +48,26 @@ if ( ! function_exists( 'as_enqueue_async_action' ) ) {
         return 0;
     }
 }
+
+if ( ! class_exists( 'WP_CLI' ) ) {
+    /**
+     * Minimal WP-CLI stand-in for static analysis. Runtime registration still requires WP-CLI.
+     */
+    class WP_CLI {
+        /**
+         * @param array<int, mixed>    $args
+         * @param array<string, mixed> $assoc
+         */
+        public static function add_command( string $name, callable $callable ): void {
+            unset( $name, $callable );
+        }
+
+        public static function error( string $message ): void {
+            unset( $message );
+        }
+
+        public static function log( string $message ): void {
+            unset( $message );
+        }
+    }
+}
