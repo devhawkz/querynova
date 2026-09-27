@@ -51,6 +51,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Internationalization | COMPLETE | The text domain is querynova. The admin script depends on wp-i18n and loads translations from languages. Setup and schema field labels, screen chrome, and fixed product, category, and briefing labels pass through that domain and stay English until a translation is loaded. Stored titles, keywords, and provider names are not translated |
 | Timezone | COMPLETE | The clock and stored timestamps use UTC. Display converts a UTC instant into the WordPress timezone. In January, 12:00 UTC is 13:00 in Europe/Belgrade. In July it is 14:00. The stored instant stays 12:00 UTC. With no WordPress timezone, display stays UTC |
 | Multisite | COMPLETE | Activation accepts the network flag and still prepares only the current site. There is no network settings screen, and the network admin does not register the site menu. A site admin still does. This suite did not boot a WordPress multisite install |
+| Multilingual adapters | COMPLETE | Content analysis stores a language context. A language on the request is used as given. Otherwise WPML is read when its current-language filter is present, then Polylang when pll_current_language exists, then the site locale. A missing language stays null. WPML and Polylang were not installed or executed in this suite |
 | Staging and production builds | NOT_STARTED | Docs describe the intended builds |
 | Release ZIP | NOT_STARTED | |
 | Definition of Done | NOT_STARTED | The product is not complete |

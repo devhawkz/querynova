@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Modules\Content;
 
 use QueryNova\Core\Container\ContainerInterface;
+use QueryNova\Core\Multilingual\LanguageResolver;
 use QueryNova\Core\Features\Feature;
 use QueryNova\Core\Features\FeatureFlagState;
 use QueryNova\Core\Features\FeatureRegistry;
@@ -116,9 +117,11 @@ final class ContentModule extends AbstractModule {
         if ( strlen( $html ) > 200000 ) {
             $html = substr( $html, 0, 200000 );
         }
-        $topics = $this->strings( $input['topics'] ?? [] );
-        $report = [
+        $topics    = $this->strings( $input['topics'] ?? [] );
+        $requested = $input['language'] ?? null;
+        $report    = [
             'fetched'           => false,
+            'language'          => LanguageResolver::fromWordPress()->context( is_string( $requested ) ? $requested : null ),
             'intent'            => $this->intelligence->intent( (string) ( $input['query'] ?? '' ), $this->strings( $input['page_types'] ?? [] ) ),
             'analysis'          => $this->intelligence->analyze( $html, (string) ( $input['keyword'] ?? '' ), $topics ),
             'information_gain'  => $this->intelligence->informationGain( $html ),
@@ -131,7 +134,7 @@ final class ContentModule extends AbstractModule {
             'commerce_links'    => $this->intelligence->commerceLinks( $this->commerce( $input['commerce'] ?? [] ) ),
             'note'              => 'The document was analyzed as supplied. QueryNova did not fetch a URL.',
         ];
-        $pageId = (int) ( $input['page_id'] ?? 0 );
+        $pageId    = (int) ( $input['page_id'] ?? 0 );
         if ( $pageId > 0 && $this->store instanceof ContentRepository ) {
             $report['stored_id'] = $this->store->save( $pageId, $report );
             $mentions            = $report['entities']['mentions'] ?? [];
