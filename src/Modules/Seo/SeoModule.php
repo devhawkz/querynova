@@ -17,9 +17,15 @@ use QueryNova\Core\Features\LicenseTier;
 use QueryNova\Core\Hooks\HookRegistrar;
 use QueryNova\Core\Modules\AbstractModule;
 use QueryNova\Core\Security\Capability;
+use QueryNova\Infrastructure\Database\ArrayDatabase;
+use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
+use QueryNova\Modules\Redirects\Application\RedirectEngine;
+use QueryNova\Modules\Redirects\Infrastructure\RedirectRepository;
+use QueryNova\Modules\Seo\Application\SeoImporter;
 use QueryNova\Modules\Seo\Application\SeoMetaService;
 use QueryNova\Modules\Seo\Domain\TemplateRenderer;
+use QueryNova\Modules\Seo\Infrastructure\WordPressForeignMetaReader;
 use QueryNova\Modules\Seo\Infrastructure\WordPressMetaStore;
 use QueryNova\Modules\Seo\Presentation\FrontendSeoSubscriber;
 
@@ -60,6 +66,7 @@ final class SeoModule extends AbstractModule {
     public function registerRoutes( RestRegistrar $rest ): void {
         $rest->route( 'GET', '/seo/meta', [ $this, 'show' ], Capability::MANAGE_SEO );
         $rest->route( 'POST', '/seo/meta', [ $this, 'update' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/seo/import', [ $this, 'import' ], Capability::MANAGE_SEO );
     }
 
     /**
@@ -102,5 +109,80 @@ final class SeoModule extends AbstractModule {
         $service->save( 'post', $objectId, $clean );
 
         return [ 'status' => 'saved' ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function import( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        if ( ! is_array( $params ) ) {
+            $params = [];
+        }
+        $plugin  = is_string( $params['plugin'] ?? null ) ? $params['plugin'] : '';
+        $replace = ( $params['replace'] ?? false ) === true;
+        $objects = $this->importObjects( $params, $plugin );
+        $rows    = [];
+        if ( isset( $params['redirects'] ) && is_array( $params['redirects'] ) ) {
+            foreach ( $params['redirects'] as $row ) {
+                if ( is_array( $row ) ) {
+                    $rows[] = $row;
+                }
+            }
+        }
+        $importer = $this->importer();
+
+        return [
+            'meta'      => $importer->importMeta( $plugin, $objects, $replace ),
+            'redirects' => $importer->importRedirects( $rows ),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return list<array{object_type: string, object_id: int, meta: array<string, mixed>}>
+     */
+    private function importObjects( array $params, string $plugin ): array {
+        $objects = [];
+        if ( isset( $params['objects'] ) && is_array( $params['objects'] ) ) {
+            foreach ( $params['objects'] as $object ) {
+                if ( ! is_array( $object ) ) {
+                    continue;
+                }
+                $meta      = isset( $object['meta'] ) && is_array( $object['meta'] ) ? $object['meta'] : [];
+                $objects[] = [
+                    'object_type' => is_string( $object['object_type'] ?? null ) ? $object['object_type'] : 'post',
+                    'object_id'   => (int) ( $object['object_id'] ?? 0 ),
+                    'meta'        => $meta,
+                ];
+            }
+
+            return $objects;
+        }
+        if ( ! isset( $params['object_ids'] ) || ! is_array( $params['object_ids'] ) ) {
+            return [];
+        }
+        $reader = new WordPressForeignMetaReader();
+        $type   = is_string( $params['object_type'] ?? null ) ? $params['object_type'] : 'post';
+        foreach ( $params['object_ids'] as $id ) {
+            $objectId  = (int) $id;
+            $objects[] = [
+                'object_type' => $type,
+                'object_id'   => $objectId,
+                'meta'        => $reader->read( $type, $objectId, $plugin ),
+            ];
+        }
+
+        return $objects;
+    }
+
+    private function importer(): SeoImporter {
+        $database = isset( $GLOBALS['wpdb'] ) ? new WpdbConnection() : new ArrayDatabase();
+
+        return new SeoImporter(
+            new SeoMetaService( new WordPressMetaStore(), new TemplateRenderer() ),
+            new RedirectEngine(),
+            new RedirectRepository( $database )
+        );
     }
 }

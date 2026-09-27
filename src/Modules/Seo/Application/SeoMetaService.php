@@ -30,6 +30,7 @@ final class SeoMetaService {
     public const OG_DESCRIPTION = 'og_description';
     public const OG_IMAGE       = 'og_image';
     public const TWITTER_CARD   = 'twitter_card';
+    public const FOCUS_KEYWORD  = 'focus_keyword';
 
     public function __construct(
         private readonly MetaStoreInterface $meta,
@@ -74,6 +75,10 @@ final class SeoMetaService {
         );
     }
 
+    public function stored( string $objectType, int $objectId, string $key ): string {
+        return $this->meta->get( $objectType, $objectId, $key );
+    }
+
     /**
      * @param array<string, string> $fields
      */
@@ -88,6 +93,7 @@ final class SeoMetaService {
             self::OG_DESCRIPTION,
             self::OG_IMAGE,
             self::TWITTER_CARD,
+            self::FOCUS_KEYWORD,
         ];
         foreach ( $fields as $key => $value ) {
             if ( ! in_array( $key, $allowed, true ) ) {
