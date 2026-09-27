@@ -37,6 +37,14 @@ final class RestRegistrar {
         return $this->routes;
     }
 
+    public function allowed( string $capability ): bool {
+        if ( $capability === '' ) {
+            return false;
+        }
+
+        return current_user_can( $capability );
+    }
+
     public function register(): void {
         add_action(
             'rest_api_init',
@@ -48,8 +56,8 @@ final class RestRegistrar {
                         [
 							'methods'             => $route['method'],
 							'callback'            => $route['callback'],
-							'permission_callback' => static function () use ( $route ): bool {
-								return current_user_can( $route['capability'] );
+							'permission_callback' => function () use ( $route ): bool {
+								return $this->allowed( $route['capability'] );
 							},
                         ]
 					);

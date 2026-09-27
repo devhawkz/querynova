@@ -13,7 +13,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Schema and migrations | COMPLETE | Required tables asserted. Runner covered by the migration classes |
 | Jobs | COMPLETE | Idempotency and non-retry of validation tested |
 | Cache, HTTP, locks, SSRF | COMPLETE | SSRF tests cover private and metadata addresses |
-| REST permission model | IN_PROGRESS | Registrar exists. Feature routes are not all registered |
+| REST permission model | COMPLETE | Feature routes register a named QueryNova capability. An empty capability is denied. Holding one capability does not grant another. Content, commerce, and developer roles do not receive capabilities outside their map. Cookie REST nonces remain WordPress core behavior |
 | Admin React app | IN_PROGRESS | What Matters Now shows revenue, search, technical, commerce, AI, and recent-change sections from stored rows. Empty sections stay empty. An estimate is labeled estimated. Simple mode lists at most ten actions and does not pad. Advanced mode is a separate view for stored SERPs, keywords, backlinks, methodologies, providers, confidence, and rank history. Raw provider payloads are not reconstructed. The product screen shows the latest stored product across the spec tabs and leaves missing metrics empty. The category screen does the same for the latest stored category. A product count of zero is not shown. |
 | Core SEO metadata | COMPLETE | Titles, descriptions, canonical, robots, and social tags. Templates and validation are tested |
 | Sitemaps | COMPLETE | Paged XML for posts, pages, products, categories, brands, CPTs, taxonomies, images, and video. News is optional and off until a publication name is set. Inclusion rules are tested |
