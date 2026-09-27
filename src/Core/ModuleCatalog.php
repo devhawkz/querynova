@@ -11,6 +11,7 @@ namespace QueryNova\Core;
 
 use QueryNova\Core\Contracts\ModuleInterface;
 use QueryNova\Modules\Core\CoreModule;
+use QueryNova\Modules\Schema\SchemaModule;
 use QueryNova\Modules\Seo\SeoModule;
 use QueryNova\Modules\Sitemap\SitemapModule;
 
@@ -31,6 +32,7 @@ final class ModuleCatalog {
 
         $modules[] = new SeoModule();
         $modules[] = new SitemapModule();
+        $modules[] = new SchemaModule();
 
         return $modules;
     }
