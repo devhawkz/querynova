@@ -14,10 +14,10 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Jobs | COMPLETE | Idempotency and non-retry of validation tested |
 | Cache, HTTP, locks, SSRF | COMPLETE | SSRF tests cover private and metadata addresses |
 | REST permission model | IN_PROGRESS | Registrar exists. Feature routes are not all registered |
-| Admin React app | IN_PROGRESS | Shell, provenance labels, and asset enqueue exist. Feature screens are not built |
+| Admin React app | IN_PROGRESS | Shell, provenance labels, schema builder, and asset enqueue exist. Feature screens are not all built |
 | Core SEO metadata | COMPLETE | Titles, descriptions, canonical, robots, and social tags. Templates and validation are tested |
 | Sitemaps | COMPLETE | Paged XML for posts, pages, products, categories, brands, CPTs, taxonomies, images, and video. News is optional and off until a publication name is set. Inclusion rules are tested |
-| Schema graph | NOT_STARTED | |
+| Schema graph | COMPLETE | Connected JSON-LD for the supported types, including product offers and ratings only when measured. The builder stores type, field mappings, WooCommerce fields, custom fields, conditions, and templates |
 | Redirects and 404s | NOT_STARTED | |
 | Crawler | NOT_STARTED | |
 | WooCommerce SEO | NOT_STARTED | |

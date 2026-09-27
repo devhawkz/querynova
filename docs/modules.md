@@ -5,7 +5,7 @@
 | core | Implemented | Bootstrap, settings boundary, status route, initial migration, capabilities |
 | seo | Implemented | Titles, descriptions, canonical, robots, Open Graph, Twitter/X |
 | technical-seo | Not started | Indexability and technical issues |
-| schema | Not started | Connected JSON-LD graph |
+| schema | Implemented | Connected JSON-LD graph and schema builder |
 | sitemap | Implemented | XML sitemaps. News is optional |
 | redirects | Not started | Redirects and 404 monitor |
 | crawler | Not started | Bounded internal crawl |
