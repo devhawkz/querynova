@@ -7,10 +7,11 @@
     "dev": "vite",
     "build": "vite build --mode production",
     "build:staging": "vite build --mode staging",
+    "package:staging": "node scripts/package-plugin.mjs --staging",
     "lint": "eslint assets/admin",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "package": "npm run build && node build/package-plugin.mjs"
+    "package": "node scripts/package-plugin.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",
