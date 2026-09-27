@@ -1,6 +1,6 @@
 # Implementation status
 
-COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means code is landing. NOT_STARTED means it is not in the tree. BLOCKED means a decision in `docs/decisions-needed.md` stops it. The open decision is the three environments that were not booted: an end-to-end browser pass, a real WordPress release, and a real WooCommerce release.
+COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means code is landing. NOT_STARTED means it is not in the tree. BLOCKED means a decision in `docs/decisions-needed.md` stops it. Pavle chose Option B, recorded in `docs/adr/ADR-008-release-environments.md`. An end-to-end browser pass, a real WordPress release boot, and a real WooCommerce release boot stay untested until those CI jobs have passed.
 
 | Area | Status | Notes |
 | --- | --- | --- |
@@ -55,6 +55,6 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Staging and production builds | COMPLETE | `npm run build` writes a production channel with diagnostics off and debug off. `npm run build:staging` writes a staging channel with diagnostics on and debug still off. Neither build emits a source map. The channel file is not a substitute for the WordPress environment type |
 | Release ZIP | COMPLETE | `npm run package` and `npm run package:staging` write `dist/querynova-production.zip` and `dist/querynova-staging.zip`. The archives include the compiled admin and channel file, and omit node_modules, tests, git metadata, source maps, and dev packages. Composer was not on PATH, so production vendor files were copied from the existing install with dev packages left out |
 | Site Health | COMPLETE | QueryNova health checks are registered as one direct Site Health test. Healthy is good, degraded or disabled is recommended, and unhealthy is critical. No checks stay recommended. Check details are not copied into the description. This suite did not open Tools → Site Health in WordPress |
-| Definition of Done | BLOCKED | The product is not complete. The remaining checks are an end-to-end browser pass, a real WordPress release boot, and a real WooCommerce release boot. None of those was run. See `docs/decisions-needed.md` |
+| Definition of Done | IN_PROGRESS | The product is not complete. Option B is accepted. The remaining checks are an end-to-end browser pass, a real WordPress release boot, and a real WooCommerce release boot. Those CI jobs are not in the workflow yet, and none of those runs has executed. See `docs/decisions-needed.md` |
 
 QueryNova is not complete.
