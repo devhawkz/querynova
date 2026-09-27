@@ -4,6 +4,7 @@ import { AdvancedDetail } from '../features/advanced/AdvancedDetail';
 import { CategoryScreen } from '../features/categories/CategoryScreen';
 import { DiagnosticsScreen } from '../features/diagnostics/DiagnosticsScreen';
 import { ProductScreen } from '../features/products/ProductScreen';
+import { SetupScreen } from '../features/setup/SetupScreen';
 import { WhatMattersNow, type TodayAction } from '../features/dashboard/WhatMattersNow';
 import { SchemaBuilder } from '../features/schema/SchemaBuilder';
 
@@ -21,13 +22,14 @@ declare global {
       product?: unknown;
       category?: unknown;
       diagnostics?: unknown;
+      setup?: unknown;
     };
   }
 }
 
 export function App() {
   const boot = window.querynovaAdmin ?? {};
-  const [view, setView] = useState<'today' | 'schema' | 'advanced' | 'product' | 'category' | 'diagnostics'>('today');
+  const [view, setView] = useState<'today' | 'schema' | 'advanced' | 'product' | 'category' | 'diagnostics' | 'setup'>('today');
   return (
     <ErrorBoundary>
       <nav aria-label="QueryNova">
@@ -49,12 +51,16 @@ export function App() {
         <button type="button" aria-current={view === 'diagnostics' ? 'page' : undefined} onClick={() => setView('diagnostics')}>
           Diagnostics
         </button>
+        <button type="button" aria-current={view === 'setup' ? 'page' : undefined} onClick={() => setView('setup')}>
+          Setup
+        </button>
       </nav>
       {view === 'schema' ? <SchemaBuilder restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} /> : null}
       {view === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
       {view === 'product' ? <ProductScreen product={boot.product} /> : null}
       {view === 'category' ? <CategoryScreen category={boot.category} /> : null}
       {view === 'diagnostics' ? <DiagnosticsScreen diagnostics={boot.diagnostics} /> : null}
+      {view === 'setup' ? <SetupScreen setup={boot.setup} restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} /> : null}
       {view === 'today' ? (
         <WhatMattersNow
           actions={boot.actions ?? []}

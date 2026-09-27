@@ -46,6 +46,8 @@ final class CoreModule extends AbstractModule {
 
     public function registerRoutes( RestRegistrar $rest ): void {
         $rest->route( 'GET', '/status', [ $this, 'status' ], Capability::MANAGE_SETTINGS );
+        $rest->route( 'GET', '/setup', [ $this, 'setup' ], Capability::MANAGE_SETTINGS );
+        $rest->route( 'PUT', '/setup', [ $this, 'saveSetup' ], Capability::MANAGE_SETTINGS );
     }
 
     public function registerHooks( HookRegistrar $hooks ): void {
@@ -71,11 +73,35 @@ final class CoreModule extends AbstractModule {
      * @return array<string, mixed>
      */
     public function status( mixed $request = null ): array {
+        unset( $request );
+
         return [
             'name'           => 'QueryNova',
             'version'        => QUERYNOVA_VERSION,
             'schema_version' => (string) get_option( 'querynova_db_version', '0' ),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function setup( mixed $request = null ): array {
+        unset( $request );
+
+        return $this->wizard()->read( class_exists( 'WooCommerce' ) );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function saveSetup( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+
+        return $this->wizard()->save( $params, class_exists( 'WooCommerce' ) );
+    }
+
+    private function wizard(): SetupWizard {
+        return new SetupWizard( new \QueryNova\Infrastructure\WordPress\OptionStore() );
     }
 
     public function healthCheck(): HealthReport {

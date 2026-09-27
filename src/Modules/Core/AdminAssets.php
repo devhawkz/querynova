@@ -73,6 +73,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'product'           => $this->product(),
                     'category'          => $this->category(),
                     'diagnostics'       => $this->diagnostics(),
+                    'setup'             => ( new SetupWizard( new OptionStore() ) )->read( class_exists( 'WooCommerce' ) ),
                 ]
             ) . ';',
             'before'
