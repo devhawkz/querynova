@@ -34,7 +34,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Audit log and change history | COMPLETE | SEO, canonical, redirect, integration, debug, bulk, and feature-flag changes are stored separately from operational logs. The IP is stored as a hash. Rollback restores a previous title or description. Canonical, robots, slugs, URLs, redirects, and indexability are not rolled back |
 | Alerts | COMPLETE | Deindexing, rank loss, revenue loss, traffic, conversion, schema, provider, feed, AI visibility, and competitor alerts are created only from supplied evidence. A missing number does not create an alert. The same open alert is not stored twice |
 | Reports | COMPLETE | SEO, commerce, executive, keyword, competitor, and AI reports render CSV and JSON from supplied metrics. Missing values stay empty. PDF is not generated |
-| Diagnostics UI and WP-CLI | NOT_STARTED | |
+| Diagnostics UI and WP-CLI | COMPLETE | WP-CLI status, health, modules, migrate, jobs list, jobs retry, cache clear, crawl run, analytics sync, and diagnostics return JSON. Crawl and analytics sync only enqueue jobs. The diagnostics screen shows the same snapshot, leaves missing versions empty, and copies or downloads a report with secrets removed |
 | Setup wizard and SEO import | NOT_STARTED | |
 | Staging and production builds | NOT_STARTED | Docs describe the intended builds |
 | Release ZIP | NOT_STARTED | |

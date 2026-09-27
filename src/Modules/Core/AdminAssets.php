@@ -10,6 +10,16 @@ declare(strict_types=1);
 namespace QueryNova\Modules\Core;
 
 use QueryNova\Core\Contracts\HookSubscriberInterface;
+use QueryNova\Core\ModuleCatalog;
+use QueryNova\Core\SafeMode\SafeMode;
+use QueryNova\Core\Support\SystemClock;
+use QueryNova\Infrastructure\Cli\DiagnosticsReport;
+use QueryNova\Infrastructure\Database\LogRepository;
+use QueryNova\Infrastructure\Database\MigrationManager;
+use QueryNova\Infrastructure\Database\MigrationRegistrar;
+use QueryNova\Infrastructure\Database\WpdbConnection;
+use QueryNova\Infrastructure\Queue\JobRepository;
+use QueryNova\Infrastructure\WordPress\OptionStore;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -62,6 +72,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'advanced'          => $this->advanced(),
                     'product'           => $this->product(),
                     'category'          => $this->category(),
+                    'diagnostics'       => $this->diagnostics(),
                 ]
             ) . ';',
             'before'
@@ -141,6 +152,50 @@ final class AdminAssets implements HookSubscriberInterface {
             unset( $exception );
 
             return CategoryScreen::emptyScreen();
+        }
+    }
+
+    /**
+     * The same snapshot as wp querynova diagnostics. A read failure stays empty.
+     *
+     * @return array<string, mixed>
+     */
+    private function diagnostics(): array {
+        if ( ! isset( $GLOBALS['wpdb'] ) ) {
+            return DiagnosticsReport::build( [] );
+        }
+        try {
+            $database  = new WpdbConnection();
+            $options   = new OptionStore();
+            $registrar = new MigrationRegistrar();
+            ( new CoreModule() )->registerMigrations( $registrar );
+            $manager = new MigrationManager( $database, $registrar, $options, new SystemClock() );
+            $names   = [];
+            foreach ( ModuleCatalog::modules( ( new SafeMode( $options ) )->isEnabled() ) as $module ) {
+                $names[] = $module->getName();
+            }
+            $scheduled = function_exists( 'wp_next_scheduled' ) ? wp_next_scheduled( 'querynova_process_jobs' ) !== false : null;
+
+            return DiagnosticsReport::build(
+                [
+                    'environment'         => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
+                    'querynova_version'   => QUERYNOVA_VERSION,
+                    'wp_version'          => isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : null,
+                    'php_version'         => PHP_VERSION,
+                    'woocommerce_version' => defined( 'WC_VERSION' ) ? (string) WC_VERSION : null,
+                    'schema_version'      => $manager->currentVersion(),
+                    'modules'             => $names,
+                    'queue'               => ( new JobRepository( $database ) )->statusCounts(),
+                    'cron_scheduled'      => $scheduled,
+                    'cache_adapter'       => 'object-cache',
+                    'pending_migrations'  => $manager->pendingVersions(),
+                    'errors'              => ( new LogRepository( $database ) )->search( [ 'level' => 'error' ], 10, 0 ),
+                ]
+            );
+        } catch ( \Throwable $exception ) {
+            unset( $exception );
+
+            return DiagnosticsReport::build( [] );
         }
     }
 }
