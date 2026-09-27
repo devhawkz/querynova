@@ -11,6 +11,7 @@ namespace QueryNova\Core;
 
 use QueryNova\Core\Contracts\ModuleInterface;
 use QueryNova\Modules\Ai\AiModule;
+use QueryNova\Modules\Alerts\AlertModule;
 use QueryNova\Modules\Analytics\AnalyticsModule;
 use QueryNova\Modules\Audit\AuditModule;
 use QueryNova\Modules\Backlinks\BacklinkModule;
@@ -61,6 +62,7 @@ final class ModuleCatalog {
         $modules[] = new ExperienceModule();
         $modules[] = new ExperimentModule();
         $modules[] = new AuditModule();
+        $modules[] = new AlertModule();
 
         return $modules;
     }
