@@ -213,6 +213,7 @@ final class Plugin {
         $container = self::boot();
         $container->get( MigrationManager::class )->migrate();
         $container->get( CapabilityRegistrar::class )->register();
+        ( new Lifecycle() )->ensureDefaults();
         if ( ! wp_next_scheduled( 'querynova_process_jobs' ) ) {
             wp_schedule_event( time() + 60, 'querynova_quarter_hour', 'querynova_process_jobs' );
         }
@@ -223,17 +224,10 @@ final class Plugin {
     }
 
     public static function deactivate(): void {
-        wp_clear_scheduled_hook( 'querynova_process_jobs' );
+        ( new Lifecycle() )->releaseRuntime();
         if ( function_exists( 'flush_rewrite_rules' ) ) {
             flush_rewrite_rules( false );
         }
-        delete_transient( 'querynova_lock_' . md5( 'crawl' ) );
-        delete_transient( 'querynova_lock_' . md5( 'migration' ) );
-        delete_transient( 'querynova_lock_' . md5( 'analytics-sync' ) );
-        delete_transient( 'querynova_lock_' . md5( 'serp-batch' ) );
-        delete_transient( 'querynova_lock_' . md5( 'backlink-batch' ) );
-        delete_transient( 'querynova_lock_' . md5( 'ai-batch' ) );
-        delete_transient( 'querynova_lock_' . md5( 'experience-batch' ) );
     }
 
     private static function bootModule(

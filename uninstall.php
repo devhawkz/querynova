@@ -17,46 +17,14 @@ if ( get_option( 'querynova_delete_data_on_uninstall' ) !== 'yes' ) {
 
 global $wpdb;
 
-$querynova_tables = [
-    'queries',
-    'keywords',
-    'keyword_clusters',
-    'keyword_cluster_members',
-    'pages',
-    'products',
-    'categories',
-    'query_pages',
-    'serp_snapshots',
-    'serp_results',
-    'rank_history',
-    'competitors',
-    'backlink_snapshots',
-    'gsc_metrics',
-    'ga_metrics',
-    'commerce_metrics',
-    'product_metrics',
-    'category_metrics',
-    'revenue_metrics',
-    'content_analysis',
-    'entities',
-    'entity_relations',
-    'internal_links',
-    'ai_prompts',
-    'ai_runs',
-    'ai_mentions',
-    'issues',
-    'recommendations',
-    'actions',
-    'experiments',
-    'jobs',
-    'audit_log',
-    'logs',
-    'redirects',
-    'not_found',
-    'alerts',
-    'migrations',
-    'provider_usage',
-];
+$querynova_autoload = __DIR__ . '/vendor/autoload.php';
+if ( is_file( $querynova_autoload ) ) {
+    require_once $querynova_autoload;
+}
+
+$querynova_tables = class_exists( \QueryNova\Infrastructure\Database\Schema::class )
+    ? ( new \QueryNova\Infrastructure\Database\Schema() )->tableNames()
+    : [];
 
 foreach ( $querynova_tables as $querynova_table ) {
     // Table names come from the fixed list above, not from user input.

@@ -69,6 +69,13 @@ final class Schema {
         return $statements;
     }
 
+    /**
+     * @return list<string>
+     */
+    public function tableNames(): array {
+        return array_keys( $this->definitions() );
+    }
+
     public function statementFor( string $prefix, string $charsetCollate, string $name ): string {
         $definitions = $this->definitions();
         if ( ! isset( $definitions[ $name ] ) ) {
