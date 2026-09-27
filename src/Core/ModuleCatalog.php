@@ -17,6 +17,7 @@ use QueryNova\Modules\Crawler\CrawlerModule;
 use QueryNova\Modules\Redirects\RedirectModule;
 use QueryNova\Modules\Schema\SchemaModule;
 use QueryNova\Modules\Seo\SeoModule;
+use QueryNova\Modules\Serp\SerpModule;
 use QueryNova\Modules\Sitemap\SitemapModule;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -41,6 +42,7 @@ final class ModuleCatalog {
         $modules[] = new CrawlerModule();
         $modules[] = new CommerceModule();
         $modules[] = new KeywordModule();
+        $modules[] = new SerpModule();
 
         return $modules;
     }

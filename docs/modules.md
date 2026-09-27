@@ -10,8 +10,8 @@
 | redirects | Implemented | Redirects and 404 monitor. Misses are not auto-redirected |
 | crawler | Implemented | Bounded internal crawl in batches. A public request does not crawl the site |
 | keywords | Implemented | Research, discovery, clusters, gap, and estimated organic difficulty |
-| serp | Not started | Provider-backed SERP snapshots |
-| rankings | Not started | Rank history |
+| serp | Implemented | Provider-backed SERP snapshots, page types, and stability |
+| rankings | Implemented | Rank history from stored snapshots. A missing rank is null |
 | competitors | Not started | Competitor matrix |
 | backlinks | Not started | Backlink snapshots and gap |
 | content-intelligence | Not started | Coverage, information gain, entities |
