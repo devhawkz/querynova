@@ -22,7 +22,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Crawler | COMPLETE | Batched jobs record status, redirects, canonicals, robots, headings, titles, descriptions, broken links, orphans, duplicates, thin pages, depth, sitemap inclusion, schema, HTTPS, pagination, and hreflang. A public request only enqueues the next batch. A page under 100 words is QueryNova's thin-page rule, not a search-engine score. Uncrawled links stay unknown |
 | WooCommerce SEO | COMPLETE | Gateway reads products, categories, and brands through WooCommerce APIs. Order totals use `wc_get_orders`, including HPOS, and do not query order tables. Product audit, image and feed checks, merchant readiness, variation and stock decisions, facet indexability, and bulk CSV are tested. Clicks, impressions, revenue, and opportunity stay unavailable until those sources exist. Out-of-stock and discontinued URLs are not changed automatically |
 | Analytics and attribution | NOT_STARTED | Provenance type is in place and tested |
-| Keyword intelligence | NOT_STARTED | |
+| Keyword intelligence | COMPLETE | Explorer, discovery, clustering, gap, winnable keywords, traffic potential, content mapping, and cannibalization. Volume, CPC, rank, and difficulty stay unavailable until supplied. Organic difficulty is the published equal-weight average and is labeled estimated. Paid competition is never copied into it. No search-result scraping |
 | SERP and rank tracking | NOT_STARTED | |
 | Competitors and backlinks | NOT_STARTED | |
 | Content intelligence | NOT_STARTED | |

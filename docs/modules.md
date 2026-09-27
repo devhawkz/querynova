@@ -9,7 +9,7 @@
 | sitemap | Implemented | XML sitemaps. News is optional |
 | redirects | Implemented | Redirects and 404 monitor. Misses are not auto-redirected |
 | crawler | Implemented | Bounded internal crawl in batches. A public request does not crawl the site |
-| keywords | Not started | Research, discovery, clusters, gap, difficulty |
+| keywords | Implemented | Research, discovery, clusters, gap, and estimated organic difficulty |
 | serp | Not started | Provider-backed SERP snapshots |
 | rankings | Not started | Rank history |
 | competitors | Not started | Competitor matrix |

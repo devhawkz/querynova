@@ -12,6 +12,7 @@ namespace QueryNova\Core;
 use QueryNova\Core\Contracts\ModuleInterface;
 use QueryNova\Modules\Commerce\CommerceModule;
 use QueryNova\Modules\Core\CoreModule;
+use QueryNova\Modules\Keywords\KeywordModule;
 use QueryNova\Modules\Crawler\CrawlerModule;
 use QueryNova\Modules\Redirects\RedirectModule;
 use QueryNova\Modules\Schema\SchemaModule;
@@ -39,6 +40,7 @@ final class ModuleCatalog {
         $modules[] = new RedirectModule();
         $modules[] = new CrawlerModule();
         $modules[] = new CommerceModule();
+        $modules[] = new KeywordModule();
 
         return $modules;
     }
