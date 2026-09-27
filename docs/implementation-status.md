@@ -15,7 +15,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Cache, HTTP, locks, SSRF | COMPLETE | SSRF tests cover private and metadata addresses |
 | REST permission model | IN_PROGRESS | Registrar exists. Feature routes are not all registered |
 | Admin React app | IN_PROGRESS | Shell, provenance labels, and asset enqueue exist. Feature screens are not built |
-| Core SEO metadata | NOT_STARTED | |
+| Core SEO metadata | COMPLETE | Titles, descriptions, canonical, robots, and social tags. Templates and validation are tested |
 | Sitemaps | NOT_STARTED | |
 | Schema graph | NOT_STARTED | |
 | Redirects and 404s | NOT_STARTED | |

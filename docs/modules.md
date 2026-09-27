@@ -3,7 +3,7 @@
 | Module | Status | Role |
 | --- | --- | --- |
 | core | Implemented | Bootstrap, settings boundary, status route, initial migration, capabilities |
-| seo | Not started | Titles, descriptions, canonical, robots, social |
+| seo | Implemented | Titles, descriptions, canonical, robots, Open Graph, Twitter/X |
 | technical-seo | Not started | Indexability and technical issues |
 | schema | Not started | Connected JSON-LD graph |
 | sitemap | Not started | XML sitemaps |

@@ -244,6 +244,12 @@ if ( ! function_exists( 'esc_html__' ) ) {
     }
 }
 
+if ( ! function_exists( 'wp_strip_all_tags' ) ) {
+    function wp_strip_all_tags( string $text ): string {
+        return trim( strip_tags( $text ) );
+    }
+}
+
 if ( ! function_exists( 'wp_parse_url' ) ) {
     function wp_parse_url( string $url, int $component = -1 ): mixed {
         $parts = parse_url( $url );

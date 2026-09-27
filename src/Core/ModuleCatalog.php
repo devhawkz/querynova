@@ -11,6 +11,7 @@ namespace QueryNova\Core;
 
 use QueryNova\Core\Contracts\ModuleInterface;
 use QueryNova\Modules\Core\CoreModule;
+use QueryNova\Modules\Seo\SeoModule;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -26,6 +27,8 @@ final class ModuleCatalog {
         if ( $safeMode ) {
             return $modules;
         }
+
+        $modules[] = new SeoModule();
 
         return $modules;
     }
