@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { AdvancedDetail } from '../features/advanced/AdvancedDetail';
+import { CategoryScreen } from '../features/categories/CategoryScreen';
 import { ProductScreen } from '../features/products/ProductScreen';
 import { WhatMattersNow, type TodayAction } from '../features/dashboard/WhatMattersNow';
 import { SchemaBuilder } from '../features/schema/SchemaBuilder';
@@ -17,13 +18,14 @@ declare global {
       sections?: unknown;
       advanced?: unknown;
       product?: unknown;
+      category?: unknown;
     };
   }
 }
 
 export function App() {
   const boot = window.querynovaAdmin ?? {};
-  const [view, setView] = useState<'today' | 'schema' | 'advanced' | 'product'>('today');
+  const [view, setView] = useState<'today' | 'schema' | 'advanced' | 'product' | 'category'>('today');
   return (
     <ErrorBoundary>
       <nav aria-label="QueryNova">
@@ -39,10 +41,14 @@ export function App() {
         <button type="button" aria-current={view === 'product' ? 'page' : undefined} onClick={() => setView('product')}>
           Product
         </button>
+        <button type="button" aria-current={view === 'category' ? 'page' : undefined} onClick={() => setView('category')}>
+          Category
+        </button>
       </nav>
       {view === 'schema' ? <SchemaBuilder restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} /> : null}
       {view === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
       {view === 'product' ? <ProductScreen product={boot.product} /> : null}
+      {view === 'category' ? <CategoryScreen category={boot.category} /> : null}
       {view === 'today' ? (
         <WhatMattersNow
           actions={boot.actions ?? []}

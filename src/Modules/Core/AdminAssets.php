@@ -61,6 +61,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'sections'          => $briefing['sections'],
                     'advanced'          => $this->advanced(),
                     'product'           => $this->product(),
+                    'category'          => $this->category(),
                 ]
             ) . ';',
             'before'
@@ -122,6 +123,24 @@ final class AdminAssets implements HookSubscriberInterface {
             unset( $exception );
 
             return ProductScreen::emptyScreen();
+        }
+    }
+
+    /**
+     * The latest stored category. A read failure leaves the screen empty.
+     *
+     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>}
+     */
+    private function category(): array {
+        if ( ! isset( $GLOBALS['wpdb'] ) ) {
+            return CategoryScreen::emptyScreen();
+        }
+        try {
+            return ( new CategoryScreen() )->fromDatabase( new \QueryNova\Infrastructure\Database\WpdbConnection() );
+        } catch ( \Throwable $exception ) {
+            unset( $exception );
+
+            return CategoryScreen::emptyScreen();
         }
     }
 }
