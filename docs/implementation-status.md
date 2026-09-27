@@ -24,7 +24,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Analytics and attribution | NOT_STARTED | Provenance type is in place and tested |
 | Keyword intelligence | COMPLETE | Explorer, discovery, clustering, gap, winnable keywords, traffic potential, content mapping, and cannibalization. Volume, CPC, rank, and difficulty stay unavailable until supplied. Organic difficulty is the published equal-weight average and is labeled estimated. Paid competition is never copied into it. No search-result scraping |
 | SERP and rank tracking | COMPLETE | Snapshots come from a provider interface. The connected adapter is null until a provider is configured, and a fixture adapter covers tests. Top 10, 20, and 100, page type, features, history, stability, competitor rows, and rank history are stored by a job. A public request only enqueues. Authority and backlinks stay null when the payload does not include them. Google is not scraped |
-| Competitors and backlinks | NOT_STARTED | |
+| Competitors and backlinks | COMPLETE | Competitor rows from a SERP snapshot leave authority and backlinks null. Backlink snapshots use a provider interface. Counts, dofollow, nofollow, new, and lost are measured only from returned links. The first snapshot does not mark every link as new. The gap lists domains that link to competitors and not to us, ordered by overlap. A public request only enqueues |
 | Content intelligence | NOT_STARTED | |
 | Opportunity and recommendations | NOT_STARTED | |
 | AI visibility | NOT_STARTED | |

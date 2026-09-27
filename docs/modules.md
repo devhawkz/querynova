@@ -12,8 +12,8 @@
 | keywords | Implemented | Research, discovery, clusters, gap, and estimated organic difficulty |
 | serp | Implemented | Provider-backed SERP snapshots, page types, and stability |
 | rankings | Implemented | Rank history from stored snapshots. A missing rank is null |
-| competitors | Not started | Competitor matrix |
-| backlinks | Not started | Backlink snapshots and gap |
+| competitors | Implemented | Competitor rows from stored SERP snapshots. Missing authority stays null |
+| backlinks | Implemented | Provider-backed snapshots, new and lost links, and the gap |
 | content-intelligence | Not started | Coverage, information gain, entities |
 | internal-links | Not started | Link graph and suggestions |
 | search-console | Not started | Google Search Console sync |

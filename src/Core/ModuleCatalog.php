@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Core;
 
 use QueryNova\Core\Contracts\ModuleInterface;
+use QueryNova\Modules\Backlinks\BacklinkModule;
 use QueryNova\Modules\Commerce\CommerceModule;
 use QueryNova\Modules\Core\CoreModule;
 use QueryNova\Modules\Keywords\KeywordModule;
@@ -43,6 +44,7 @@ final class ModuleCatalog {
         $modules[] = new CommerceModule();
         $modules[] = new KeywordModule();
         $modules[] = new SerpModule();
+        $modules[] = new BacklinkModule();
 
         return $modules;
     }
