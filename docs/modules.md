@@ -27,5 +27,6 @@
 | experiments | Implemented | Before/after movement. Causation is not claimed |
 | reports | Not started | CSV, JSON, PDF |
 | diagnostics | Not started | Health, logs, jobs, system report |
+| audit | Implemented | Change history separate from operational logs. Safe rollback is title and description only |
 
 Status values in `docs/implementation-status.md` are authoritative. This table is the map.

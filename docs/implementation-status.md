@@ -31,7 +31,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Page experience | COMPLETE | LCP, INP, CLS, and TTFB come from a provider interface for desktop and mobile. The connected adapter is null. A missing timing stays null. There is no performance score and no SEO score. A public request only enqueues |
 | Experiments | COMPLETE | Title, description, category content, internal links, and schema changes store before and after rank, CTR, clicks, traffic, and revenue. A missing side stays null. Improved, declined, mixed, and inconclusive describe the movement only. Causation is not claimed |
 | Recommendation outcomes | COMPLETE | Suggested recommendations can be accepted and marked applied. Marking one applied does not change the page. Improved or declined is stored only after measured before and after values. Conflicting movement stays inconclusive. Causation is not claimed |
-| Audit log and change history | NOT_STARTED | |
+| Audit log and change history | COMPLETE | SEO, canonical, redirect, integration, debug, bulk, and feature-flag changes are stored separately from operational logs. The IP is stored as a hash. Rollback restores a previous title or description. Canonical, robots, slugs, URLs, redirects, and indexability are not rolled back |
 | Alerts | NOT_STARTED | |
 | Reports | NOT_STARTED | |
 | Diagnostics UI and WP-CLI | NOT_STARTED | |
