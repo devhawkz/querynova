@@ -12,6 +12,7 @@ namespace QueryNova\Core;
 use QueryNova\Core\Contracts\ModuleInterface;
 use QueryNova\Modules\Backlinks\BacklinkModule;
 use QueryNova\Modules\Commerce\CommerceModule;
+use QueryNova\Modules\Content\ContentModule;
 use QueryNova\Modules\Core\CoreModule;
 use QueryNova\Modules\Keywords\KeywordModule;
 use QueryNova\Modules\Crawler\CrawlerModule;
@@ -45,6 +46,7 @@ final class ModuleCatalog {
         $modules[] = new KeywordModule();
         $modules[] = new SerpModule();
         $modules[] = new BacklinkModule();
+        $modules[] = new ContentModule();
 
         return $modules;
     }

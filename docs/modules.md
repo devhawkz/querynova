@@ -14,8 +14,8 @@
 | rankings | Implemented | Rank history from stored snapshots. A missing rank is null |
 | competitors | Implemented | Competitor rows from stored SERP snapshots. Missing authority stays null |
 | backlinks | Implemented | Provider-backed snapshots, new and lost links, and the gap |
-| content-intelligence | Not started | Coverage, information gain, entities |
-| internal-links | Not started | Link graph and suggestions |
+| content-intelligence | Implemented | Supplied-document coverage, information gain, and entities. No content score |
+| internal-links | Implemented | Link graph and commerce suggestions from supplied edges. Suggestions are not inserted |
 | search-console | Not started | Google Search Console sync |
 | analytics | Not started | GA4 and fused analytics |
 | woocommerce | Implemented | Product, category, brand, facet, and merchant SEO through a WooCommerce gateway |
