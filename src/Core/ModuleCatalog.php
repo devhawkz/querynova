@@ -25,6 +25,7 @@ use QueryNova\Modules\Opportunities\OpportunityModule;
 use QueryNova\Modules\Opportunities\OutcomeModule;
 use QueryNova\Modules\Crawler\CrawlerModule;
 use QueryNova\Modules\Redirects\RedirectModule;
+use QueryNova\Modules\Reports\ReportModule;
 use QueryNova\Modules\Schema\SchemaModule;
 use QueryNova\Modules\Seo\SeoModule;
 use QueryNova\Modules\Serp\SerpModule;
@@ -63,6 +64,7 @@ final class ModuleCatalog {
         $modules[] = new ExperimentModule();
         $modules[] = new AuditModule();
         $modules[] = new AlertModule();
+        $modules[] = new ReportModule();
 
         return $modules;
     }

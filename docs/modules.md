@@ -25,7 +25,7 @@
 | opportunities | Implemented | Supplied-input opportunities. No numeric score. Missing money stays null |
 | recommendations | Implemented | Today's suggested actions. Accepted and measured outcomes do not change the page by themselves |
 | experiments | Implemented | Before/after movement. Causation is not claimed |
-| reports | Not started | CSV, JSON, PDF |
+| reports | Implemented | CSV and JSON from supplied metrics. PDF is not generated |
 | diagnostics | Not started | Health, logs, jobs, system report |
 | audit | Implemented | Change history separate from operational logs. Safe rollback is title and description only |
 

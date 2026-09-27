@@ -33,7 +33,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Recommendation outcomes | COMPLETE | Suggested recommendations can be accepted and marked applied. Marking one applied does not change the page. Improved or declined is stored only after measured before and after values. Conflicting movement stays inconclusive. Causation is not claimed |
 | Audit log and change history | COMPLETE | SEO, canonical, redirect, integration, debug, bulk, and feature-flag changes are stored separately from operational logs. The IP is stored as a hash. Rollback restores a previous title or description. Canonical, robots, slugs, URLs, redirects, and indexability are not rolled back |
 | Alerts | COMPLETE | Deindexing, rank loss, revenue loss, traffic, conversion, schema, provider, feed, AI visibility, and competitor alerts are created only from supplied evidence. A missing number does not create an alert. The same open alert is not stored twice |
-| Reports | NOT_STARTED | |
+| Reports | COMPLETE | SEO, commerce, executive, keyword, competitor, and AI reports render CSV and JSON from supplied metrics. Missing values stay empty. PDF is not generated |
 | Diagnostics UI and WP-CLI | NOT_STARTED | |
 | Setup wizard and SEO import | NOT_STARTED | |
 | Staging and production builds | NOT_STARTED | Docs describe the intended builds |
