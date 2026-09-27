@@ -35,6 +35,7 @@
 
 	<exclude-pattern>*/tests/Support/*</exclude-pattern>
 	<exclude-pattern>*/tests/bootstrap.php</exclude-pattern>
+	<exclude-pattern>*/tests/environments/bootstrap-wordpress.php</exclude-pattern>
 
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<properties>

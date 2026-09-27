@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
 
+# Release pins are the downloads the runner jobs request.
+# A green job is the only record of an observed WordPress, WooCommerce, or browser run.
+env:
+  QUERYNOVA_WP_VERSION: '7.1.2'
+
 jobs:
   php:
     runs-on: ubuntu-latest
@@ -23,7 +28,7 @@ jobs:
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist
       - name: PHP syntax
-        run: find src tests -name '*.php' -print0 | xargs -0 -n1 php -l && php -l querynova.php && php -l uninstall.php
+        run: find src tests bin -name '*.php' -print0 | xargs -0 -n1 php -l && php -l querynova.php && php -l uninstall.php
       - name: PHPCS
         run: composer lint
       - name: PHPStan
@@ -49,3 +54,40 @@ jobs:
         run: npm run test
       - name: Production build
         run: npm run build
+
+  wordpress:
+    name: WordPress release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      WP_CORE_DIR: /tmp/wordpress
+      WP_TESTS_DIR: /tmp/wordpress-tests-lib
+      QUERYNOVA_DB_NAME: wordpress_test
+      QUERYNOVA_DB_USER: root
+      QUERYNOVA_DB_PASSWORD: root
+      QUERYNOVA_DB_HOST: 127.0.0.1:3306
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          extensions: mysqli, zip
+          tools: composer
+      - name: Install the plugin runtime
+        run: composer install --no-interaction --prefer-dist --no-dev
+      - name: Boot WordPress and the test library
+        run: bash bin/boot-release-tests.sh phpunit.wp-release.xml.dist
