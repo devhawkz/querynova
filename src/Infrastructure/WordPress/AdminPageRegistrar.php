@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace QueryNova\Infrastructure\WordPress;
 
+use QueryNova\Core\MultisitePolicy;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -34,6 +36,9 @@ final class AdminPageRegistrar {
         add_action(
             'admin_menu',
             function (): void {
+				if ( ! ( new MultisitePolicy() )->registersSiteMenu() ) {
+					return;
+				}
 				$first = true;
 				foreach ( $this->pages as $page ) {
 					if ( $first ) {

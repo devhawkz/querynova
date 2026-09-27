@@ -202,7 +202,10 @@ final class Plugin {
         return $container;
     }
 
-    public static function activate(): void {
+    public static function activate( bool $networkWide = false ): void {
+        if ( ! ( new MultisitePolicy() )->activatesCurrentSite( $networkWide ) ) {
+            return;
+        }
         $failures = ( new Requirements() )->failures();
         if ( $failures !== [] ) {
             if ( function_exists( 'deactivate_plugins' ) && defined( 'QUERYNOVA_BASENAME' ) ) {

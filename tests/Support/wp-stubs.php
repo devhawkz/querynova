@@ -132,6 +132,34 @@ if ( ! function_exists( 'wp_timezone' ) ) {
     }
 }
 
+if ( ! function_exists( 'is_network_admin' ) ) {
+    function is_network_admin(): bool {
+        return (bool) ( $GLOBALS['qn_network_admin'] ?? false ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- test bootstrap stores network admin state under this key.
+    }
+}
+
+if ( ! function_exists( 'add_menu_page' ) ) {
+    /**
+     * @param mixed ...$args
+     */
+    function add_menu_page( mixed ...$args ): string {
+        $GLOBALS['qn_menus'][] = $args; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- test bootstrap records registered menus under this key.
+
+        return 'querynova';
+    }
+}
+
+if ( ! function_exists( 'add_submenu_page' ) ) {
+    /**
+     * @param mixed ...$args
+     */
+    function add_submenu_page( mixed ...$args ): string {
+        $GLOBALS['qn_menus'][] = $args; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- test bootstrap records registered menus under this key.
+
+        return 'querynova';
+    }
+}
+
 if ( ! function_exists( 'add_action' ) ) {
     function add_action( string $hook, callable $callback, int $priority = 10, int $args = 1 ): void {
         $GLOBALS['qn_actions'][ $hook ][] = $callback;
