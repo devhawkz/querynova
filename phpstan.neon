@@ -1,0 +1,14 @@
+parameters:
+  level: 6
+  paths:
+    - src
+    - querynova.php
+    - uninstall.php
+  bootstrapFiles:
+    - tests/Support/phpstan-bootstrap.php
+  excludePaths:
+    - vendor (?)
+    - node_modules (?)
+    - build (?)
+    - dist (?)
+  treatPhpDocTypesAsCertain: false

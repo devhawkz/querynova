@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<ruleset name="QueryNova">
+	<description>QueryNova coding standards. PSR-4 filenames replace the legacy class-filename sniff.</description>
+
+	<file>src</file>
+	<file>tests</file>
+	<file>querynova.php</file>
+	<file>uninstall.php</file>
+
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/build/*</exclude-pattern>
+	<exclude-pattern>*/dist/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg value="s"/>
+	<arg name="colors"/>
+
+	<config name="minimum_supported_wp_version" value="6.4"/>
+	<config name="testVersion" value="8.1-"/>
+
+	<rule ref="WordPress-Extra">
+		<exclude name="WordPress.Files.FileName"/>
+		<exclude name="WordPress.PHP.YodaConditions"/>
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+		<exclude name="Generic.Commenting.DocComment.MissingShort"/>
+		<!-- PSR-4 sources use four-space indentation. Security sniffs stay on. -->
+		<exclude name="Generic.WhiteSpace.DisallowSpaceIndent"/>
+		<!-- Namespaced code uses camelCase methods and properties. Hooks, options, and capabilities stay prefixed. -->
+		<exclude name="WordPress.NamingConventions.ValidVariableName"/>
+		<exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+		<!-- Exception messages are not HTML output. -->
+		<exclude name="WordPress.Security.EscapeOutput.ExceptionNotEscaped"/>
+	</rule>
+
+	<exclude-pattern>*/tests/Support/*</exclude-pattern>
+	<exclude-pattern>*/tests/bootstrap.php</exclude-pattern>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="querynova"/>
+				<element value="QueryNova"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.WP.Capabilities">
+		<properties>
+			<property name="custom_capabilities" type="array">
+				<element value="querynova_manage_settings"/>
+				<element value="querynova_view_analytics"/>
+				<element value="querynova_manage_seo"/>
+				<element value="querynova_manage_woocommerce_seo"/>
+				<element value="querynova_run_analysis"/>
+				<element value="querynova_manage_integrations"/>
+				<element value="querynova_view_logs"/>
+				<element value="querynova_manage_debug"/>
+			</property>
+		</properties>
+	</rule>
+</ruleset>
