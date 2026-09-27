@@ -21,8 +21,8 @@
 | woocommerce | Implemented | Product, category, brand, facet, and merchant SEO through a WooCommerce gateway |
 | commerce-analytics | Implemented | Orders, revenue, profit, and stock notes. Cost is not invented |
 | ai-visibility | Not started | Prompts, mentions, citations, index |
-| opportunities | Not started | Opportunity scoring |
-| recommendations | Not started | Today's actions |
+| opportunities | Implemented | Supplied-input opportunities. No numeric score. Missing money stays null |
+| recommendations | Implemented | Today's suggested actions. Nothing is applied automatically |
 | experiments | Not started | Before/after measurement |
 | reports | Not started | CSV, JSON, PDF |
 | diagnostics | Not started | Health, logs, jobs, system report |

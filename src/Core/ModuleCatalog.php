@@ -16,6 +16,7 @@ use QueryNova\Modules\Commerce\CommerceModule;
 use QueryNova\Modules\Content\ContentModule;
 use QueryNova\Modules\Core\CoreModule;
 use QueryNova\Modules\Keywords\KeywordModule;
+use QueryNova\Modules\Opportunities\OpportunityModule;
 use QueryNova\Modules\Crawler\CrawlerModule;
 use QueryNova\Modules\Redirects\RedirectModule;
 use QueryNova\Modules\Schema\SchemaModule;
@@ -49,6 +50,7 @@ final class ModuleCatalog {
         $modules[] = new BacklinkModule();
         $modules[] = new ContentModule();
         $modules[] = new AnalyticsModule();
+        $modules[] = new OpportunityModule();
 
         return $modules;
     }
