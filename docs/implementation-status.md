@@ -20,7 +20,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | Schema graph | COMPLETE | Connected JSON-LD for the supported types, including product offers and ratings only when measured. The builder stores type, field mappings, WooCommerce fields, custom fields, conditions, and templates |
 | Redirects and 404s | COMPLETE | 301, 302, 307, 410, and 451, including regex, CSV import and export, chain collapsing, and loop rejection. 404s record hits, referrer, and user agent, and may suggest a target. They never create a redirect |
 | Crawler | COMPLETE | Batched jobs record status, redirects, canonicals, robots, headings, titles, descriptions, broken links, orphans, duplicates, thin pages, depth, sitemap inclusion, schema, HTTPS, pagination, and hreflang. A public request only enqueues the next batch. A page under 100 words is QueryNova's thin-page rule, not a search-engine score. Uncrawled links stay unknown |
-| WooCommerce SEO | NOT_STARTED | |
+| WooCommerce SEO | COMPLETE | Gateway reads products, categories, and brands through WooCommerce APIs. Order totals use `wc_get_orders`, including HPOS, and do not query order tables. Product audit, image and feed checks, merchant readiness, variation and stock decisions, facet indexability, and bulk CSV are tested. Clicks, impressions, revenue, and opportunity stay unavailable until those sources exist. Out-of-stock and discontinued URLs are not changed automatically |
 | Analytics and attribution | NOT_STARTED | Provenance type is in place and tested |
 | Keyword intelligence | NOT_STARTED | |
 | SERP and rank tracking | NOT_STARTED | |

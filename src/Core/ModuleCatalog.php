@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Core;
 
 use QueryNova\Core\Contracts\ModuleInterface;
+use QueryNova\Modules\Commerce\CommerceModule;
 use QueryNova\Modules\Core\CoreModule;
 use QueryNova\Modules\Crawler\CrawlerModule;
 use QueryNova\Modules\Redirects\RedirectModule;
@@ -37,6 +38,7 @@ final class ModuleCatalog {
         $modules[] = new SchemaModule();
         $modules[] = new RedirectModule();
         $modules[] = new CrawlerModule();
+        $modules[] = new CommerceModule();
 
         return $modules;
     }

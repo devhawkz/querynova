@@ -18,7 +18,7 @@
 | internal-links | Not started | Link graph and suggestions |
 | search-console | Not started | Google Search Console sync |
 | analytics | Not started | GA4 and fused analytics |
-| woocommerce | Not started | Product, category, brand, facet, merchant SEO |
+| woocommerce | Implemented | Product, category, brand, facet, and merchant SEO through a WooCommerce gateway |
 | commerce-analytics | Not started | Revenue, profit, inventory |
 | ai-visibility | Not started | Prompts, mentions, citations, index |
 | opportunities | Not started | Opportunity scoring |
