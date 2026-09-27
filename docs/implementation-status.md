@@ -4,7 +4,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 
 | Area | Status | Notes |
 | --- | --- | --- |
-| Repository tooling | COMPLETE | Composer, PHPCS, PHPStan, PHPUnit |
+| Repository tooling | COMPLETE | Composer, PHPCS, PHPStan, PHPUnit, ESLint, Vitest, Vite |
 | Module registry and DI | COMPLETE | Cycle detection and boot order tested |
 | Feature registry | COMPLETE | Site overrides and dependency gating tested |
 | Environment | COMPLETE | Uses `wp_get_environment_type()` |
