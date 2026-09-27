@@ -12,6 +12,7 @@ namespace QueryNova\Core;
 use QueryNova\Core\Contracts\ModuleInterface;
 use QueryNova\Modules\Core\CoreModule;
 use QueryNova\Modules\Seo\SeoModule;
+use QueryNova\Modules\Sitemap\SitemapModule;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -29,6 +30,7 @@ final class ModuleCatalog {
         }
 
         $modules[] = new SeoModule();
+        $modules[] = new SitemapModule();
 
         return $modules;
     }

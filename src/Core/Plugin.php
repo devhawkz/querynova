@@ -191,10 +191,17 @@ final class Plugin {
         if ( ! wp_next_scheduled( 'querynova_process_jobs' ) ) {
             wp_schedule_event( time() + 60, 'querynova_quarter_hour', 'querynova_process_jobs' );
         }
+        do_action( 'querynova_register_rewrites' );
+        if ( function_exists( 'flush_rewrite_rules' ) ) {
+            flush_rewrite_rules( false );
+        }
     }
 
     public static function deactivate(): void {
         wp_clear_scheduled_hook( 'querynova_process_jobs' );
+        if ( function_exists( 'flush_rewrite_rules' ) ) {
+            flush_rewrite_rules( false );
+        }
         delete_transient( 'querynova_lock_' . md5( 'crawl' ) );
         delete_transient( 'querynova_lock_' . md5( 'migration' ) );
         delete_transient( 'querynova_lock_' . md5( 'analytics-sync' ) );

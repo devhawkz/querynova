@@ -16,7 +16,7 @@ COMPLETE means the behavior exists and has automated tests. IN_PROGRESS means co
 | REST permission model | IN_PROGRESS | Registrar exists. Feature routes are not all registered |
 | Admin React app | IN_PROGRESS | Shell, provenance labels, and asset enqueue exist. Feature screens are not built |
 | Core SEO metadata | COMPLETE | Titles, descriptions, canonical, robots, and social tags. Templates and validation are tested |
-| Sitemaps | NOT_STARTED | |
+| Sitemaps | COMPLETE | Paged XML for posts, pages, products, categories, brands, CPTs, taxonomies, images, and video. News is optional and off until a publication name is set. Inclusion rules are tested |
 | Schema graph | NOT_STARTED | |
 | Redirects and 404s | NOT_STARTED | |
 | Crawler | NOT_STARTED | |

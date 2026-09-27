@@ -6,7 +6,7 @@
 | seo | Implemented | Titles, descriptions, canonical, robots, Open Graph, Twitter/X |
 | technical-seo | Not started | Indexability and technical issues |
 | schema | Not started | Connected JSON-LD graph |
-| sitemap | Not started | XML sitemaps |
+| sitemap | Implemented | XML sitemaps. News is optional |
 | redirects | Not started | Redirects and 404 monitor |
 | crawler | Not started | Bounded internal crawl |
 | keywords | Not started | Research, discovery, clusters, gap, difficulty |
