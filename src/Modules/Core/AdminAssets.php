@@ -60,6 +60,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'actions'           => $briefing['actions'],
                     'sections'          => $briefing['sections'],
                     'advanced'          => $this->advanced(),
+                    'product'           => $this->product(),
                 ]
             ) . ';',
             'before'
@@ -103,6 +104,24 @@ final class AdminAssets implements HookSubscriberInterface {
             unset( $exception );
 
             return AdvancedBriefing::emptySections();
+        }
+    }
+
+    /**
+     * The latest stored product. A read failure leaves the screen empty.
+     *
+     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>}
+     */
+    private function product(): array {
+        if ( ! isset( $GLOBALS['wpdb'] ) ) {
+            return ProductScreen::emptyScreen();
+        }
+        try {
+            return ( new ProductScreen() )->fromDatabase( new \QueryNova\Infrastructure\Database\WpdbConnection() );
+        } catch ( \Throwable $exception ) {
+            unset( $exception );
+
+            return ProductScreen::emptyScreen();
         }
     }
 }
