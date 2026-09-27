@@ -55,19 +55,21 @@ export function App() {
           Setup
         </button>
       </nav>
-      {view === 'schema' ? <SchemaBuilder restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} /> : null}
-      {view === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
-      {view === 'product' ? <ProductScreen product={boot.product} /> : null}
-      {view === 'category' ? <CategoryScreen category={boot.category} /> : null}
-      {view === 'diagnostics' ? <DiagnosticsScreen diagnostics={boot.diagnostics} /> : null}
-      {view === 'setup' ? <SetupScreen setup={boot.setup} restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} /> : null}
-      {view === 'today' ? (
-        <WhatMattersNow
-          actions={boot.actions ?? []}
-          sections={boot.sections}
-          wooCommerceActive={boot.wooCommerceActive === true}
-        />
-      ) : null}
+      <main>
+        {view === 'schema' ? <SchemaBuilder restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} /> : null}
+        {view === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
+        {view === 'product' ? <ProductScreen product={boot.product} /> : null}
+        {view === 'category' ? <CategoryScreen category={boot.category} /> : null}
+        {view === 'diagnostics' ? <DiagnosticsScreen diagnostics={boot.diagnostics} /> : null}
+        {view === 'setup' ? <SetupScreen setup={boot.setup} restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} /> : null}
+        {view === 'today' ? (
+          <WhatMattersNow
+            actions={boot.actions ?? []}
+            sections={boot.sections}
+            wooCommerceActive={boot.wooCommerceActive === true}
+          />
+        ) : null}
+      </main>
     </ErrorBoundary>
   );
 }

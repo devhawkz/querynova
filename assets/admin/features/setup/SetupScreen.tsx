@@ -137,7 +137,7 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
       <button type="button" onClick={() => void save()}>
         Save setup answers
       </button>
-      {message === '' ? null : <p>{message}</p>}
+      {message === '' ? null : <p role="status">{message}</p>}
     </section>
   );
 }
