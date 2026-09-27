@@ -72,6 +72,53 @@ final class RecommendationRepository {
         return $this->database->select( $this->table(), [ 'status' => 'suggested' ], 50, 0, [ 'id' => 'ASC' ] );
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function find( int $id ): ?array {
+        $rows = $this->database->select( $this->table(), [ 'id' => $id ], 1 );
+
+        return $rows[0] ?? null;
+    }
+
+    public function transition( int $id, string $from, string $to, string $outcome = '' ): bool {
+        $row = $this->find( $id );
+        if ( $row === null || (string) $row['status'] !== $from ) {
+            return false;
+        }
+
+        return $this->database->update(
+            $this->table(),
+            [
+                'status'     => $to,
+                'outcome'    => $outcome,
+                'updated_at' => gmdate( 'Y-m-d H:i:s' ),
+            ],
+            [
+                'id'     => $id,
+                'status' => $from,
+            ]
+        ) > 0;
+    }
+
+    /**
+     * @param array<string, mixed>|null $before
+     * @param array<string, mixed>|null $after
+     */
+    public function recordAction( int $recommendationId, int $userId, string $action, ?array $before, ?array $after ): void {
+        $this->database->insert(
+            $this->database->prefix() . 'qn_actions',
+            [
+                'recommendation_id' => $recommendationId,
+                'user_id'           => $userId,
+                'action'            => $action,
+                'before_json'       => $before === null ? null : wp_json_encode( $before ),
+                'after_json'        => $after === null ? null : wp_json_encode( $after ),
+                'created_at'        => gmdate( 'Y-m-d H:i:s' ),
+            ]
+        );
+    }
+
     private function table(): string {
         return $this->database->prefix() . 'qn_recommendations';
     }

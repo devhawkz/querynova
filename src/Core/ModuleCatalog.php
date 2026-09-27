@@ -20,6 +20,7 @@ use QueryNova\Modules\Experiments\ExperimentModule;
 use QueryNova\Modules\Core\CoreModule;
 use QueryNova\Modules\Keywords\KeywordModule;
 use QueryNova\Modules\Opportunities\OpportunityModule;
+use QueryNova\Modules\Opportunities\OutcomeModule;
 use QueryNova\Modules\Crawler\CrawlerModule;
 use QueryNova\Modules\Redirects\RedirectModule;
 use QueryNova\Modules\Schema\SchemaModule;
@@ -54,6 +55,7 @@ final class ModuleCatalog {
         $modules[] = new ContentModule();
         $modules[] = new AnalyticsModule();
         $modules[] = new OpportunityModule();
+        $modules[] = new OutcomeModule();
         $modules[] = new AiModule();
         $modules[] = new ExperienceModule();
         $modules[] = new ExperimentModule();
