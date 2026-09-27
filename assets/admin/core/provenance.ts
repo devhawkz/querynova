@@ -1,3 +1,5 @@
+import { t } from '../i18n';
+
 export type ProvenanceKind = 'MEASURED' | 'ATTRIBUTED' | 'ESTIMATED' | 'UNAVAILABLE';
 
 export interface MetricPayload {
@@ -15,12 +17,12 @@ const labels: Record<ProvenanceKind, string> = {
 };
 
 export function provenanceLabel(kind: ProvenanceKind): string {
-  return labels[kind];
+  return t(labels[kind]);
 }
 
 export function formatMetric(metric: MetricPayload): string {
   if (metric.kind === 'UNAVAILABLE' || metric.value === null) {
-    return 'Unavailable';
+    return t('Unavailable');
   }
   const rounded = Math.round(metric.value);
   return `${rounded} · ${provenanceLabel(metric.kind)}`;

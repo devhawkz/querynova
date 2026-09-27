@@ -57,7 +57,8 @@ final class AdminAssets implements HookSubscriberInterface {
         }
 
         $briefing = $this->briefing();
-        wp_enqueue_script( 'querynova-admin', QUERYNOVA_URL . 'build/admin.js', [], QUERYNOVA_VERSION, true );
+        wp_enqueue_script( 'querynova-admin', QUERYNOVA_URL . 'build/admin.js', [ 'wp-i18n' ], QUERYNOVA_VERSION, true );
+        wp_set_script_translations( 'querynova-admin', 'querynova', QUERYNOVA_PATH . 'languages' );
         wp_add_inline_script(
             'querynova-admin',
             'window.querynovaAdmin = ' . wp_json_encode(

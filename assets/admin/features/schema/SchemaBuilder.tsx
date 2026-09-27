@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { t } from '../../i18n';
 import { QueryNovaApi } from '../../core/api/client';
 import {
   emptyRule,
@@ -46,7 +47,7 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
   }, [api, nonce, restUrl]);
 
   if (restUrl === '' || nonce === '') {
-    return <p>Schema rules are unavailable in this session.</p>;
+    return <p>{t('Schema rules are unavailable in this session.')}</p>;
   }
 
   function update(index: number, next: SchemaRule) {
@@ -65,7 +66,7 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
 
   return (
     <section aria-labelledby="qn-schema-builder">
-      <h1 id="qn-schema-builder">Schema builder</h1>
+      <h1 id="qn-schema-builder">{t('Schema builder')}</h1>
       <p>
         WebSite, Organization, WebPage, article, product, offer, and breadcrumb entities are connected automatically.
         Rules add more entities. Empty values are left out. They are not sent as zero.

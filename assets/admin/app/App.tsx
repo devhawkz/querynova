@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
+import { t } from '../i18n';
 import { AdvancedDetail } from '../features/advanced/AdvancedDetail';
 import { CategoryScreen } from '../features/categories/CategoryScreen';
 import { DiagnosticsScreen } from '../features/diagnostics/DiagnosticsScreen';
@@ -34,25 +35,25 @@ export function App() {
     <ErrorBoundary>
       <nav aria-label="QueryNova">
         <button type="button" aria-current={view === 'today' ? 'page' : undefined} onClick={() => setView('today')}>
-          What Matters Now
+          {t('What Matters Now')}
         </button>
         <button type="button" aria-current={view === 'schema' ? 'page' : undefined} onClick={() => setView('schema')}>
-          Schema
+          {t('Schema')}
         </button>
         <button type="button" aria-current={view === 'advanced' ? 'page' : undefined} onClick={() => setView('advanced')}>
-          Advanced
+          {t('Advanced')}
         </button>
         <button type="button" aria-current={view === 'product' ? 'page' : undefined} onClick={() => setView('product')}>
-          Product
+          {t('Product')}
         </button>
         <button type="button" aria-current={view === 'category' ? 'page' : undefined} onClick={() => setView('category')}>
-          Category
+          {t('Category')}
         </button>
         <button type="button" aria-current={view === 'diagnostics' ? 'page' : undefined} onClick={() => setView('diagnostics')}>
-          Diagnostics
+          {t('Diagnostics')}
         </button>
         <button type="button" aria-current={view === 'setup' ? 'page' : undefined} onClick={() => setView('setup')}>
-          Setup
+          {t('Setup')}
         </button>
       </nav>
       <main>

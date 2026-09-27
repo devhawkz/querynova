@@ -1,4 +1,5 @@
 import { provenanceLabel } from '../../core/provenance';
+import { t } from '../../i18n';
 import {
   metricLine,
   normalizeSections,
@@ -19,10 +20,10 @@ export function WhatMattersNow({ actions, sections, wooCommerceActive }: Props) 
   const grouped = normalizeSections(sections);
   return (
     <section aria-labelledby="qn-what-matters">
-      <h1 id="qn-what-matters">What Matters Now</h1>
-      <p>{wooCommerceActive ? 'Organic revenue opportunities' : 'Organic growth opportunities'}</p>
+      <h1 id="qn-what-matters">{t('What Matters Now')}</h1>
+      <p>{wooCommerceActive ? t('Organic revenue opportunities') : t('Organic growth opportunities')}</p>
       {visible.length === 0 ? (
-        <p>No measured opportunities yet. Connect Search Console or run an on-site audit to rank the next actions.</p>
+        <p>{t('No measured opportunities yet. Connect Search Console or run an on-site audit to rank the next actions.')}</p>
       ) : (
         <ol>
           {visible.map((action) => (
@@ -30,8 +31,8 @@ export function WhatMattersNow({ actions, sections, wooCommerceActive }: Props) 
               <h2>{action.title}</h2>
               {action.rationale !== '' ? <p>{action.rationale}</p> : null}
               <p>
-                {action.impact !== '' ? `Impact ${action.impact}. ` : ''}
-                {action.confidence !== '' ? `Confidence ${action.confidence}. ` : ''}
+                {action.impact !== '' ? `${t('Impact')} ${action.impact}. ` : ''}
+                {action.confidence !== '' ? `${t('Confidence')} ${action.confidence}. ` : ''}
                 {provenanceLabel(action.provenance)}
               </p>
             </li>
@@ -42,9 +43,9 @@ export function WhatMattersNow({ actions, sections, wooCommerceActive }: Props) 
         const items = grouped[id];
         return (
           <section key={id} aria-labelledby={`qn-section-${id}`}>
-            <h2 id={`qn-section-${id}`}>{SECTION_TITLES[id]}</h2>
+            <h2 id={`qn-section-${id}`}>{t(SECTION_TITLES[id])}</h2>
             {items.length === 0 ? (
-              <p>Nothing recorded.</p>
+              <p>{t('Nothing recorded.')}</p>
             ) : (
               <ul>
                 {items.map((item) => {

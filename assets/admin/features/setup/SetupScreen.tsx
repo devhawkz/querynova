@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { QueryNovaApi } from '../../core/api/client';
+import { t } from '../../i18n';
 import { draftPayload, normalizeSetup, SETUP_STEPS, setupLine, type SetupModel } from './model';
 
 interface Props {
@@ -32,9 +33,9 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
 
   return (
     <section aria-labelledby="qn-setup">
-      <h1 id="qn-setup">Setup</h1>
-      <p>{model.completed ? 'Setup answers are stored.' : 'Setup is not finished.'}</p>
-      <p>Saving records these answers. It does not connect a provider, store an API key, or start a crawl.</p>
+      <h1 id="qn-setup">{t('Setup')}</h1>
+      <p>{model.completed ? t('Setup answers are stored.') : t('Setup is not finished.')}</p>
+      <p>{t('Saving records these answers. It does not connect a provider, store an API key, or start a crawl.')}</p>
       <ol>
         {SETUP_STEPS.map((step) => (
           <li key={step}>{step}</li>
@@ -46,11 +47,11 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
           value={model.siteType ?? ''}
           onChange={(event) => setModel({ ...model, siteType: event.target.value === '' ? null : event.target.value })}
         >
-          <option value="">Nothing recorded.</option>
-          <option value="store">Store</option>
-          <option value="publisher">Publisher</option>
-          <option value="business">Business</option>
-          <option value="other">Other</option>
+          <option value="">{t('Nothing recorded.')}</option>
+          <option value="store">{t('Store')}</option>
+          <option value="publisher">{t('Publisher')}</option>
+          <option value="business">{t('Business')}</option>
+          <option value="other">{t('Other')}</option>
         </select>
       </label>
       <label>
@@ -104,7 +105,7 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
           value={model.titleSeparator ?? ''}
           onChange={(event) => setModel({ ...model, titleSeparator: event.target.value === '' ? null : event.target.value })}
         >
-          <option value="">Nothing recorded.</option>
+          <option value="">{t('Nothing recorded.')}</option>
           <option value="|">|</option>
           <option value="-">-</option>
           <option value="–">–</option>
@@ -158,8 +159,8 @@ function Choice({
         value={value === null ? '' : value ? 'yes' : 'no'}
         onChange={(event) => onChange(event.target.value === '' ? null : event.target.value === 'yes')}
       >
-        <option value="">Nothing recorded.</option>
-        <option value="yes">Yes</option>
+        <option value="">{t('Nothing recorded.')}</option>
+        <option value="yes">{t('Yes')}</option>
         <option value="no">No</option>
       </select>
     </label>

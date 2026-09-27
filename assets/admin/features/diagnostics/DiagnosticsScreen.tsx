@@ -1,3 +1,4 @@
+import { t } from '../../i18n';
 import { displayValue, normalizeDiagnostics, reportText } from './model';
 
 interface Props {
@@ -9,44 +10,44 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
   const text = reportText(report);
   return (
     <section aria-labelledby="qn-diagnostics">
-      <h1 id="qn-diagnostics">Diagnostics</h1>
+      <h1 id="qn-diagnostics">{t('Diagnostics')}</h1>
       <dl>
-        <dt>Environment</dt>
+        <dt>{t('Environment')}</dt>
         <dd>{displayValue(report.environment)}</dd>
-        <dt>QueryNova version</dt>
+        <dt>{t('QueryNova version')}</dt>
         <dd>{displayValue(report.querynovaVersion)}</dd>
-        <dt>WP version</dt>
+        <dt>{t('WP version')}</dt>
         <dd>{displayValue(report.wpVersion)}</dd>
-        <dt>PHP version</dt>
+        <dt>{t('PHP version')}</dt>
         <dd>{displayValue(report.phpVersion)}</dd>
-        <dt>WooCommerce version</dt>
+        <dt>{t('WooCommerce version')}</dt>
         <dd>{displayValue(report.wooCommerceVersion)}</dd>
-        <dt>DB version</dt>
+        <dt>{t('DB version')}</dt>
         <dd>{displayValue(report.dbVersion)}</dd>
-        <dt>Schema version</dt>
+        <dt>{t('Schema version')}</dt>
         <dd>{displayValue(report.schemaVersion)}</dd>
-        <dt>Cron</dt>
+        <dt>{t('Cron')}</dt>
         <dd>{displayValue(report.cronScheduled)}</dd>
-        <dt>Cache</dt>
-        <dd>{displayValue(report.cacheAdapter)}. Hits {displayValue(report.cacheHits)}</dd>
+        <dt>{t('Cache')}</dt>
+        <dd>{displayValue(report.cacheAdapter)}. {t('Hits')} {displayValue(report.cacheHits)}</dd>
       </dl>
-      <h2>Modules</h2>
-      {report.modules.length === 0 ? <p>Nothing recorded.</p> : <ul>{report.modules.map((name) => <li key={name}>{name}</li>)}</ul>}
-      <h2>Providers</h2>
+      <h2>{t('Modules')}</h2>
+      {report.modules.length === 0 ? <p>{t('Nothing recorded.')}</p> : <ul>{report.modules.map((name) => <li key={name}>{name}</li>)}</ul>}
+      <h2>{t('Providers')}</h2>
       {report.providers.length === 0 ? (
-        <p>Nothing recorded.</p>
+        <p>{t('Nothing recorded.')}</p>
       ) : (
         <ul>
           {report.providers.map((provider) => (
             <li key={provider.name}>
-              {provider.name} {provider.state === 'not_configured' ? 'Not configured' : provider.state}
+              {provider.name} {provider.state === 'not_configured' ? t('Not configured') : provider.state}
             </li>
           ))}
         </ul>
       )}
-      <h2>Queue</h2>
+      <h2>{t('Queue')}</h2>
       {Object.keys(report.queue).length === 0 ? (
-        <p>Nothing recorded.</p>
+        <p>{t('Nothing recorded.')}</p>
       ) : (
         <ul>
           {Object.entries(report.queue).map(([status, count]) => (
@@ -56,11 +57,11 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
           ))}
         </ul>
       )}
-      <h2>Migrations</h2>
-      {report.pendingMigrations.length === 0 ? <p>Nothing recorded.</p> : <ul>{report.pendingMigrations.map((version) => <li key={version}>{version}</li>)}</ul>}
-      <h2>Recent errors</h2>
+      <h2>{t('Migrations')}</h2>
+      {report.pendingMigrations.length === 0 ? <p>{t('Nothing recorded.')}</p> : <ul>{report.pendingMigrations.map((version) => <li key={version}>{version}</li>)}</ul>}
+      <h2>{t('Recent errors')}</h2>
       {report.recentErrors.length === 0 ? (
-        <p>Nothing recorded.</p>
+        <p>{t('Nothing recorded.')}</p>
       ) : (
         <ul>
           {report.recentErrors.map((error) => (
@@ -70,8 +71,8 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
           ))}
         </ul>
       )}
-      <h2>System report</h2>
-      <textarea readOnly value={text} aria-label="System report" />
+      <h2>{t('System report')}</h2>
+      <textarea readOnly value={text} aria-label={t('System report')} />
       <button
         type="button"
         onClick={() => {
@@ -80,10 +81,10 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
           }
         }}
       >
-        Copy system report
+        {t('Copy system report')}
       </button>
       <button type="button" onClick={() => downloadReport(text)}>
-        Download diagnostic report
+        {t('Download diagnostic report')}
       </button>
     </section>
   );

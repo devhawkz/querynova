@@ -1,4 +1,5 @@
 import { Component, type ReactNode } from 'react';
+import { t } from '../i18n';
 
 interface Props {
   children: ReactNode;
@@ -23,10 +24,10 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.reference !== '') {
       return (
         <div role="alert">
-          <p>This part of QueryNova hit a problem.</p>
-          <p>Error reference: {this.state.reference}</p>
+          <p>{t('This part of QueryNova hit a problem.')}</p>
+          <p>{t('Error reference:')} {this.state.reference}</p>
           <button type="button" onClick={() => this.setState({ reference: '' })}>
-            Retry
+            {t('Retry')}
           </button>
         </div>
       );

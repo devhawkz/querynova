@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { t } from '../../i18n';
 import { CATEGORY_TABS, CATEGORY_TAB_TITLES, normalizeCategoryScreen, type CategoryTab } from './model';
 
 interface Props {
@@ -12,18 +13,18 @@ export function CategoryScreen({ category }: Props) {
   return (
     <section aria-labelledby="qn-category">
       <h1 id="qn-category">{screen.title ?? 'Category'}</h1>
-      <p>{screen.title === null ? 'No stored category.' : 'Latest stored category.'}</p>
+      <p>{screen.title === null ? t('No stored category.') : t('Latest stored category.')}</p>
       <nav aria-label="Category">
         {CATEGORY_TABS.map((id) => (
           <button key={id} type="button" aria-current={tab === id ? 'page' : undefined} onClick={() => setTab(id)}>
-            {CATEGORY_TAB_TITLES[id]}
+            {t(CATEGORY_TAB_TITLES[id])}
           </button>
         ))}
       </nav>
       <section aria-labelledby={`qn-category-${tab}`}>
-        <h2 id={`qn-category-${tab}`}>{CATEGORY_TAB_TITLES[tab]}</h2>
+        <h2 id={`qn-category-${tab}`}>{t(CATEGORY_TAB_TITLES[tab])}</h2>
         {items.length === 0 ? (
-          <p>Nothing recorded.</p>
+          <p>{t('Nothing recorded.')}</p>
         ) : (
           <ul>
             {items.map((item) => (
