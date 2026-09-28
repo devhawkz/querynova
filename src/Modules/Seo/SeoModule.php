@@ -25,6 +25,7 @@ use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Redirects\Application\RedirectEngine;
 use QueryNova\Modules\Redirects\Infrastructure\RedirectRepository;
 use QueryNova\Modules\Podcast\PodcastGate;
+use QueryNova\Modules\Seo\Application\HeadlessDocument;
 use QueryNova\Modules\Seo\Application\ImportPreview;
 use QueryNova\Modules\Seo\Application\SeoConflictDetector;
 use QueryNova\Modules\Seo\Application\SeoImporter;
@@ -85,6 +86,7 @@ final class SeoModule extends AbstractModule {
     public function registerRoutes( RestRegistrar $rest ): void {
         $onPage = $this->onPage();
         $rest->route( 'GET', '/seo/meta', [ $this, 'show' ], Capability::MANAGE_SEO );
+        $rest->route( 'GET', '/headless/seo', [ $this, 'headless' ], Capability::MANAGE_SEO );
         $rest->route( 'POST', '/seo/meta', [ $this, 'update' ], Capability::MANAGE_SEO );
         $rest->route( 'PUT', '/seo/editor', [ $this->editorPanel(), 'update' ], Capability::MANAGE_SEO );
         $rest->route( 'POST', '/seo/checklist', [ $onPage, 'checklist' ], Capability::MANAGE_SEO );
@@ -153,6 +155,13 @@ final class SeoModule extends AbstractModule {
         );
 
         return $document->toArray();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function headless( \WP_REST_Request $request ): array {
+        return HeadlessDocument::present( $this->show( $request ) );
     }
 
     /**

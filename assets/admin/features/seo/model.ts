@@ -1,3 +1,5 @@
+export const HEADLESS_NOTE = 'Headless SEO uses the same SEO capability. Schema stays empty until it is stored. The page is not fetched.';
+
 export const TEMPLATE_CONTEXTS = [
   'homepage',
   'post',

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { QueryNovaApi } from '../../core/api/client';
 import { t } from '../../i18n';
-import { TEMPLATE_CONTEXTS, auditFindings, auditNote, checklistNote, checklistRows, statusLabel, type ReviewRow } from './model';
+import { HEADLESS_NOTE, TEMPLATE_CONTEXTS, auditFindings, auditNote, checklistNote, checklistRows, statusLabel, type ReviewRow } from './model';
 
 interface Props {
   restUrl: string;
@@ -87,6 +87,10 @@ export function SeoScreen({ restUrl, nonce, metaDefaults, seoAudit }: Props) {
 
   return (
     <>
+      <section aria-labelledby="qn-headless">
+        <h2 id="qn-headless">{t('Headless SEO')}</h2>
+        <p>{t(HEADLESS_NOTE)}</p>
+      </section>
       <section aria-labelledby="qn-on-page">
         <h2 id="qn-on-page">{t('On-page checklist')}</h2>
         <p>{t(checkNote)}</p>
