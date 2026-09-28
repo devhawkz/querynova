@@ -94,6 +94,10 @@ export function editorRequestBody(objectId: number, fields: EditorFields): { obj
   return { object_id: objectId, ...fields };
 }
 
+export function savedDocumentNotice(): string {
+  return 'This document was saved. Other documents were not changed.';
+}
+
 export function shouldSendEditorSave(previousSaving: boolean, saving: boolean, autosave: boolean, loaded: boolean): boolean {
   return loaded && saving && !previousSaving && !autosave;
 }

@@ -102,3 +102,8 @@
 .qn-editor [role='alert'] {
   color: #8e1d2c;
 }
+
+.qn-editor .qn-toast {
+  border: 1px solid currentColor;
+  padding: 0.5rem 0.75rem;
+}

@@ -205,6 +205,11 @@
   margin-right: var(--qn-space-1);
 }
 
+.qn-toast {
+  border: 1px solid currentColor;
+  padding: var(--qn-space-2) var(--qn-space-3);
+}
+
 @media (max-width: 1024px) {
   .qn-shell,
   .qn-settings {

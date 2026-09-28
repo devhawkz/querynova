@@ -1,5 +1,5 @@
 import './editor.css';
-import { shouldSendEditorSave, type EditorFields } from './model';
+import { savedDocumentNotice, shouldSendEditorSave, type EditorFields } from './model';
 import { renderEditor, saveEditor, type EditorMount } from './panel';
 
 interface EditorStore {
@@ -86,8 +86,26 @@ function registerSidebar(source: EditorMount): void {
       const pending = fields;
       void saveEditor(source, pending).then((message) => {
         const alert = document.querySelector('.qn-editor [role="alert"]');
+        const toast = document.querySelector('.qn-editor .qn-toast');
+        if (message === '') {
+          if (toast) {
+            toast.textContent = savedDocumentNotice();
+          }
+          if (alert) {
+            alert.textContent = '';
+          }
+          return;
+        }
         if (alert) {
           alert.textContent = message;
+        }
+        if (toast) {
+          toast.textContent = '';
+        }
+      }).catch(() => {
+        const alert = document.querySelector('.qn-editor [role="alert"]');
+        if (alert) {
+          alert.textContent = 'This document was not saved.';
         }
       });
     }

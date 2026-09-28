@@ -42,6 +42,9 @@ export function renderEditor(root: HTMLElement, boot: EditorMount, mode: Mode): 
   const canonicalWarning = warning('A canonical URL replaces the default URL for this document.');
   const status = document.createElement('p');
   status.setAttribute('role', 'alert');
+  const toast = document.createElement('p');
+  toast.className = 'qn-toast';
+  toast.setAttribute('role', 'status');
   const inputs = new Map<keyof EditorFields, HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>();
 
   function read(): EditorFields {
@@ -124,7 +127,7 @@ export function renderEditor(root: HTMLElement, boot: EditorMount, mode: Mode): 
     marker.value = '1';
     shell.append(marker);
   }
-  shell.append(tabs, ...sections, status, paragraph(t('Saving writes this document only.')));
+  shell.append(tabs, ...sections, toast, status, paragraph(t('Saving writes this document only.')));
   root.replaceChildren(shell);
   refresh();
   for (const input of inputs.values()) {

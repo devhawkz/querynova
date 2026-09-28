@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { DataTable } from '../../components/DataTable';
 import { textCell } from '../../components/data-table';
+import { Toast } from '../../components/Toast';
+import { missingSessionToast } from '../../components/action-toast';
 import { QueryNovaApi } from '../../core/api/client';
 import { t } from '../../i18n';
 import { indexNowPlan, linkPresentation, linkSettingsPlan, listText, podcastPlan, ROBOTS_NOTE } from './model';
@@ -42,6 +44,7 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
   const [podcastEnabled, setPodcastEnabled] = useState(boolField(stored.podcast, 'enabled'));
   const [podcastConfirm, setPodcastConfirm] = useState(false);
   const [message, setMessage] = useState('');
+  const [toast, setToast] = useState('');
   const presentation = linkPresentation(board);
   const boardRecord = isRecord(board) ? board : {};
   const ready = restUrl !== '' && nonce !== '';
@@ -83,8 +86,10 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
 
   async function savePermalink() {
     if (!ready) {
+      setToast(t(missingSessionToast('save')));
       return;
     }
+    setToast('');
     try {
       const body = await api.post<{ note?: string; created?: boolean }>('/redirects/permalink', { from, to, confirmed });
       setMessage(t(typeof body.note === 'string' ? body.note : 'A redirect is not created until you confirm it.'));
@@ -95,8 +100,10 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
 
   async function saveRobots() {
     if (!ready) {
+      setToast(t(missingSessionToast('save')));
       return;
     }
+    setToast('');
     try {
       const body = await api.put<{ note?: string }>('/seo/robots', { content: robots, allow_file: allowFile, confirm: robotsConfirm });
       setMessage(t(typeof body.note === 'string' ? body.note : ROBOTS_NOTE));
@@ -107,8 +114,10 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
 
   async function saveBreadcrumbs() {
     if (!ready) {
+      setToast(t(missingSessionToast('save')));
       return;
     }
+    setToast('');
     try {
       await api.put('/seo/breadcrumbs', { separator, home });
       setMessage(t('Breadcrumb settings are stored. They are not inserted into every page.'));
@@ -119,8 +128,10 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
 
   async function saveRss() {
     if (!ready) {
+      setToast(t(missingSessionToast('save')));
       return;
     }
+    setToast('');
     try {
       await api.put('/seo/rss', { enabled: rssEnabled, before, after });
       setMessage(t('RSS text is stored. It is added only when RSS text is enabled.'));
@@ -346,6 +357,7 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
       </label>
       <button type="button" onClick={() => void savePodcast()}>{t('Store podcast')}</button>
       {message !== '' ? <p role="status">{message}</p> : null}
+      <Toast message={toast} />
     </section>
   );
 }

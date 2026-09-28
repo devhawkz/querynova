@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { Toast } from '../../components/Toast';
+import { missingSessionToast } from '../../components/action-toast';
 import { QueryNovaApi } from '../../core/api/client';
 import { t } from '../../i18n';
 import { channelFlags, htaccessVisibility, SITEMAP_CHANNELS, type ChannelFlags } from '../links/model';
@@ -19,6 +21,7 @@ export function SitemapFields({ restUrl, nonce, siteTools }: Props) {
   const [urls, setUrls] = useState('');
   const [html, setHtml] = useState('');
   const [message, setMessage] = useState(typeof record.note === 'string' ? record.note : '');
+  const [toast, setToast] = useState('');
 
   async function save() {
     const next = channelFlags(flags, newsConfigured, localEnabled);
@@ -37,13 +40,19 @@ export function SitemapFields({ restUrl, nonce, siteTools }: Props) {
 
   async function generateHtml() {
     if (restUrl === '' || nonce === '') {
+      setToast(t('The HTML sitemap was not generated. Permalinks were not flushed.'));
       return;
     }
-    const body = await api.post<{ html?: string; note?: string }>('/sitemap/html', {
-      urls: urls.split('\n').map((line) => line.trim()).filter((line) => line !== ''),
-    });
-    setHtml(typeof body.html === 'string' ? body.html : '');
-    setMessage(t(typeof body.note === 'string' ? body.note : 'Permalinks were not flushed.'));
+    try {
+      const body = await api.post<{ html?: string; note?: string }>('/sitemap/html', {
+        urls: urls.split('\n').map((line) => line.trim()).filter((line) => line !== ''),
+      });
+      setHtml(typeof body.html === 'string' ? body.html : '');
+      setMessage(t(typeof body.note === 'string' ? body.note : 'Permalinks were not flushed.'));
+      setToast('');
+    } catch {
+      setToast(t('The HTML sitemap was not generated. Permalinks were not flushed.'));
+    }
   }
 
   return (
@@ -71,6 +80,7 @@ export function SitemapFields({ restUrl, nonce, siteTools }: Props) {
       <button type="button" onClick={() => void generateHtml()}>{t('Generate HTML sitemap')}</button>
       {html !== '' ? <pre>{html}</pre> : null}
       {message !== '' ? <p role="status">{message}</p> : null}
+      <Toast message={toast} />
     </>
   );
 }
@@ -129,11 +139,14 @@ export function WebmasterFields({ restUrl, nonce, siteTools }: Props) {
   const [pinterest, setPinterest] = useState(text(codes.pinterest));
   const [yandex, setYandex] = useState(text(codes.yandex));
   const [message, setMessage] = useState('');
+  const [toast, setToast] = useState('');
 
   async function save() {
     if (restUrl === '' || nonce === '') {
+      setToast(t(missingSessionToast('save')));
       return;
     }
+    setToast('');
     try {
       await api.put('/seo/webmaster', { google, bing, pinterest, yandex });
       setMessage(t('Verification codes are stored. Empty codes print nothing.'));
@@ -162,6 +175,7 @@ export function WebmasterFields({ restUrl, nonce, siteTools }: Props) {
       </label>
       <button type="button" onClick={() => void save()}>{t('Store verification codes')}</button>
       {message !== '' ? <p role="status">{message}</p> : null}
+      <Toast message={toast} />
     </>
   );
 }
@@ -172,11 +186,14 @@ export function BreadcrumbFields({ restUrl, nonce, siteTools }: Props) {
   const [separator, setSeparator] = useState(text(stored.separator) || '/');
   const [home, setHome] = useState(text(stored.home) || 'Home');
   const [message, setMessage] = useState('');
+  const [toast, setToast] = useState('');
 
   async function save() {
     if (restUrl === '' || nonce === '') {
+      setToast(t(missingSessionToast('save')));
       return;
     }
+    setToast('');
     try {
       await api.put('/seo/breadcrumbs', { separator, home });
       setMessage(t('Breadcrumb settings are stored. They are not inserted into every page.'));
@@ -198,6 +215,7 @@ export function BreadcrumbFields({ restUrl, nonce, siteTools }: Props) {
       </label>
       <button type="button" onClick={() => void save()}>{t('Store breadcrumb settings')}</button>
       {message !== '' ? <p role="status">{message}</p> : null}
+      <Toast message={toast} />
     </>
   );
 }

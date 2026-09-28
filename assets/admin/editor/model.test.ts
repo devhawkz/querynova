@@ -6,6 +6,7 @@ import {
   elementorAdapter,
   fieldsFrom,
   searchPreview,
+  savedDocumentNotice,
   shouldSendEditorSave,
 } from './model';
 
@@ -47,5 +48,6 @@ describe('editor panel', () => {
     expect(shouldSendEditorSave(false, true, true, true)).toBe(false);
     expect(shouldSendEditorSave(true, true, false, true)).toBe(false);
     expect(shouldSendEditorSave(false, true, false, false)).toBe(false);
+    expect(savedDocumentNotice()).toBe('This document was saved. Other documents were not changed.');
   });
 });
