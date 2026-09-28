@@ -22,6 +22,7 @@ use QueryNova\Infrastructure\Database\ArrayDatabase;
 use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Experiments\Application\ExperimentComparison;
+use QueryNova\Modules\Opportunities\Application\OpportunityDrawer;
 use QueryNova\Modules\Opportunities\Application\RecommendationOutcome;
 use QueryNova\Modules\Opportunities\Infrastructure\RecommendationRepository;
 
@@ -73,6 +74,25 @@ final class OutcomeModule extends AbstractModule {
         $rest->route( 'POST', '/outcomes/accept', [ $this, 'acceptRoute' ], Capability::RUN_ANALYSIS );
         $rest->route( 'POST', '/outcomes/apply', [ $this, 'applyRoute' ], Capability::RUN_ANALYSIS );
         $rest->route( 'POST', '/outcomes/measure', [ $this, 'measureRoute' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'POST', '/outcomes/drawer', [ $this, 'drawerRoute' ], Capability::RUN_ANALYSIS );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function drawerRoute( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+        $item   = isset( $params['item'] ) && is_array( $params['item'] ) ? $params['item'] : [];
+
+        return [
+            'detail' => OpportunityDrawer::present( $item ),
+            'result' => OpportunityDrawer::act(
+                (int) ( $params['id'] ?? 0 ),
+                is_string( $params['action'] ?? null ) ? $params['action'] : '',
+                ( $params['confirmed'] ?? false ) === true
+            ),
+        ];
     }
 
     /**
