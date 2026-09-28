@@ -165,6 +165,7 @@ export function App() {
                 restUrl={boot.restUrl ?? ''}
                 nonce={boot.nonce ?? ''}
                 siteTools={boot.siteTools}
+                metaDefaults={boot.metaDefaults}
                 mode={mode}
                 onOpenSchema={() => setView('schema')}
               />

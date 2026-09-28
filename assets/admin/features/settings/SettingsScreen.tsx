@@ -1,4 +1,5 @@
 import { DiagnosticsScreen } from '../diagnostics/DiagnosticsScreen';
+import { RoleSettings, TitleSettings, UrlBaseSettings } from './SettingsEditors';
 import { SetupScreen } from '../setup/SetupScreen';
 import { BreadcrumbFields, HtaccessFields, ImageAltFields, SitemapFields, WebmasterFields } from './SiteToolForms';
 import { type AdminMode } from '../../app/navigation';
@@ -26,6 +27,7 @@ interface Props {
   restUrl: string;
   nonce: string;
   siteTools: unknown;
+  metaDefaults: unknown;
   mode: AdminMode;
   onOpenSchema: () => void;
 }
@@ -42,6 +44,7 @@ export function SettingsScreen({
   restUrl,
   nonce,
   siteTools,
+  metaDefaults,
   mode,
   onOpenSchema,
 }: Props) {
@@ -74,7 +77,7 @@ export function SettingsScreen({
           <h2 id="qn-settings-section">{t(current.label)}</h2>
           {section === 'general' ? <GeneralSection environment={model.wordpressEnvironment} build={model.querynovaBuild} version={version} /> : null}
           {section === 'seo' ? <p>{t('Title templates and the on-page checklist are on the SEO screen. Saving templates there does not rewrite custom titles, canonicals, or indexability.')}</p> : null}
-          {section === 'titles' ? <p>{t('Title and meta templates are not edited here. Stored titles are unchanged.')}</p> : null}
+          {section === 'titles' ? <TitleSettings restUrl={restUrl} nonce={nonce} metaDefaults={metaDefaults} /> : null}
           {section === 'links' ? <p>{t('Link suggestions stay Suggest Only. Open Links to review the graph. This screen does not insert links.')}</p> : null}
           {section === 'breadcrumbs' ? <BreadcrumbFields restUrl={restUrl} nonce={nonce} siteTools={siteTools} mode={mode} /> : null}
           {section === 'images' ? <ImageAltFields restUrl={restUrl} nonce={nonce} siteTools={siteTools} mode={mode} /> : null}
@@ -86,12 +89,22 @@ export function SettingsScreen({
           ) : null}
           {section === 'schema' ? <SchemaSection rules={schemaRules} onOpenSchema={onOpenSchema} /> : null}
           {section === 'webmaster' ? <WebmasterFields restUrl={restUrl} nonce={nonce} siteTools={siteTools} mode={mode} /> : null}
-          {section === 'woocommerce' ? <WooSection active={wooCommerceActive} /> : null}
+          {section === 'woocommerce' ? (
+            <>
+              <WooSection active={wooCommerceActive} />
+              <UrlBaseSettings restUrl={restUrl} nonce={nonce} />
+            </>
+          ) : null}
           {section === 'local' ? <LocalSection registered={hasModule(model, 'local')} /> : null}
           {section === 'analytics' ? <p>{t('Search Console and GA4 are on the Analytics screen. Disconnected stays Not connected. This screen does not invent clicks, impressions, sessions, or revenue.')}</p> : null}
           {section === 'providers' ? <p>{t('An empty provider stays Not connected. Configure is on Diagnostics and does not call a vendor.')}</p> : null}
           {section === 'ai' ? <AiSection features={featuresFor(model, 'ai')} /> : null}
-          {section === 'roles' ? <RolesSection roles={model.roles} /> : null}
+          {section === 'roles' ? (
+            <>
+              <RolesSection roles={model.roles} />
+              <RoleSettings restUrl={restUrl} nonce={nonce} />
+            </>
+          ) : null}
           {section === 'advanced' ? <HtaccessFields restUrl={restUrl} nonce={nonce} siteTools={siteTools} mode={mode} /> : null}
           {section === 'tools' ? (
             <>
