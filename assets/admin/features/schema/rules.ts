@@ -12,6 +12,7 @@ export const SCHEMA_TYPES = [
   'Product',
   'ProductGroup',
   'Offer',
+  'FAQPage',
   'AggregateOffer',
   'AggregateRating',
   'Review',

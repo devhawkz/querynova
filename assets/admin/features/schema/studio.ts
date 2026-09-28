@@ -18,6 +18,7 @@ export const SCHEMA_TEMPLATES = [
   { id: 'article', label: 'Article', type: 'Article', properties: ['headline', 'description'] },
   { id: 'product', label: 'Product', type: 'Product', properties: ['name', 'description'] },
   { id: 'breadcrumb', label: 'Breadcrumb', type: 'BreadcrumbList', properties: ['itemListElement'] },
+  { id: 'faq', label: 'FAQ', type: 'FAQPage', properties: ['mainEntity'] },
 ] as const;
 
 export interface ImportPreview {

@@ -31,6 +31,7 @@ final class SchemaTypes {
             'Product',
             'ProductGroup',
             'Offer',
+            'FAQPage',
             'AggregateOffer',
             'AggregateRating',
             'Review',

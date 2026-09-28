@@ -40,6 +40,12 @@ final class JsonLdStudio {
                 'type'       => 'BreadcrumbList',
                 'properties' => [ 'itemListElement' ],
             ],
+            [
+                'id'         => 'faq',
+                'label'      => 'FAQ',
+                'type'       => 'FAQPage',
+                'properties' => [ 'mainEntity' ],
+            ],
         ];
     }
 

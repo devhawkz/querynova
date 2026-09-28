@@ -3,13 +3,14 @@ import { previewImport, SCHEMA_TEMPLATES, SPEAKABLE_NOTE, templateProperties, vi
 import { SCHEMA_TYPES } from './rules';
 
 describe('schema studio', () => {
-  it('offers three template cards and does not dump blank fields', () => {
-    expect(SCHEMA_TEMPLATES.map((template) => template.id)).toEqual(['article', 'product', 'breadcrumb']);
+  it('offers template cards and does not dump blank fields', () => {
+    expect(SCHEMA_TEMPLATES.map((template) => template.id)).toEqual(['article', 'product', 'breadcrumb', 'faq']);
     expect(templateProperties('article')).toEqual(['headline', 'description']);
     expect(templateProperties('product')).toEqual(['name', 'description']);
     expect(templateProperties('breadcrumb')).toEqual(['itemListElement']);
+    expect(templateProperties('faq')).toEqual(['mainEntity']);
     const fields = SCHEMA_TEMPLATES.reduce((count, template) => count + template.properties.length, 0);
-    expect(fields).toBe(5);
+    expect(fields).toBe(6);
     expect(fields).toBeLessThan(60);
     expect(SCHEMA_TYPES).not.toContain('Speakable');
     expect(SPEAKABLE_NOTE).toContain('headline and a CSS selector');
@@ -25,10 +26,16 @@ describe('schema studio', () => {
     expect(preview.note).toContain('Nothing was saved');
   });
 
-  it('rejects an unsupported schema type', () => {
-    const preview = previewImport('{"@type":"FAQPage","name":"Questions"}');
-    expect(preview.valid).toBe(false);
+  it('keeps a supplied FAQ property and drops an empty one', () => {
+    const preview = previewImport('{"@type":"FAQPage","name":"Questions","mainEntity":""}');
+    expect(preview.valid).toBe(true);
     expect(preview.saved).toBe(false);
-    expect(preview.properties).toEqual([]);
+    expect(preview.properties).toEqual(['name']);
+    const empty = previewImport('{"@type":"FAQPage","name":"","mainEntity":""}');
+    expect(empty.valid).toBe(true);
+    expect(empty.properties).toEqual([]);
+    const unsupported = previewImport('{"@type":"HowTo","name":"Steps"}');
+    expect(unsupported.valid).toBe(false);
+    expect(unsupported.saved).toBe(false);
   });
 });

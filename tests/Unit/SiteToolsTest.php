@@ -122,9 +122,14 @@ final class SiteToolsTest extends TestCase {
         self::assertIsArray( $preview['rule'] );
         self::assertCount( 1, $preview['rule']['mappings'] );
         self::assertSame( 'headline', $preview['rule']['mappings'][0]['property'] );
-        self::assertSame( [ 'article', 'product', 'breadcrumb' ], array_column( JsonLdStudio::templates(), 'id' ) );
+        self::assertSame( [ 'article', 'product', 'breadcrumb', 'faq' ], array_column( JsonLdStudio::templates(), 'id' ) );
 
-        $rejected = JsonLdStudio::import( '{"@type":"FAQPage","name":"Questions"}' );
+        $faq = JsonLdStudio::import( '{"@type":"FAQPage","name":"Questions","mainEntity":""}' );
+        self::assertTrue( $faq['valid'] );
+        self::assertFalse( $faq['saved'] );
+        self::assertSame( [ 'name' ], array_column( $faq['rule']['mappings'], 'property' ) );
+
+        $rejected = JsonLdStudio::import( '{"@type":"HowTo","name":"Steps"}' );
 
         self::assertFalse( $rejected['valid'] );
         self::assertNull( $rejected['rule'] );
@@ -135,7 +140,7 @@ final class SiteToolsTest extends TestCase {
     public function testValidationDoesNotSaveAndRequiresATypeAndId(): void {
         $invalid = JsonLdStudio::validate(
             [
-                'type'        => 'FAQPage',
+                'type'        => 'HowTo',
                 'id_template' => '',
             ]
         );
