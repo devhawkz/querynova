@@ -35,18 +35,28 @@ final class SupportMatrixTest extends TestCase {
         self::assertNotSame( [], ( new Requirements() )->evaluate( '8.0.30', '6.4', true, true ) );
     }
 
-    public function testWordPressAndWooCommerceReleasesAreNotMarkedTested(): void {
+    public function testOnlyWordPress712AndWooCommerce1112AreMarkedTested(): void {
         $matrix = ( new SupportMatrix() )->combinations();
         $header = (string) file_get_contents( QUERYNOVA_PATH . 'querynova.php' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local plugin header, not a remote request.
         $ci     = (string) file_get_contents( QUERYNOVA_PATH . '.github/workflows/ci.yml' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- local workflow file, not a remote request.
 
         self::assertSame( '6.4', $matrix['wp']['minimum'] );
-        self::assertSame( [], $matrix['wp']['observed'] );
+        self::assertSame( [ '7.1.2' ], $matrix['wp']['observed'] );
+        self::assertSame( 'dbe8ec5edaed5782802597d17b3a1394c0fff0a5', $matrix['wp']['commit'] );
+        self::assertSame( '36388914008', $matrix['wp']['actions_run'] );
         self::assertFalse( $matrix['wc']['required'] );
         self::assertSame( 'api', $matrix['wc']['hpos'] );
-        self::assertSame( [], $matrix['wc']['observed'] );
+        self::assertSame( [ '11.1.2' ], $matrix['wc']['observed'] );
+        self::assertSame( '7.1.2', $matrix['wc']['wp_release'] );
+        self::assertSame( 'dbe8ec5edaed5782802597d17b3a1394c0fff0a5', $matrix['wc']['commit'] );
+        self::assertSame( '36388914008', $matrix['wc']['actions_run'] );
+        self::assertTrue( $matrix['admin_browser']['observed'] );
+        self::assertSame( '7.1.2', $matrix['admin_browser']['wp_release'] );
+        self::assertSame( 'dbe8ec5edaed5782802597d17b3a1394c0fff0a5', $matrix['admin_browser']['commit'] );
+        self::assertSame( '36388914008', $matrix['admin_browser']['actions_run'] );
         self::assertStringContainsString( 'Requires at least: 6.4', $header );
         self::assertStringNotContainsString( 'WC tested up to', $header );
+        self::assertStringNotContainsString( 'Tested up to:', $header );
         self::assertStringContainsString( "QUERYNOVA_WP_VERSION: '7.1.2'", $ci );
         self::assertStringContainsString( "QUERYNOVA_WC_VERSION: '11.1.2'", $ci );
         self::assertStringContainsString( 'bin/boot-release-tests.sh phpunit.wp-release.xml.dist', $ci );

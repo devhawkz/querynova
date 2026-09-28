@@ -14,4 +14,4 @@ The jobs are `wordpress`, `woocommerce`, and `admin-browser` in `.github/workflo
 
 ## Consequences
 
-The Definition of Done still includes all three runs. QueryNova stays incomplete until those jobs have passed. The support matrix keeps WordPress and WooCommerce observed lists empty until then.
+Actions run 36388914008 on commit `dbe8ec5edaed5782802597d17b3a1394c0fff0a5` passed `wordpress`, `woocommerce`, and `admin-browser`. The support matrix records WordPress 7.1.2, WooCommerce 11.1.2 on that WordPress, and that admin browser pass. QueryNova stays incomplete while other Definition of Done items remain open. See `docs/implementation-status.md`.
