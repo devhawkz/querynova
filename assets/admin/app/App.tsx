@@ -6,6 +6,8 @@ import { CategoryScreen } from '../features/categories/CategoryScreen';
 import { ProductScreen } from '../features/products/ProductScreen';
 import { WhatMattersNow, type TodayAction } from '../features/dashboard/WhatMattersNow';
 import { SchemaBuilder } from '../features/schema/SchemaBuilder';
+import { AnalyticsScreen } from '../features/analytics/AnalyticsScreen';
+import { RankScreen } from '../features/rank/RankScreen';
 import { SeoScreen } from '../features/seo/SeoScreen';
 import { SettingsScreen } from '../features/settings/SettingsScreen';
 import { type SettingsSectionId } from '../features/settings/model';
@@ -30,6 +32,8 @@ declare global {
       settings?: unknown;
       metaDefaults?: unknown;
       seoAudit?: unknown;
+      analytics?: unknown;
+      rankTracker?: unknown;
     };
   }
 }
@@ -104,6 +108,9 @@ export function App() {
             {view === 'seo' ? (
               <SeoScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} metaDefaults={boot.metaDefaults} seoAudit={boot.seoAudit} />
             ) : null}
+            {view === 'analytics' ? (
+              <AnalyticsScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} analytics={boot.analytics} rankTracker={boot.rankTracker} />
+            ) : null}
             {view === 'schema' ? (
               <SchemaBuilder
                 restUrl={boot.restUrl ?? ''}
@@ -115,13 +122,8 @@ export function App() {
                 }}
               />
             ) : null}
+            {view === 'rank' ? <RankScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} rankTracker={boot.rankTracker} /> : null}
             {view === 'rank' && mode === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
-            {view === 'rank' && mode === 'simple' ? (
-              <section>
-                <h2>{t('Rank history stays in Advanced')}</h2>
-                <p>{t('Simple mode keeps the next actions on the dashboard. Switch to Advanced to inspect stored SERP rows. Missing ranks stay empty.')}</p>
-              </section>
-            ) : null}
             {view === 'commerce' ? (
               <>
                 <ProductScreen product={boot.product} />
@@ -143,7 +145,7 @@ export function App() {
                 onOpenSchema={() => setView('schema')}
               />
             ) : null}
-            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' ? (
+            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' && view !== 'analytics' ? (
               <section>
                 <h2>{t(page.label)}</h2>
                 <p>{t(page.hint)}</p>

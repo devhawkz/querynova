@@ -82,7 +82,7 @@ export function SettingsScreen({
           {section === 'webmaster' ? <p>{t('Verification codes are not stored on this screen. Search engines stay not connected.')}</p> : null}
           {section === 'woocommerce' ? <WooSection active={wooCommerceActive} /> : null}
           {section === 'local' ? <LocalSection registered={hasModule(model, 'local')} /> : null}
-          {section === 'analytics' ? <p>{t('Analytics is not connected. Metrics are not available.')}</p> : null}
+          {section === 'analytics' ? <p>{t('Search Console and GA4 are on the Analytics screen. Disconnected stays Not connected. This screen does not invent clicks, impressions, sessions, or revenue.')}</p> : null}
           {section === 'providers' ? <p>{t('Providers are not configured. This screen does not invent metrics.')}</p> : null}
           {section === 'ai' ? <AiSection features={featuresFor(model, 'ai')} /> : null}
           {section === 'roles' ? <RolesSection roles={model.roles} /> : null}

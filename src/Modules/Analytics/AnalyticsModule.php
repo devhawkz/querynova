@@ -25,7 +25,9 @@ use QueryNova\Infrastructure\Lock\TransientLock;
 use QueryNova\Infrastructure\Queue\JobRegistrar;
 use QueryNova\Infrastructure\Queue\JobRunner;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
+use QueryNova\Modules\Analytics\Application\AnalyticsScreens;
 use QueryNova\Modules\Analytics\Application\AnalyticsWorkspace;
+use QueryNova\Modules\Analytics\Application\ProviderConnections;
 use QueryNova\Modules\Analytics\Domain\AnalyticsProvider;
 use QueryNova\Modules\Analytics\Domain\CommerceMetricsProvider;
 use QueryNova\Modules\Analytics\Domain\SearchConsoleProvider;
@@ -33,6 +35,8 @@ use QueryNova\Modules\Analytics\Infrastructure\AnalyticsRepository;
 use QueryNova\Modules\Analytics\Infrastructure\NullAnalyticsProvider;
 use QueryNova\Modules\Analytics\Infrastructure\NullCommerceMetricsProvider;
 use QueryNova\Modules\Analytics\Infrastructure\NullSearchConsoleProvider;
+use QueryNova\Modules\Experience\Application\ExperienceSummary;
+use QueryNova\Modules\Serp\Application\IndexAvailability;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -111,6 +115,9 @@ final class AnalyticsModule extends AbstractModule {
     public function registerRoutes( RestRegistrar $rest ): void {
         $rest->route( 'POST', '/analytics/sync', [ $this, 'enqueue' ], Capability::RUN_ANALYSIS );
         $rest->route( 'GET', '/analytics', [ $this, 'show' ], Capability::VIEW_ANALYTICS );
+        $rest->route( 'GET', '/analytics/connections', [ $this, 'connections' ], Capability::VIEW_ANALYTICS );
+        $rest->route( 'POST', '/analytics/connections', [ $this, 'connectionAction' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'GET', '/analytics/screens', [ $this, 'screens' ], Capability::VIEW_ANALYTICS );
     }
 
     /**
@@ -172,6 +179,115 @@ final class AnalyticsModule extends AbstractModule {
             'stored_search_rows'   => $search === null ? 0 : $this->repository()->saveSearch( $property, $search ),
             'stored_traffic_rows'  => $traffic === null ? 0 : $this->repository()->saveTraffic( $traffic ),
             'stored_commerce_rows' => $commerce === null ? 0 : $this->repository()->saveCommerce( $commerce ),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function connections( \WP_REST_Request $request ): array {
+        unset( $request );
+
+        return [
+            'search_console' => ProviderConnections::card( 'search_console', $this->search->id() ),
+            'ga4'            => ProviderConnections::card( 'ga4', $this->analytics->id() ),
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|\WP_Error
+     */
+    public function connectionAction( \WP_REST_Request $request ): array|\WP_Error {
+        $params   = $request->get_json_params();
+        $params   = is_array( $params ) ? $params : [];
+        $channel  = is_string( $params['channel'] ?? null ) ? $params['channel'] : '';
+        $action   = is_string( $params['action'] ?? null ) ? $params['action'] : '';
+        $property = is_string( $params['property'] ?? null ) ? $params['property'] : '';
+        $start    = is_string( $params['start'] ?? null ) ? $params['start'] : '';
+        $end      = is_string( $params['end'] ?? null ) ? $params['end'] : '';
+        if ( ! in_array( $channel, ProviderConnections::CHANNELS, true ) ) {
+            return new \WP_Error( 'querynova_invalid_connection', 'Choose Search Console or GA4.', [ 'status' => 400 ] );
+        }
+        $providerId = $channel === 'search_console' ? $this->search->id() : $this->analytics->id();
+        if ( $action === 'connect' ) {
+            return ProviderConnections::connect( $channel, $property, $providerId );
+        }
+        if ( $action === 'disconnect' ) {
+            return ProviderConnections::disconnect( $channel );
+        }
+        if ( $action === 'test' ) {
+            return $channel === 'search_console'
+                ? ProviderConnections::probeSearch( $this->search, $property, $start, $end )
+                : ProviderConnections::probeAnalytics( $this->analytics, $property, $start, $end );
+        }
+        if ( $action === 'resync' ) {
+            return $this->queueResync( $channel, $providerId, $start, $end );
+        }
+
+        return new \WP_Error( 'querynova_invalid_connection', 'Choose connect, test, disconnect, or resync.', [ 'status' => 400 ] );
+    }
+
+    /**
+     * Stored screen model. This does not call a provider.
+     *
+     * @return array<string, mixed>
+     */
+    public function screens( \WP_REST_Request $request ): array {
+        $start = trim( (string) $request->get_param( 'start' ) );
+        $end   = trim( (string) $request->get_param( 'end' ) );
+
+        return self::screenModel( $this->search->id(), $this->analytics->id(), $start, $end );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function screenModel( string $searchId, string $analyticsId, string $start, string $end ): array {
+        if ( $start === '' || $end === '' ) {
+            $day   = 86400;
+            $end   = gmdate( 'Y-m-d', time() - $day );
+            $start = gmdate( 'Y-m-d', time() - ( 28 * $day ) );
+        }
+
+        return AnalyticsScreens::present(
+            ProviderConnections::card( 'search_console', $searchId ),
+            ProviderConnections::card( 'ga4', $analyticsId ),
+            $start,
+            $end,
+            null,
+            null,
+            null,
+            null,
+            ( new ExperienceSummary() )->summarize( null, 'mobile' ),
+            IndexAvailability::report( '', null, 'Index status' ),
+            IndexAvailability::report( '', null, 'Trends' )
+        );
+    }
+
+    /**
+     * @return array<string, mixed>|\WP_Error
+     */
+    private function queueResync( string $channel, string $providerId, string $start, string $end ): array|\WP_Error {
+        $plan = ProviderConnections::resyncPlan( $channel, $providerId, $start, $end );
+        if ( $plan['queued'] !== true ) {
+            return $plan;
+        }
+        if ( ! $this->runner instanceof JobRunner ) {
+            return new \WP_Error( 'querynova_analytics_unavailable', 'Analytics sync is unavailable.', [ 'status' => 500 ] );
+        }
+        $payload = is_array( $plan['payload'] ?? null ) ? $plan['payload'] : [];
+        unset( $payload['url'], $payload['urls'] );
+        $jobId = $this->runner->enqueue(
+            (string) $plan['type'],
+            $payload,
+            'analytics-resync-' . bin2hex( random_bytes( 8 ) )
+        );
+
+        return [
+            'job_id' => $jobId,
+            'status' => 'queued',
+            'queued' => true,
+            'note'   => $plan['note'],
         ];
     }
 

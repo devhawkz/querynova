@@ -24,9 +24,11 @@ use QueryNova\Infrastructure\Database\MigrationRegistrar;
 use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Queue\JobRepository;
 use QueryNova\Infrastructure\WordPress\OptionStore;
+use QueryNova\Modules\Analytics\AnalyticsModule;
 use QueryNova\Modules\Schema\SchemaModule;
 use QueryNova\Modules\Seo\Application\MetaDefaults;
 use QueryNova\Modules\Seo\Presentation\OnPageController;
+use QueryNova\Modules\Serp\Application\RankTracker;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -90,6 +92,8 @@ final class AdminAssets implements HookSubscriberInterface {
                     'settings'          => $this->settingsSnapshot(),
                     'metaDefaults'      => MetaDefaults::read(),
                     'seoAudit'          => $this->seoAudit(),
+                    'analytics'         => $this->analytics(),
+                    'rankTracker'       => RankTracker::catalog(),
                 ]
             ) . ';',
             'before'
@@ -170,6 +174,15 @@ final class AdminAssets implements HookSubscriberInterface {
 
             return CategoryScreen::emptyScreen();
         }
+    }
+
+    /**
+     * Disconnected screen model. Opening the admin page does not call a provider.
+     *
+     * @return array<string, mixed>
+     */
+    private function analytics(): array {
+        return AnalyticsModule::screenModel( '', '', '', '' );
     }
 
     /**

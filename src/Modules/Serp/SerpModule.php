@@ -25,6 +25,8 @@ use QueryNova\Infrastructure\Lock\TransientLock;
 use QueryNova\Infrastructure\Queue\JobRegistrar;
 use QueryNova\Infrastructure\Queue\JobRunner;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
+use QueryNova\Modules\Serp\Application\IndexAvailability;
+use QueryNova\Modules\Serp\Application\RankTracker;
 use QueryNova\Modules\Serp\Application\SerpCapture;
 use QueryNova\Modules\Serp\Domain\SerpProvider;
 use QueryNova\Modules\Serp\Domain\SerpQuery;
@@ -98,6 +100,11 @@ final class SerpModule extends AbstractModule {
     public function registerRoutes( RestRegistrar $rest ): void {
         $rest->route( 'POST', '/serp', [ $this, 'enqueue' ], Capability::RUN_ANALYSIS );
         $rest->route( 'GET', '/serp', [ $this, 'history' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'GET', '/serp/keywords', [ $this, 'keywords' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'POST', '/serp/keywords', [ $this, 'addKeyword' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'POST', '/serp/keywords/bulk', [ $this, 'addKeywords' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'POST', '/serp/keywords/csv', [ $this, 'importKeywords' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'GET', '/serp/index-status', [ $this, 'indexStatus' ], Capability::RUN_ANALYSIS );
     }
 
     /**
@@ -142,6 +149,71 @@ final class SerpModule extends AbstractModule {
         return [
             'status'    => 'stored',
             'snapshots' => $rows,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function keywords( \WP_REST_Request $request ): array {
+        unset( $request );
+        $catalog            = RankTracker::catalog();
+        $catalog['history'] = RankTracker::history( $this->repository()->recentRanks( 20 ) );
+
+        return $catalog;
+    }
+
+    /**
+     * @return array<string, mixed>|\WP_Error
+     */
+    public function addKeyword( \WP_REST_Request $request ): array|\WP_Error {
+        $params = $request->get_json_params();
+        $result = RankTracker::add( is_array( $params ) ? $params : [] );
+        if ( ( $result['status'] ?? '' ) === 'invalid' ) {
+            return new \WP_Error( 'querynova_invalid_keyword', (string) $result['note'], [ 'status' => 400 ] );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function addKeywords( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $rows   = is_array( $params ) && is_array( $params['keywords'] ?? null ) ? $params['keywords'] : [];
+        $clean  = [];
+        foreach ( $rows as $row ) {
+            if ( is_array( $row ) ) {
+                $clean[] = $row;
+            }
+        }
+
+        return RankTracker::addMany( $clean );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function importKeywords( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $csv    = is_array( $params ) && is_string( $params['csv'] ?? null ) ? $params['csv'] : '';
+
+        return RankTracker::importCsv( $csv );
+    }
+
+    /**
+     * Index status and trends stay unavailable until a provider supplies rows.
+     *
+     * @return array<string, mixed>
+     */
+    public function indexStatus( \WP_REST_Request $request ): array {
+        unset( $request );
+
+        return [
+            'index_status' => IndexAvailability::report( '', null, 'Index status' ),
+            'trends'       => IndexAvailability::report( '', null, 'Trends' ),
+            'note'         => 'No SERP vendor is selected.',
         ];
     }
 
