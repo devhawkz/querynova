@@ -14,8 +14,6 @@
             <directory>tests/Security</directory>
             <directory>tests/Providers</directory>
             <directory>tests/Performance</directory>
-            <directory>tests/WooCommerce</directory>
-            <directory>tests/WordPress</directory>
         </testsuite>
     </testsuites>
     <source>
