@@ -1,0 +1,59 @@
+# Release notes
+
+## 0.1.0
+
+Plugin version `0.1.0`. Schema version `202609270002`. REST namespace `querynova/v1`. Text domain `querynova`.
+
+Published methodology versions shipped with this plugin version:
+
+| Methodology | Version |
+| --- | --- |
+| `querynova.organic_difficulty` | `1` |
+| `querynova.content_observations` | `v1` |
+| `querynova.ai_visibility_index` | `v1` |
+
+A methodology without a published version is omitted from the version description. The release channel follows the WordPress environment: development for local and development, beta for staging, and stable otherwise.
+
+### Requirements
+
+- PHP 8.1 or newer
+- WordPress 6.4 or newer
+- WooCommerce is not required. The README names WooCommerce 8.2 or newer when commerce features are used.
+
+The plugin header states Requires at least 6.4 and Requires PHP 8.1. It does not state a tested-up-to range.
+
+### Observed on CI
+
+[Actions run 36388914008](https://github.com/devhawkz/querynova/actions/runs/36388914008) on commit `dbe8ec5edaed5782802597d17b3a1394c0fff0a5` passed:
+
+- `php (8.1)` and `php (8.3)`, including PHPCS, PHPStan, PHPUnit, and the synthetic catalog checks
+- `admin` (ESLint, TypeScript, Vitest, production build)
+- `WordPress release` for WordPress 7.1.2
+- `WooCommerce release` for WooCommerce 11.1.2 on that WordPress
+- `Admin browser pass` of the QueryNova admin, which found the visible What Matters Now heading and recorded no page or console errors on that screen
+
+The support matrix records WordPress 7.1.2 and WooCommerce 11.1.2 as the observed releases, plus that admin browser pass. PHP observed inside a process remains the interpreter running that process.
+
+### What this version includes
+
+- Activation, deactivation, and uninstall with retain-data as the default
+- Admin views: What Matters Now, Schema, Advanced, Product, Category, Diagnostics, and Setup
+- Core SEO metadata, sitemaps, schema rules, redirects, the 404 monitor, and the batched crawler
+- WooCommerce product, category, brand, facet, and bulk SEO through WooCommerce APIs, including HPOS order reads
+- Keyword, SERP, rank, competitor, backlink, content, opportunity, recommendation, experiment, alert, and report modules
+- AI visibility and page-experience storage behind provider interfaces
+- CSV and JSON reports
+- Diagnostics and `wp querynova`
+- Safe mode, staging identifier warning, and SEO plugin conflict notice
+- Import from supplied Yoast, Rank Math, and AIOSEO meta
+- Site Health registration of one direct QueryNova health test
+
+Connected Search Console, GA4, SERP, backlink, page-experience, and model adapters are null until a provider is configured. Setup can store property strings. It does not connect a provider.
+
+### Packages
+
+`npm run build` writes the production admin bundle with diagnostics off, debug off, and no source map. `npm run build:staging` writes the staging bundle with diagnostics on and debug off. `npm run package` and `npm run package:staging` write `dist/querynova-production.zip` and `dist/querynova-staging.zip`.
+
+### Data
+
+Upgrading runs pending migrations through activation or `wp querynova migrate`. Deactivation does not delete stored options. Uninstall deletes QueryNova tables only when `querynova_delete_data_on_uninstall` is `yes`.

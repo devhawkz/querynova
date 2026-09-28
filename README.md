@@ -35,9 +35,13 @@ Environment comes from `wp_get_environment_type()` (`local`, `development`, `sta
 
 ## Documentation
 
+- `docs/user-guide.md`
 - `docs/architecture.md`
 - `docs/modules.md`
 - `docs/implementation-status.md`
+- `docs/performance.md`
+- `docs/release-notes.md`
+- `docs/known-limitations.md`
 - `docs/adding-a-feature.md`
 - `docs/adding-a-provider.md`
 
