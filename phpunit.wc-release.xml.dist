@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  PHPUnit 9 configuration for the WooCommerce release job.
+  PHPUnit 11 configuration for the WooCommerce release job.
   The default phpunit.xml.dist suite does not load this file and does not boot WooCommerce.
 -->
-<phpunit
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
-	bootstrap="tests/environments/bootstrap-wordpress.php"
-	colors="true"
-	beStrictAboutTestsThatDoNotTestAnything="true"
-	failOnRisky="true"
-	convertErrorsToExceptions="true"
-	convertWarningsToExceptions="true"
-	convertNoticesToExceptions="false"
-	convertDeprecationsToExceptions="false"
->
-	<testsuites>
-		<testsuite name="woocommerce-release">
-			<file>tests/environments/WooCommerceReleaseTest.php</file>
-		</testsuite>
-	</testsuites>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.5/phpunit.xsd"
+         bootstrap="tests/environments/bootstrap-wordpress.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache/wc-release"
+         failOnRisky="true"
+         failOnWarning="true"
+         failOnNotice="false"
+         failOnDeprecation="false">
+    <testsuites>
+        <testsuite name="woocommerce-release">
+            <file>tests/environments/WooCommerceReleaseTest.php</file>
+        </testsuite>
+    </testsuites>
 </phpunit>

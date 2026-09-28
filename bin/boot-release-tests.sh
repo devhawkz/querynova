@@ -73,8 +73,8 @@ cat > "$tooling/composer.json" <<'EOF'
   "name": "querynova/release-phpunit",
   "description": "PHPUnit 9 for the WordPress test library. Separate from the plugin PHPUnit 11 suite.",
   "require-dev": {
-    "phpunit/phpunit": "9.6.22",
-    "yoast/phpunit-polyfills": "^2.0"
+    "phpunit/phpunit": "11.5.56",
+    "yoast/phpunit-polyfills": "3.1.2"
   }
 }
 EOF
