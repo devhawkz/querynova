@@ -10,12 +10,14 @@ import {
   IDENTIFIER_KEYS,
   type IdentifierKey,
 } from '../commerce/workspace';
+import { SparklineList } from '../charts/Sparkline';
 import { PRODUCT_TABS, PRODUCT_TAB_TITLES, normalizeProductScreen, type ProductTab } from './model';
 
 interface Props {
   product: unknown;
   restUrl?: string;
   nonce?: string;
+  sparklines?: unknown;
 }
 
 const IDENTIFIER_LABELS: Record<IdentifierKey, string> = {
@@ -30,7 +32,7 @@ const IDENTIFIER_LABELS: Record<IdentifierKey, string> = {
   isbn: 'ISBN',
 };
 
-export function ProductScreen({ product, restUrl = '', nonce = '' }: Props) {
+export function ProductScreen({ product, restUrl = '', nonce = '', sparklines }: Props) {
   const screen = normalizeProductScreen(product);
   const stored = readWorkspace(recordField(product, 'workspace'), 'product');
   const api = useMemo(() => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }), [restUrl, nonce]);
@@ -170,6 +172,7 @@ export function ProductScreen({ product, restUrl = '', nonce = '' }: Props) {
       </nav>
       <section aria-labelledby={`qn-product-${tab}`}>
         <h2 id={`qn-product-${tab}`}>{t(PRODUCT_TAB_TITLES[tab])}</h2>
+        {tab === 'revenue' ? <SparklineList source={sparklines} ids={['revenue-measured', 'revenue-attributed', 'revenue-estimated']} /> : null}
         {items.length === 0 ? (
           <p>{t('Nothing recorded.')}</p>
         ) : (

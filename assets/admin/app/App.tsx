@@ -49,6 +49,7 @@ declare global {
       localWorkspace?: unknown;
       notifications?: unknown;
       documents?: unknown;
+      sparklines?: unknown;
     };
   }
 }
@@ -162,7 +163,7 @@ export function App() {
               <SeoScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} metaDefaults={boot.metaDefaults} seoAudit={boot.seoAudit} />
             ) : null}
             {view === 'analytics' ? (
-              <AnalyticsScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} analytics={boot.analytics} rankTracker={boot.rankTracker} />
+              <AnalyticsScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} analytics={boot.analytics} rankTracker={boot.rankTracker} sparklines={boot.sparklines} />
             ) : null}
             {view === 'schema' ? (
               <SchemaBuilder
@@ -175,7 +176,7 @@ export function App() {
                 }}
               />
             ) : null}
-            {view === 'rank' ? <RankScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} rankTracker={boot.rankTracker} /> : null}
+            {view === 'rank' ? <RankScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} rankTracker={boot.rankTracker} sparklines={boot.sparklines} /> : null}
             {view === 'links' ? <LinksScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} siteTools={boot.siteTools} /> : null}
             {view === 'content' ? <ContentScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} contentWorkspace={boot.contentWorkspace} /> : null}
             {view === 'ai' ? <AiScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} aiWorkspace={boot.aiWorkspace} /> : null}
@@ -184,7 +185,7 @@ export function App() {
             {view === 'rank' && mode === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
             {view === 'commerce' ? (
               <>
-                <ProductScreen product={boot.product} restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} />
+                <ProductScreen product={boot.product} restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} sparklines={boot.sparklines} />
                 <CategoryScreen category={boot.category} restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} />
               </>
             ) : null}

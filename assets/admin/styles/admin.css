@@ -217,6 +217,31 @@
   min-height: 2.5rem;
 }
 
+.qn-sparkline {
+  margin: var(--qn-space-3) 0;
+}
+
+.qn-sparkline .qn-badge {
+  margin-left: var(--qn-space-2);
+}
+
+.qn-spark {
+  display: block;
+  width: 10rem;
+  height: 2rem;
+  color: var(--qn-accent);
+}
+
+.qn-spark path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+.qn-spark circle {
+  fill: currentColor;
+}
+
 .qn-search-backdrop {
   position: fixed;
   inset: 0;

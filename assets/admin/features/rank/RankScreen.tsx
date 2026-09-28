@@ -1,15 +1,17 @@
 import { useMemo, useState } from 'react';
 import { QueryNovaApi } from '../../core/api/client';
 import { t } from '../../i18n';
+import { SparklineList } from '../charts/Sparkline';
 import { historyNote, historyRows, indexState, trackedKeywords, trendState, type TrackedKeyword } from './model';
 
 interface Props {
   restUrl: string;
   nonce: string;
   rankTracker: unknown;
+  sparklines?: unknown;
 }
 
-export function RankScreen({ restUrl, nonce, rankTracker }: Props) {
+export function RankScreen({ restUrl, nonce, rankTracker, sparklines }: Props) {
   const api = useMemo(() => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }), [restUrl, nonce]);
   const [catalog, setCatalog] = useState(rankTracker);
   const [keyword, setKeyword] = useState('');
@@ -105,6 +107,8 @@ export function RankScreen({ restUrl, nonce, rankTracker }: Props) {
       </label>
       <button type="button" onClick={() => void importCsv()}>{t('Import CSV')}</button>
       <KeywordTable keywords={keywords} />
+      <h3>{t('Rank position')}</h3>
+      <SparklineList source={sparklines} ids={['rank']} />
       <h3>{t('History')}</h3>
       <p>{t(historyNote(catalog))}</p>
       {history.length === 0 ? null : (

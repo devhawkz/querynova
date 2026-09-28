@@ -108,6 +108,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'reportsWorkspace'  => ReportModule::workspaceSnapshot(),
                     'localWorkspace'    => LocalGate::present(),
                     'notifications'     => $this->notifications(),
+                    'sparklines'        => $this->sparklines(),
                 ]
             ) . ';',
             'before'
@@ -277,6 +278,24 @@ final class AdminAssets implements HookSubscriberInterface {
             unset( $exception );
 
             return DiagnosticsReport::build( [] );
+        }
+    }
+
+    /**
+     * Stored points only. A read failure leaves every series empty.
+     *
+     * @return array<string, mixed>
+     */
+    private function sparklines(): array {
+        if ( ! isset( $GLOBALS['wpdb'] ) ) {
+            return ChartSeries::present( [], [], [] );
+        }
+        try {
+            return ChartSeries::fromDatabase( new \QueryNova\Infrastructure\Database\WpdbConnection() );
+        } catch ( \Throwable $exception ) {
+            unset( $exception );
+
+            return ChartSeries::present( [], [], [] );
         }
     }
 

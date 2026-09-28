@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { QueryNovaApi } from '../../core/api/client';
 import { t } from '../../i18n';
+import { SparklineList } from '../charts/Sparkline';
 import { RankScreen } from '../rank/RankScreen';
 import {
   ANALYTICS_SCREENS,
@@ -19,6 +20,7 @@ interface Props {
   nonce: string;
   analytics: unknown;
   rankTracker: unknown;
+  sparklines?: unknown;
 }
 
 const SCREEN_LABELS: Record<(typeof ANALYTICS_SCREENS)[number], string> = {
@@ -33,7 +35,7 @@ const SCREEN_LABELS: Record<(typeof ANALYTICS_SCREENS)[number], string> = {
   ai: 'AI',
 };
 
-export function AnalyticsScreen({ restUrl, nonce, analytics, rankTracker }: Props) {
+export function AnalyticsScreen({ restUrl, nonce, analytics, rankTracker, sparklines }: Props) {
   const api = useMemo(() => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }), [restUrl, nonce]);
   const [report, setReport] = useState(analytics);
   const [section, setSection] = useState<(typeof ANALYTICS_SCREENS)[number]>('overview');
@@ -128,7 +130,7 @@ export function AnalyticsScreen({ restUrl, nonce, analytics, rankTracker }: Prop
             </button>
           ))}
         </div>
-        {section === 'rank_tracker' ? <RankScreen restUrl={restUrl} nonce={nonce} rankTracker={rankTracker} /> : null}
+        {section === 'rank_tracker' ? <RankScreen restUrl={restUrl} nonce={nonce} rankTracker={rankTracker} sparklines={sparklines} /> : null}
         {section === 'index_status' ? <AvailabilityBlock title="Index status" block={blockOf(report, 'index_status')} /> : null}
         {section !== 'rank_tracker' && section !== 'index_status' ? (
           <>
@@ -138,6 +140,8 @@ export function AnalyticsScreen({ restUrl, nonce, analytics, rankTracker }: Prop
             <Movement title="Winning posts" rows={winningPosts?.map((row) => `${row.label}: ${row.detail}`) ?? null} empty="Winning posts appear after both periods have stored rows. A missing period is not zero." />
             <Movement title="Losing posts" rows={losingPosts?.map((row) => `${row.label}: ${row.detail}`) ?? null} empty="Losing posts appear after both periods have stored rows. A missing period is not zero." />
             {section === 'overview' || section === 'seo_performance' ? <AvailabilityBlock title="Trends" block={blockOf(report, 'trends')} /> : null}
+            {section === 'overview' || section === 'seo_performance' || section === 'traffic' ? <SparklineList source={sparklines} ids={['clicks', 'impressions']} /> : null}
+            {section === 'commerce' ? <SparklineList source={sparklines} ids={['revenue-measured', 'revenue-attributed', 'revenue-estimated']} /> : null}
             <ExperienceBlock report={report} />
             {section === 'commerce' ? <p>{t(textOf(report, 'commerce', 'note') || 'Commerce metrics stay empty until a provider supplies them.')}</p> : null}
             {section === 'ai' ? <p>{t(textOf(report, 'ai', 'note') || 'AI metrics are shown only when a provider supplies them.')}</p> : null}
