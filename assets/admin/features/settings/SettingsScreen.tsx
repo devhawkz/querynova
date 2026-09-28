@@ -89,7 +89,7 @@ export function SettingsScreen({
           {section === 'woocommerce' ? <WooSection active={wooCommerceActive} /> : null}
           {section === 'local' ? <LocalSection registered={hasModule(model, 'local')} /> : null}
           {section === 'analytics' ? <p>{t('Search Console and GA4 are on the Analytics screen. Disconnected stays Not connected. This screen does not invent clicks, impressions, sessions, or revenue.')}</p> : null}
-          {section === 'providers' ? <p>{t('Providers are not configured. This screen does not invent metrics.')}</p> : null}
+          {section === 'providers' ? <p>{t('An empty provider stays Not connected. Configure is on Diagnostics and does not call a vendor.')}</p> : null}
           {section === 'ai' ? <AiSection features={featuresFor(model, 'ai')} /> : null}
           {section === 'roles' ? <RolesSection roles={model.roles} /> : null}
           {section === 'advanced' ? <HtaccessFields restUrl={restUrl} nonce={nonce} siteTools={siteTools} mode={mode} /> : null}
@@ -97,7 +97,7 @@ export function SettingsScreen({
             <>
               <p>{t('Setup stores answers only. Diagnostics reads the current snapshot. Neither tool rewrites live SEO data.')}</p>
               <SetupScreen setup={setup} restUrl={restUrl} nonce={nonce} />
-              <DiagnosticsScreen diagnostics={diagnostics} />
+              <DiagnosticsScreen diagnostics={diagnostics} restUrl={restUrl} nonce={nonce} />
             </>
           ) : null}
         </section>

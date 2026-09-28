@@ -49,6 +49,7 @@ final class CoreModule extends AbstractModule {
         $rest->route( 'GET', '/status', [ $this, 'status' ], Capability::MANAGE_SETTINGS );
         $rest->route( 'GET', '/setup', [ $this, 'setup' ], Capability::MANAGE_SETTINGS );
         $rest->route( 'PUT', '/setup', [ $this, 'saveSetup' ], Capability::MANAGE_SETTINGS );
+        $rest->route( 'POST', '/providers/configure', [ $this, 'configureProvider' ], Capability::MANAGE_SETTINGS );
     }
 
     public function registerHooks( HookRegistrar $hooks ): void {
@@ -102,6 +103,19 @@ final class CoreModule extends AbstractModule {
         $params = $request->get_json_params();
 
         return $this->wizard()->save( $params, class_exists( 'WooCommerce' ) );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function configureProvider( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+
+        return ProviderCards::configure(
+            is_string( $params['name'] ?? null ) ? $params['name'] : '',
+            ( $params['confirmed'] ?? false ) === true
+        );
     }
 
     private function wizard(): SetupWizard {

@@ -151,6 +151,14 @@ function strings(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === 'string' && item.trim() !== '').map((item) => item.trim());
 }
 
+export function providerCard(name: string, state: string): { name: string; state: 'Not connected' | 'Connected'; called: false } {
+  return {
+    name,
+    state: state === 'connected' || state === 'Connected' ? 'Connected' : 'Not connected',
+    called: false,
+  };
+}
+
 function providers(value: unknown): Array<{ name: string; state: string }> {
   if (!Array.isArray(value)) {
     return [];

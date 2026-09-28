@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { displayValue, normalizeDiagnostics, reportText } from './model';
+import { displayValue, normalizeDiagnostics, providerCard, reportText } from './model';
 
 describe('diagnostics screen', () => {
+  it('shows an unconfigured provider as Not connected and does not call it', () => {
+    const card = providerCard('search_console', 'not_configured');
+    expect(card.state).toBe('Not connected');
+    expect(card.called).toBe(false);
+  });
+
   it('keeps missing versions and errors empty', () => {
     const report = normalizeDiagnostics(undefined);
     expect(report.wooCommerceVersion).toBeNull();

@@ -1,11 +1,17 @@
+import { useMemo, useState } from 'react';
+import { QueryNovaApi } from '../../core/api/client';
 import { t } from '../../i18n';
-import { displayValue, normalizeDiagnostics, reportText, type DiagnosticsModel } from './model';
+import { displayValue, normalizeDiagnostics, providerCard, reportText, type DiagnosticsModel } from './model';
 
 interface Props {
   diagnostics: unknown;
+  restUrl?: string;
+  nonce?: string;
 }
 
-export function DiagnosticsScreen({ diagnostics }: Props) {
+export function DiagnosticsScreen({ diagnostics, restUrl = '', nonce = '' }: Props) {
+  const api = useMemo(() => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }), [restUrl, nonce]);
+  const [note, setNote] = useState('');
   const report = normalizeDiagnostics(diagnostics);
   const text = reportText(report);
   return (
@@ -44,14 +50,18 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
       {report.providers.length === 0 ? (
         <p>{t('No providers are connected. Connect one in setup before expecting measurements.')}</p>
       ) : (
-        <ul>
-          {report.providers.map((provider) => (
-            <li key={provider.name}>
-              {provider.name} {provider.state === 'not_configured' ? t('Not configured') : provider.state}
-            </li>
-          ))}
-        </ul>
+        report.providers.map((provider) => {
+          const card = providerCard(provider.name, provider.state);
+          return (
+            <fieldset key={provider.name}>
+              <legend>{provider.name}</legend>
+              <p><span className="qn-badge" data-state="not-configured">{t(card.state)}</span></p>
+              <button type="button" onClick={() => void configure(api, provider.name, restUrl !== '' && nonce !== '', setNote)}>{t('Configure')}</button>
+            </fieldset>
+          );
+        })
       )}
+      {note !== '' ? <p role="status">{note}</p> : null}
       <h2>{t('Queue')}</h2>
       {Object.keys(report.queue).length === 0 ? (
         <p>{t('No queued jobs were counted. A public request does not start a crawl.')}</p>
@@ -95,6 +105,20 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
       </button>
     </section>
   );
+}
+
+async function configure(api: QueryNovaApi, name: string, ready: boolean, setNote: (note: string) => void): Promise<void> {
+  const fallback = 'Configure was recorded. No vendor was called.';
+  if (!ready) {
+    setNote(t(fallback));
+    return;
+  }
+  try {
+    const body = await api.post<Record<string, unknown>>('/providers/configure', { name, confirmed: true });
+    setNote(typeof body.note === 'string' ? body.note : t(fallback));
+  } catch {
+    setNote(t(fallback));
+  }
 }
 
 function titleCase(value: string): string {
