@@ -10,6 +10,7 @@ import { SchemaBuilder } from '../features/schema/SchemaBuilder';
 import { AiScreen } from '../features/ai/AiScreen';
 import { AnalyticsScreen } from '../features/analytics/AnalyticsScreen';
 import { RankScreen } from '../features/rank/RankScreen';
+import { ReportsScreen } from '../features/reports/ReportsScreen';
 import { LinksScreen } from '../features/links/LinksScreen';
 import { SeoScreen } from '../features/seo/SeoScreen';
 import { SettingsScreen } from '../features/settings/SettingsScreen';
@@ -40,6 +41,7 @@ declare global {
       siteTools?: unknown;
       contentWorkspace?: unknown;
       aiWorkspace?: unknown;
+      reportsWorkspace?: unknown;
     };
   }
 }
@@ -132,6 +134,7 @@ export function App() {
             {view === 'links' ? <LinksScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} siteTools={boot.siteTools} /> : null}
             {view === 'content' ? <ContentScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} contentWorkspace={boot.contentWorkspace} /> : null}
             {view === 'ai' ? <AiScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} aiWorkspace={boot.aiWorkspace} /> : null}
+            {view === 'reports' ? <ReportsScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} /> : null}
             {view === 'rank' && mode === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
             {view === 'commerce' ? (
               <>
@@ -156,7 +159,7 @@ export function App() {
                 onOpenSchema={() => setView('schema')}
               />
             ) : null}
-            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' && view !== 'analytics' && view !== 'links' && view !== 'content' && view !== 'ai' ? (
+            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' && view !== 'analytics' && view !== 'links' && view !== 'content' && view !== 'ai' && view !== 'reports' ? (
               <section>
                 <h2>{t(page.label)}</h2>
                 <p>{t(page.hint)}</p>

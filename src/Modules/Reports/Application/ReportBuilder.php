@@ -22,12 +22,18 @@ final class ReportBuilder {
      * @var array<string, list<string>>
      */
     private const KINDS = [
-        'seo'        => [ 'clicks', 'impressions', 'ctr', 'position' ],
-        'commerce'   => [ 'revenue', 'orders', 'conversion' ],
-        'executive'  => [ 'organic_revenue', 'organic_orders', 'organic_growth', 'visibility', 'top_gains', 'top_losses', 'top_opportunities', 'ai_visibility', 'completed_actions' ],
-        'keyword'    => [ 'keyword', 'volume', 'difficulty' ],
-        'competitor' => [ 'domain', 'overlap', 'authority' ],
-        'ai'         => [ 'mentions', 'citations', 'index' ],
+        'seo'           => [ 'clicks', 'impressions', 'ctr', 'position' ],
+        'commerce'      => [ 'revenue', 'orders', 'conversion' ],
+        'executive'     => [ 'organic_revenue', 'organic_orders', 'organic_growth', 'visibility', 'top_gains', 'top_losses', 'top_opportunities', 'ai_visibility', 'completed_actions' ],
+        'keyword'       => [ 'keyword', 'volume', 'difficulty' ],
+        'competitor'    => [ 'domain', 'overlap', 'authority' ],
+        'ai'            => [ 'mentions', 'citations', 'index' ],
+        'organic'       => [ 'clicks', 'impressions', 'ctr', 'position' ],
+        'content'       => [ 'coverage', 'gap', 'entities' ],
+        'rank'          => [ 'keyword', 'position' ],
+        'index'         => [ 'status', 'coverage' ],
+        'woocommerce'   => [ 'revenue', 'orders', 'conversion' ],
+        'ai_visibility' => [ 'mentions', 'citations', 'index' ],
     ];
 
     /**
@@ -58,7 +64,7 @@ final class ReportBuilder {
         $document = [
             'kind'       => $kind,
             'values'     => $values,
-            'disclaimer' => $kind === 'ai' || $kind === 'executive' ? AiVisibility::DISCLAIMER : null,
+            'disclaimer' => in_array( $kind, [ 'ai', 'executive', 'ai_visibility' ], true ) ? AiVisibility::DISCLAIMER : null,
         ];
 
         return [

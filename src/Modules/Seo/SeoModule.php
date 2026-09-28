@@ -24,6 +24,7 @@ use QueryNova\Infrastructure\Queue\JobRunner;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Redirects\Application\RedirectEngine;
 use QueryNova\Modules\Redirects\Infrastructure\RedirectRepository;
+use QueryNova\Modules\Seo\Application\ImportPreview;
 use QueryNova\Modules\Seo\Application\SeoConflictDetector;
 use QueryNova\Modules\Seo\Application\SeoImporter;
 use QueryNova\Modules\Seo\Application\SeoMetaService;
@@ -89,6 +90,7 @@ final class SeoModule extends AbstractModule {
         $rest->route( 'POST', '/seo/audit', [ $onPage, 'startAudit' ], Capability::RUN_ANALYSIS );
         $rest->route( 'GET', '/seo/audit', [ $onPage, 'showAudit' ], Capability::RUN_ANALYSIS );
         $rest->route( 'POST', '/seo/import', [ $this, 'import' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/seo/import/preview', [ $this, 'importPreview' ], Capability::MANAGE_SEO );
         $tools = new SiteToolsController();
         $rest->route( 'GET', '/seo/robots', [ $tools, 'robots' ], Capability::MANAGE_SEO );
         $rest->route( 'PUT', '/seo/robots', [ $tools, 'saveRobots' ], Capability::MANAGE_SEO );
@@ -195,6 +197,27 @@ final class SeoModule extends AbstractModule {
             'meta'      => $importer->importMeta( $plugin, $objects, $replace ),
             'redirects' => $importer->importRedirects( $rows ),
         ];
+    }
+
+    /**
+     * Preview only. This does not call the importer and does not read live meta.
+     *
+     * @return array<string, mixed>
+     */
+    public function importPreview( \WP_REST_Request $request ): array {
+        $params  = $request->get_json_params();
+        $params  = is_array( $params ) ? $params : [];
+        $plugin  = is_string( $params['plugin'] ?? null ) ? $params['plugin'] : '';
+        $objects = [];
+        if ( isset( $params['objects'] ) && is_array( $params['objects'] ) ) {
+            foreach ( $params['objects'] as $object ) {
+                if ( is_array( $object ) ) {
+                    $objects[] = $object;
+                }
+            }
+        }
+
+        return ImportPreview::plan( $plugin, $objects );
     }
 
     /**
