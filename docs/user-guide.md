@@ -28,8 +28,8 @@ The screen is one app with these views:
 | What Matters Now | Up to ten actions, then Revenue Opportunities, Search Opportunities, Technical Risks, Commerce Risks, AI Opportunities, and Recent Changes. Each section shows at most five stored rows. |
 | Schema | Stored schema rules. Save writes the rules. It does not publish a page. |
 | Advanced | Stored SERPs, keywords, backlinks, methodologies, providers, confidence, and rank history. Lists are capped at twenty rows. Raw provider payloads are not reconstructed. |
-| Product | The latest stored product, or “No stored product.” |
-| Category | The latest stored category. A missing product count is left empty. |
+| Product | Search, recent products, issue and opportunity filters, and identifier fields. Product URLs stay unchanged. |
+| Category | Search, recent categories, and a facet review. Category URLs stay unchanged. A missing product count is left empty. |
 | Diagnostics | Environment, versions, modules, providers, queue, migrations, and recent errors. |
 | Setup | Site answers. Saving stores the answers. |
 
@@ -51,7 +51,7 @@ Product tabs are Overview, Search, Keywords, Revenue, Conversion, Content, Schem
 
 Category tabs are Overview, Keywords, Revenue, Products, Content, SERP, Filters, Links, Competitors, AI, and Recommendations.
 
-Both screens read stored rows. A tab with no rows says “Nothing recorded.”
+Both screens read stored rows. Search, issue, and opportunity filters do not rewrite URLs. Identifier values and a product or category URL base are stored only after confirmation, and confirmation does not change live WooCommerce permalinks. A tab with no rows says “Nothing recorded.”
 
 ## Schema
 

@@ -139,8 +139,9 @@ final class ConnectedGraphFactory {
         if ( ! $commerce instanceof CommerceFacts || $snapshot->kind() !== 'product' || $pageId === '' ) {
             return;
         }
-        if ( count( $commerce->variations() ) >= 2 ) {
-            $productId = $this->addProductGroup( $graph, $snapshot, $commerce, $pageId );
+        $variations = VariationSchema::unique( $commerce->variations(), $commerce->sku(), $commerce->name(), $commerce->currency() );
+        if ( count( $variations ) >= 2 ) {
+            $productId = $this->addProductGroup( $graph, $snapshot, $commerce, $pageId, $variations );
         } else {
             $productId = $this->addSimpleProduct( $graph, $snapshot, $commerce, $pageId );
         }
@@ -161,15 +162,24 @@ final class ConnectedGraphFactory {
         return $productId;
     }
 
-    private function addProductGroup( SchemaGraph $graph, ContentSnapshot $snapshot, CommerceFacts $commerce, string $pageId ): string {
+    /**
+     * @param list<array{sku: string, name: string, price: string, currency: string, availability: string, gtin: string, mpn: string, isbn: string}> $variations
+     */
+    private function addProductGroup( SchemaGraph $graph, ContentSnapshot $snapshot, CommerceFacts $commerce, string $pageId, array $variations ): string {
         $groupId    = $pageId . '-group';
         $group      = $this->productNode( $groupId, 'ProductGroup', $snapshot, $commerce );
         $variantIds = [];
-        foreach ( $commerce->variations() as $index => $variation ) {
+        foreach ( $variations as $index => $variation ) {
             $variantId = $groupId . '-variant-' . ( $index + 1 );
-            $variant   = new SchemaNode( $variantId, 'Product' );
+            if ( $graph->find( $variantId ) instanceof SchemaNode ) {
+                continue;
+            }
+            $variant = new SchemaNode( $variantId, 'Product' );
             $variant->text( 'name', $variation['name'] !== '' ? $variation['name'] : $snapshot->title() );
             $variant->text( 'sku', $variation['sku'] );
+            $variant->text( 'gtin', $variation['gtin'] );
+            $variant->text( 'mpn', $variation['mpn'] );
+            $variant->text( 'isbn', $variation['isbn'] );
             $offerId = $this->addOffer(
                 $graph,
                 $variantId . '-offer',
@@ -184,7 +194,7 @@ final class ConnectedGraphFactory {
             $variantIds[] = $variantId;
         }
         $group->references( 'hasVariant', $variantIds );
-        $group->reference( 'offers', $this->addAggregateOffer( $graph, $groupId, $commerce ) );
+        $group->reference( 'offers', $this->addAggregateOffer( $graph, $groupId, $variations ) );
         $this->addBrandRatingReviews( $graph, $group, $commerce, $groupId );
         $graph->add( $group );
 
@@ -217,16 +227,19 @@ final class ConnectedGraphFactory {
         return $offerId;
     }
 
-    private function addAggregateOffer( SchemaGraph $graph, string $groupId, CommerceFacts $commerce ): string {
+    /**
+     * @param list<array{sku: string, name: string, price: string, currency: string, availability: string, gtin: string, mpn: string, isbn: string}> $variations
+     */
+    private function addAggregateOffer( SchemaGraph $graph, string $groupId, array $variations ): string {
         $prices   = [];
         $currency = '';
         $mixed    = false;
-        foreach ( $commerce->variations() as $variation ) {
+        foreach ( $variations as $variation ) {
             if ( $variation['price'] === '' || ! is_numeric( $variation['price'] ) ) {
                 continue;
             }
             $prices[] = $variation['price'];
-            $next     = $variation['currency'] !== '' ? $variation['currency'] : $commerce->currency();
+            $next     = $variation['currency'];
             if ( $currency === '' ) {
                 $currency = $next;
             } elseif ( $next !== '' && $next !== $currency ) {

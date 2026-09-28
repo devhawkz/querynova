@@ -22,6 +22,7 @@ final class CatalogProduct {
      * @param list<string> $attributes
      * @param list<int>    $variationIds
      * @param list<string> $reviews
+     * @param list<array{id: int, sku: string, gtin: string, mpn: string, isbn: string}> $variationIdentifiers
      */
     public function __construct(
         public readonly int $id,
@@ -59,6 +60,8 @@ final class CatalogProduct {
         public readonly ?string $canonical,
         public readonly ?string $seoTitle,
         public readonly ?string $seoDescription,
+        public readonly string $isbn = '',
+        public readonly array $variationIdentifiers = [],
     ) {
     }
 
@@ -101,12 +104,14 @@ final class CatalogProduct {
             self::nullableString( $row['indexability'] ?? null ),
             self::nullableString( $row['canonical'] ?? null ),
             self::nullableString( $row['seo_title'] ?? null ),
-            self::nullableString( $row['seo_description'] ?? null )
+            self::nullableString( $row['seo_description'] ?? null ),
+            (string) ( $row['isbn'] ?? '' ),
+            self::variationIdentifiers( $row['variation_identifiers'] ?? null )
         );
     }
 
     public function identifier(): string {
-        foreach ( [ $this->gtin, $this->ean, $this->upc ] as $value ) {
+        foreach ( [ $this->gtin, $this->ean, $this->upc, $this->isbn ] as $value ) {
             if ( $value !== '' ) {
                 return $value;
             }
@@ -168,6 +173,37 @@ final class CatalogProduct {
             if ( is_int( $value ) || ( is_string( $value ) && is_numeric( $value ) ) ) {
                 $rows[] = (int) $value;
             }
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @return list<array{id: int, sku: string, gtin: string, mpn: string, isbn: string}>
+     */
+    private static function variationIdentifiers( mixed $values ): array {
+        if ( ! is_array( $values ) ) {
+            return [];
+        }
+        $rows = [];
+        foreach ( $values as $value ) {
+            if ( ! is_array( $value ) ) {
+                continue;
+            }
+            $sku  = trim( (string) ( $value['sku'] ?? '' ) );
+            $gtin = trim( (string) ( $value['gtin'] ?? '' ) );
+            $mpn  = trim( (string) ( $value['mpn'] ?? '' ) );
+            $isbn = trim( (string) ( $value['isbn'] ?? '' ) );
+            if ( $sku === '' && $gtin === '' && $mpn === '' && $isbn === '' ) {
+                continue;
+            }
+            $rows[] = [
+                'id'   => (int) ( $value['id'] ?? 0 ),
+                'sku'  => $sku,
+                'gtin' => $gtin,
+                'mpn'  => $mpn,
+                'isbn' => $isbn,
+            ];
         }
 
         return $rows;

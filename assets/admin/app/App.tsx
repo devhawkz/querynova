@@ -129,8 +129,8 @@ export function App() {
             {view === 'rank' && mode === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
             {view === 'commerce' ? (
               <>
-                <ProductScreen product={boot.product} />
-                <CategoryScreen category={boot.category} />
+                <ProductScreen product={boot.product} restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} />
+                <CategoryScreen category={boot.category} restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} />
               </>
             ) : null}
             {view === 'settings' ? (

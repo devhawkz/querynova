@@ -17,6 +17,7 @@ use QueryNova\Modules\Audit\AuditModule;
 use QueryNova\Modules\Backlinks\BacklinkModule;
 use QueryNova\Modules\Commerce\CommerceModule;
 use QueryNova\Modules\Content\ContentModule;
+use QueryNova\Modules\Edd\EddModule;
 use QueryNova\Modules\Experience\ExperienceModule;
 use QueryNova\Modules\Experiments\ExperimentModule;
 use QueryNova\Modules\Core\CoreModule;
@@ -52,6 +53,9 @@ final class ModuleCatalog {
         $modules[] = new RedirectModule();
         $modules[] = new CrawlerModule();
         $modules[] = new CommerceModule();
+        if ( EddModule::present() ) {
+            $modules[] = new EddModule();
+        }
         $modules[] = new KeywordModule();
         $modules[] = new SerpModule();
         $modules[] = new BacklinkModule();

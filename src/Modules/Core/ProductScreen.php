@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Modules\Core;
 
 use QueryNova\Infrastructure\Database\DatabaseConnection;
+use QueryNova\Modules\Commerce\Application\CatalogWorkspace;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -40,12 +41,16 @@ final class ProductScreen {
     private const KINDS = [ 'MEASURED', 'ATTRIBUTED', 'ESTIMATED', 'UNAVAILABLE' ];
 
     /**
-     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>}
+     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>, workspace: array<string, mixed>}
      */
     public function fromDatabase( DatabaseConnection $database ): array {
-        $products = $database->select( $this->table( $database, 'products' ), [], 1, 0, [ 'id' => 'DESC' ] );
+        $workspace = CatalogWorkspace::present( $this->productRows( $database ), '', '', '', 'product' );
+        $products  = $database->select( $this->table( $database, 'products' ), [], 1, 0, [ 'id' => 'DESC' ] );
         if ( $products === [] ) {
-            return self::emptyScreen();
+            $empty              = self::emptyScreen();
+            $empty['workspace'] = $workspace;
+
+            return $empty;
         }
         $product    = $products[0];
         $product_id = (int) ( $product['product_id'] ?? 0 );
@@ -63,7 +68,10 @@ final class ProductScreen {
         $keyword_id = (int) ( $product['primary_keyword_id'] ?? 0 );
         $keywords   = $keyword_id > 0 ? $database->select( $this->table( $database, 'keywords' ), [ 'id' => $keyword_id ], 1 ) : [];
 
-        return $this->compose( $product, $metrics[0] ?? null, $revenue[0] ?? null, $keywords[0] ?? null );
+        $screen              = $this->compose( $product, $metrics[0] ?? null, $revenue[0] ?? null, $keywords[0] ?? null );
+        $screen['workspace'] = $workspace;
+
+        return $screen;
     }
 
     /**
@@ -71,7 +79,7 @@ final class ProductScreen {
      * @param array<string, mixed>|null $metrics
      * @param array<string, mixed>|null $revenue
      * @param array<string, mixed>|null $keyword
-     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>}
+     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>, workspace: array<string, mixed>}
      */
     public function compose( array $product, ?array $metrics, ?array $revenue, ?array $keyword ): array {
         $tabs       = self::emptyTabs();
@@ -97,19 +105,49 @@ final class ProductScreen {
         }
 
         return [
-            'title' => $title,
-            'tabs'  => $tabs,
+            'title'     => $title,
+            'tabs'      => $tabs,
+            'workspace' => CatalogWorkspace::present( [], '', '', '', 'product' ),
         ];
     }
 
     /**
-     * @return array{title: null, tabs: array<string, list<array<string, mixed>>>}
+     * @return array{title: null, tabs: array<string, list<array<string, mixed>>>, workspace: array<string, mixed>}
      */
     public static function emptyScreen(): array {
         return [
-            'title' => null,
-            'tabs'  => self::emptyTabs(),
+            'title'     => null,
+            'tabs'      => self::emptyTabs(),
+            'workspace' => CatalogWorkspace::present( [], '', '', '', 'product' ),
         ];
+    }
+
+    /**
+     * @return list<array{id: int, name: string, sku: string, issues: list<string>, opportunity: string}>
+     */
+    private function productRows( DatabaseConnection $database ): array {
+        $rows = [];
+        foreach ( $database->select( $this->table( $database, 'products' ), [], 20, 0, [ 'id' => 'DESC' ] ) as $product ) {
+            $id   = (int) ( $product['product_id'] ?? 0 );
+            $sku  = trim( (string) ( $product['sku'] ?? '' ) );
+            $gtin = trim( (string) ( $product['gtin'] ?? '' ) );
+            if ( $id < 1 && $sku === '' ) {
+                continue;
+            }
+            $issues = [];
+            if ( $gtin === '' ) {
+                $issues[] = 'missing_identifier';
+            }
+            $rows[] = [
+                'id'          => $id,
+                'name'        => $sku !== '' ? $sku : 'Product ' . (string) $id,
+                'sku'         => $sku,
+                'issues'      => $issues,
+                'opportunity' => 'unavailable',
+            ];
+        }
+
+        return $rows;
     }
 
     /**

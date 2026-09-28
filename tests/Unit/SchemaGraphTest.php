@@ -15,6 +15,7 @@ use QueryNova\Modules\Schema\Application\ConnectedGraphFactory;
 use QueryNova\Modules\Schema\Application\SchemaDocumentBuilder;
 use QueryNova\Modules\Schema\Application\SchemaRuleCodec;
 use QueryNova\Modules\Schema\Application\SchemaRuleCompiler;
+use QueryNova\Modules\Schema\Application\VariationSchema;
 use QueryNova\Modules\Schema\Domain\CommerceFacts;
 use QueryNova\Modules\Schema\Domain\ContentSnapshot;
 use QueryNova\Modules\Schema\Domain\PropertyMapping;
@@ -123,6 +124,85 @@ final class SchemaGraphTest extends TestCase {
         self::assertSame( '30', $offer['highPrice'] );
         self::assertSame( 2, $offer['offerCount'] );
         self::assertNotContains( 'Product', $this->typesExceptVariants( $graph ) );
+    }
+
+    public function testDuplicateVariationsDoNotEmitInvalidProductNodes(): void {
+        $duplicate = $this->builder->build(
+            $this->product(
+                new CommerceFacts(
+                    name: 'Welder',
+                    sku: 'WELD',
+                    currency: 'USD',
+                    variations: [
+                        [
+                            'sku'          => 'WELD',
+                            'name'         => 'Welder',
+                            'price'        => '10',
+                            'currency'     => 'USD',
+                            'availability' => 'https://schema.org/InStock',
+                        ],
+                        [
+                            'sku'          => '',
+                            'name'         => '',
+                            'price'        => '',
+                            'currency'     => '',
+                            'availability' => '',
+                        ],
+                        [
+                            'sku'          => 'A',
+                            'name'         => 'Small',
+                            'price'        => '10',
+                            'currency'     => 'USD',
+                            'availability' => 'https://schema.org/InStock',
+                        ],
+                        [
+                            'sku'          => 'A',
+                            'name'         => 'Small again',
+                            'price'        => '12',
+                            'currency'     => 'USD',
+                            'availability' => 'https://schema.org/InStock',
+                        ],
+                    ],
+                )
+            ),
+            []
+        );
+
+        self::assertNotContains( 'ProductGroup', $duplicate->types() );
+        self::assertSame( 1, $this->countType( $duplicate, 'Product' ) );
+
+        $unique = VariationSchema::unique(
+            [
+                [
+                    'sku'   => 'A',
+                    'name'  => 'Small',
+                    'price' => '10',
+                ],
+                [
+                    'sku'   => 'A',
+                    'name'  => 'Copy',
+                    'price' => '11',
+                ],
+                [
+                    'sku'   => '',
+                    'name'  => '',
+                    'price' => '',
+                ],
+                [
+                    'sku'   => 'B',
+                    'name'  => 'Large',
+                    'price' => '30',
+                    'gtin'  => '0001',
+                ],
+            ],
+            'PARENT',
+            'Welder',
+            'USD'
+        );
+
+        self::assertCount( 2, $unique );
+        self::assertSame( 'USD', $unique[0]['currency'] );
+        self::assertSame( '0001', $unique[1]['gtin'] );
     }
 
     public function testBuilderRuleOmitsEmptyCommerceFieldsAndStripsUnknownTokens(): void {
@@ -279,5 +359,16 @@ final class SchemaGraphTest extends TestCase {
         }
 
         return $types;
+    }
+
+    private function countType( SchemaGraph $graph, string $type ): int {
+        $count = 0;
+        foreach ( $graph->toArray()['@graph'] as $document ) {
+            if ( ( $document['@type'] ?? '' ) === $type ) {
+                ++$count;
+            }
+        }
+
+        return $count;
     }
 }

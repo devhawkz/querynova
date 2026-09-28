@@ -19,6 +19,7 @@ use QueryNova\Modules\Analytics\AnalyticsModule;
 use QueryNova\Modules\Audit\AuditModule;
 use QueryNova\Modules\Backlinks\BacklinkModule;
 use QueryNova\Modules\Commerce\CommerceModule;
+use QueryNova\Modules\Edd\EddModule;
 use QueryNova\Modules\Content\ContentModule;
 use QueryNova\Modules\Core\CoreModule;
 use QueryNova\Modules\Crawler\CrawlerModule;
@@ -67,6 +68,7 @@ final class RestPermissionTest extends TestCase {
             new RedirectModule(),
             new CrawlerModule(),
             new CommerceModule(),
+            new EddModule(),
             new AnalyticsModule(),
             new KeywordModule(),
             new SerpModule(),

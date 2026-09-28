@@ -145,7 +145,7 @@ final class AdminAssets implements HookSubscriberInterface {
     /**
      * The latest stored product. A read failure leaves the screen empty.
      *
-     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>}
+     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>, workspace: array<string, mixed>}
      */
     private function product(): array {
         if ( ! isset( $GLOBALS['wpdb'] ) ) {
@@ -163,7 +163,7 @@ final class AdminAssets implements HookSubscriberInterface {
     /**
      * The latest stored category. A read failure leaves the screen empty.
      *
-     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>}
+     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>, workspace: array<string, mixed>}
      */
     private function category(): array {
         if ( ! isset( $GLOBALS['wpdb'] ) ) {

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Modules\Core;
 
 use QueryNova\Infrastructure\Database\DatabaseConnection;
+use QueryNova\Modules\Commerce\Application\CatalogWorkspace;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -40,12 +41,16 @@ final class CategoryScreen {
     private const KINDS = [ 'MEASURED', 'ATTRIBUTED', 'ESTIMATED', 'UNAVAILABLE' ];
 
     /**
-     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>}
+     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>, workspace: array<string, mixed>}
      */
     public function fromDatabase( DatabaseConnection $database ): array {
+        $workspace  = CatalogWorkspace::present( $this->categoryRows( $database ), '', '', '', 'category' );
         $categories = $database->select( $this->table( $database, 'categories' ), [], 1, 0, [ 'id' => 'DESC' ] );
         if ( $categories === [] ) {
-            return self::emptyScreen();
+            $empty              = self::emptyScreen();
+            $empty['workspace'] = $workspace;
+
+            return $empty;
         }
         $category    = $categories[0];
         $category_id = (int) ( $category['term_id'] ?? 0 );
@@ -63,7 +68,10 @@ final class CategoryScreen {
         $keyword_id  = (int) ( $category['primary_keyword_id'] ?? 0 );
         $keywords    = $keyword_id > 0 ? $database->select( $this->table( $database, 'keywords' ), [ 'id' => $keyword_id ], 1 ) : [];
 
-        return $this->compose( $category, $metrics[0] ?? null, $revenue[0] ?? null, $keywords[0] ?? null );
+        $screen              = $this->compose( $category, $metrics[0] ?? null, $revenue[0] ?? null, $keywords[0] ?? null );
+        $screen['workspace'] = $workspace;
+
+        return $screen;
     }
 
     /**
@@ -71,7 +79,7 @@ final class CategoryScreen {
      * @param array<string, mixed>|null $metrics
      * @param array<string, mixed>|null $revenue
      * @param array<string, mixed>|null $keyword
-     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>}
+     * @return array{title: string|null, tabs: array<string, list<array<string, mixed>>>, workspace: array<string, mixed>}
      */
     public function compose( array $category, ?array $metrics, ?array $revenue, ?array $keyword ): array {
         $tabs        = self::emptyTabs();
@@ -99,19 +107,43 @@ final class CategoryScreen {
         }
 
         return [
-            'title' => $title,
-            'tabs'  => $tabs,
+            'title'     => $title,
+            'tabs'      => $tabs,
+            'workspace' => CatalogWorkspace::present( [], '', '', '', 'category' ),
         ];
     }
 
     /**
-     * @return array{title: null, tabs: array<string, list<array<string, mixed>>>}
+     * @return array{title: null, tabs: array<string, list<array<string, mixed>>>, workspace: array<string, mixed>}
      */
     public static function emptyScreen(): array {
         return [
-            'title' => null,
-            'tabs'  => self::emptyTabs(),
+            'title'     => null,
+            'tabs'      => self::emptyTabs(),
+            'workspace' => CatalogWorkspace::present( [], '', '', '', 'category' ),
         ];
+    }
+
+    /**
+     * @return list<array{id: int, name: string, sku: string, issues: list<string>, opportunity: string}>
+     */
+    private function categoryRows( DatabaseConnection $database ): array {
+        $rows = [];
+        foreach ( $database->select( $this->table( $database, 'categories' ), [], 20, 0, [ 'id' => 'DESC' ] ) as $category ) {
+            $id = (int) ( $category['term_id'] ?? 0 );
+            if ( $id < 1 ) {
+                continue;
+            }
+            $rows[] = [
+                'id'          => $id,
+                'name'        => 'Category ' . (string) $id,
+                'sku'         => '',
+                'issues'      => [],
+                'opportunity' => 'unavailable',
+            ];
+        }
+
+        return $rows;
     }
 
     /**

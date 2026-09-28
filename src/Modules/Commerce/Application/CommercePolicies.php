@@ -164,6 +164,32 @@ final class CommercePolicies {
     }
 
     /**
+     * Facet combinations that can trap a crawler. This does not crawl or rewrite URLs.
+     *
+     * @return array{status: string, indexable: int|null, applied: bool, note: string}
+     */
+    public function crawlTrap( int $facetCount, ?int $combinationCount, ?int $indexableCount ): array {
+        if ( $combinationCount === null ) {
+            return [
+                'status'    => 'unavailable',
+                'indexable' => $indexableCount,
+                'applied'   => false,
+                'note'      => 'Combination count was not measured. QueryNova did not crawl facet URLs.',
+            ];
+        }
+        $trap = $combinationCount >= 50 || ( $facetCount > 0 && $combinationCount > $facetCount * 8 );
+
+        return [
+            'status'    => $trap ? 'crawl_trap' : 'clear',
+            'indexable' => $indexableCount,
+            'applied'   => false,
+            'note'      => $trap
+                ? 'These facet combinations can trap a crawler. Nothing was noindexed and no URL was rewritten.'
+                : 'The supplied facet counts do not show a crawl trap. Nothing was changed.',
+        ];
+    }
+
+    /**
      * @return array{path: string, title: string, description: string, h1: string, status: string}|null
      */
     public function landing( string $basePath, string $value, bool $indexable ): ?array {
