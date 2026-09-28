@@ -8,6 +8,7 @@ import {
   automationPlan,
   contentLead,
   generateDraft,
+  healthReport,
   modelConnection,
   storeDraft,
   type DraftKind,
@@ -37,6 +38,11 @@ export function ContentScreen({ restUrl, nonce, contentWorkspace }: Props) {
   const [draftText, setDraftText] = useState('');
   const [rule, setRule] = useState<(typeof AUTOMATION_RULES)[number]>('internal_links');
   const [automate, setAutomate] = useState(false);
+  const [healthUrl, setHealthUrl] = useState('');
+  const [currentClicks, setCurrentClicks] = useState('');
+  const [previousClicks, setPreviousClicks] = useState('');
+  const [healthKeyword, setHealthKeyword] = useState('');
+  const [healthOther, setHealthOther] = useState('');
   const [message, setMessage] = useState('');
   const [rules, setRules] = useState(automationPlan('internal_links', false));
   const connection = modelConnection(modelId);
@@ -104,6 +110,39 @@ export function ContentScreen({ restUrl, nonce, contentWorkspace }: Props) {
       setMessage(typeof body.note === 'string' ? body.note : t(local.note));
     } catch {
       setMessage(t('This draft was not created. QueryNova did not call a model.'));
+    }
+  }
+
+  async function reviewHealth(kind: 'decay' | 'cannibalization') {
+    const local = healthReport(kind);
+    const metric = (value: string): number | null => {
+      const trimmed = value.trim();
+      if (trimmed === '' || Number.isNaN(Number(trimmed))) {
+        return null;
+      }
+      return Number(trimmed);
+    };
+    const rows = kind === 'cannibalization'
+      ? [
+          { keyword: healthKeyword, url: healthUrl },
+          { keyword: healthKeyword, url: healthOther },
+        ]
+      : [
+          {
+            url: healthUrl,
+            current: { clicks: metric(currentClicks) },
+            previous: { clicks: metric(previousClicks) },
+          },
+        ];
+    if (!ready) {
+      setMessage(t(local.note));
+      return;
+    }
+    try {
+      const body = await api.post<Record<string, unknown>>('/content/health', { kind, rows });
+      setMessage(typeof body.note === 'string' ? body.note : t(local.note));
+    } catch {
+      setMessage(t(local.note));
     }
   }
 
@@ -200,6 +239,30 @@ export function ContentScreen({ restUrl, nonce, contentWorkspace }: Props) {
         {t('Turn automation on for this one rule')}
       </label>
       <button type="button" onClick={() => void saveRule()}>{t('Save link rule')}</button>
+      <h2>{t('Stored reports')}</h2>
+      <p>{t(healthReport('decay').note)}</p>
+      <label>
+        {t('Page URL')}
+        <input value={healthUrl} onChange={(event) => setHealthUrl(event.target.value)} />
+      </label>
+      <label>
+        {t('Current clicks')}
+        <input value={currentClicks} onChange={(event) => setCurrentClicks(event.target.value)} />
+      </label>
+      <label>
+        {t('Previous clicks')}
+        <input value={previousClicks} onChange={(event) => setPreviousClicks(event.target.value)} />
+      </label>
+      <button type="button" onClick={() => void reviewHealth('decay')}>{t('Review decay')}</button>
+      <label>
+        {t('Shared keyword')}
+        <input value={healthKeyword} onChange={(event) => setHealthKeyword(event.target.value)} />
+      </label>
+      <label>
+        {t('Second URL')}
+        <input value={healthOther} onChange={(event) => setHealthOther(event.target.value)} />
+      </label>
+      <button type="button" onClick={() => void reviewHealth('cannibalization')}>{t('Review cannibalization')}</button>
       <p>{t('Internal links')}: {t(rules.internal_links)}</p>
       <p>{t('Keyword links')}: {t(rules.keyword_links)}</p>
       {message !== '' ? <p role="status">{message}</p> : null}

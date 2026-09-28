@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { DRAFT_KINDS, automationPlan, contentLead, gapTopics, generateDraft, modelConnection, storeDraft } from './model';
+import { DRAFT_KINDS, automationPlan, contentLead, gapTopics, generateDraft, healthReport, modelConnection, storeDraft } from './model';
 
 describe('content workspace', () => {
+  it('keeps decay and cannibalization off a crawl and a cause', () => {
+    expect(healthReport('decay').crawled).toBe(false);
+    expect(healthReport('decay').causation).toBe(false);
+    expect(healthReport('decay').note).toContain('missing side stays empty');
+    expect(healthReport('cannibalization').note).toContain('does not claim a cause');
+  });
+
   it('explains the next step and does not score the document', () => {
     expect(contentLead(false)).toBe('Supply a document. QueryNova does not fetch the URL.');
     expect(contentLead(true)).toContain('not a content score');

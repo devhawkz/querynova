@@ -21,6 +21,7 @@ use QueryNova\Infrastructure\Database\ArrayDatabase;
 use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Content\Application\ContentAutomation;
+use QueryNova\Modules\Content\Application\ContentHealth;
 use QueryNova\Modules\Content\Application\ContentDrafts;
 use QueryNova\Modules\Content\Application\ContentIntelligence;
 use QueryNova\Modules\Content\Application\ContentWorkspace;
@@ -77,6 +78,7 @@ final class ContentModule extends AbstractModule {
         $rest->route( 'POST', '/content/model', [ $this, 'model' ], Capability::RUN_ANALYSIS );
         $rest->route( 'POST', '/content/automation', [ $this, 'automation' ], Capability::RUN_ANALYSIS );
         $rest->route( 'POST', '/content/link-settings', [ $this, 'linkSettings' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/content/health', [ $this, 'health' ], Capability::RUN_ANALYSIS );
     }
 
     /**
@@ -182,6 +184,25 @@ final class ContentModule extends AbstractModule {
         unset( $request );
 
         return LinkBoard::present( [] );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function health( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+        $rows   = [];
+        if ( isset( $params['rows'] ) && is_array( $params['rows'] ) ) {
+            foreach ( $params['rows'] as $row ) {
+                if ( is_array( $row ) ) {
+                    $rows[] = $row;
+                }
+            }
+        }
+        $kind = is_string( $params['kind'] ?? null ) ? $params['kind'] : '';
+
+        return $kind === 'cannibalization' ? ContentHealth::cannibalization( $rows ) : ContentHealth::decay( $rows );
     }
 
     /**

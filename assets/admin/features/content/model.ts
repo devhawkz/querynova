@@ -142,6 +142,16 @@ export function automationPlan(rule: string, enabled: boolean): {
   };
 }
 
+export function healthReport(kind: 'decay' | 'cannibalization'): { crawled: false; causation: false; note: string } {
+  return {
+    crawled: false,
+    causation: false,
+    note: kind === 'cannibalization'
+      ? 'Cannibalization reads stored keyword rows. A missing keyword or URL is left out. This does not claim a cause.'
+      : 'Decay reads stored metrics. A missing side stays empty. This does not claim a cause.',
+  };
+}
+
 export function gapTopics(coverage: Array<{ topic: string; classification: string | null; on_our_page: boolean | null }>): {
   status: 'UNAVAILABLE' | 'MEASURED';
   topics: string[] | null;
