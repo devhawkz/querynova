@@ -7,6 +7,7 @@ import { ContentScreen } from '../features/content/ContentScreen';
 import { ProductScreen } from '../features/products/ProductScreen';
 import { WhatMattersNow, type TodayAction } from '../features/dashboard/WhatMattersNow';
 import { SchemaBuilder } from '../features/schema/SchemaBuilder';
+import { AiScreen } from '../features/ai/AiScreen';
 import { AnalyticsScreen } from '../features/analytics/AnalyticsScreen';
 import { RankScreen } from '../features/rank/RankScreen';
 import { LinksScreen } from '../features/links/LinksScreen';
@@ -38,6 +39,7 @@ declare global {
       rankTracker?: unknown;
       siteTools?: unknown;
       contentWorkspace?: unknown;
+      aiWorkspace?: unknown;
     };
   }
 }
@@ -129,6 +131,7 @@ export function App() {
             {view === 'rank' ? <RankScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} rankTracker={boot.rankTracker} /> : null}
             {view === 'links' ? <LinksScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} siteTools={boot.siteTools} /> : null}
             {view === 'content' ? <ContentScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} contentWorkspace={boot.contentWorkspace} /> : null}
+            {view === 'ai' ? <AiScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} aiWorkspace={boot.aiWorkspace} /> : null}
             {view === 'rank' && mode === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
             {view === 'commerce' ? (
               <>
@@ -153,7 +156,7 @@ export function App() {
                 onOpenSchema={() => setView('schema')}
               />
             ) : null}
-            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' && view !== 'analytics' && view !== 'links' && view !== 'content' ? (
+            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' && view !== 'analytics' && view !== 'links' && view !== 'content' && view !== 'ai' ? (
               <section>
                 <h2>{t(page.label)}</h2>
                 <p>{t(page.hint)}</p>

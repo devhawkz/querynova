@@ -28,7 +28,12 @@ use QueryNova\Infrastructure\Queue\JobRunner;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Ai\Application\AiCrawlers;
 use QueryNova\Modules\Ai\Application\AiVisibility;
+use QueryNova\Modules\Ai\Application\AiWorkspace;
+use QueryNova\Modules\Ai\Application\CrawlerAccess;
 use QueryNova\Modules\Ai\Application\LlmsDocument;
+use QueryNova\Modules\Ai\Application\LlmsSettings;
+use QueryNova\Modules\Ai\Application\McpTools;
+use QueryNova\Modules\Ai\Application\PromptTracker;
 use QueryNova\Modules\Ai\Domain\AiObservation;
 use QueryNova\Modules\Ai\Domain\LlmProvider;
 use QueryNova\Modules\Ai\Infrastructure\AiRepository;
@@ -128,6 +133,13 @@ final class AiModule extends AbstractModule {
     public function registerRoutes( RestRegistrar $rest ): void {
         $rest->route( 'POST', '/ai/prompts', [ $this, 'enqueue' ], Capability::RUN_ANALYSIS );
         $rest->route( 'GET', '/ai', [ $this, 'show' ], Capability::VIEW_ANALYTICS );
+        $rest->route( 'GET', '/ai/workspace', [ $this, 'workspace' ], Capability::VIEW_ANALYTICS );
+        $rest->route( 'POST', '/ai/prompts/track', [ $this, 'track' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'POST', '/ai/crawlers', [ $this, 'crawlers' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/ai/llms', [ $this, 'llmsSettings' ], Capability::MANAGE_SEO );
+        $rest->route( 'GET', '/mcp/tools', [ $this, 'mcpCatalog' ], Capability::VIEW_ANALYTICS );
+        $rest->route( 'POST', '/mcp/read', [ $this, 'mcpRead' ], Capability::VIEW_ANALYTICS );
+        $rest->route( 'POST', '/mcp/write', [ $this, 'mcpWrite' ], Capability::MANAGE_SEO );
     }
 
     /**
@@ -174,6 +186,119 @@ final class AiModule extends AbstractModule {
             'status'     => 'stored',
             'disclaimer' => AiVisibility::DISCLAIMER,
             'note'       => 'Stored observations. This response did not call a model.',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function workspace( \WP_REST_Request $request ): array {
+        unset( $request );
+
+        return self::workspaceSnapshot();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function track( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+        $tags   = [];
+        if ( isset( $params['tags'] ) && is_array( $params['tags'] ) ) {
+            foreach ( $params['tags'] as $tag ) {
+                if ( is_string( $tag ) ) {
+                    $tags[] = $tag;
+                }
+            }
+        }
+
+        return PromptTracker::track(
+            is_string( $params['prompt'] ?? null ) ? $params['prompt'] : '',
+            is_string( $params['locale'] ?? null ) ? $params['locale'] : '',
+            is_string( $params['country'] ?? null ) ? $params['country'] : '',
+            is_string( $params['language'] ?? null ) ? $params['language'] : '',
+            is_string( $params['provider'] ?? null ) ? $params['provider'] : '',
+            is_string( $params['frequency'] ?? null ) ? $params['frequency'] : '',
+            $tags
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function crawlers( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+
+        return CrawlerAccess::plan(
+            is_string( $params['agent'] ?? null ) ? $params['agent'] : '',
+            is_string( $params['decision'] ?? null ) ? $params['decision'] : '',
+            ( $params['confirmed'] ?? false ) === true
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function llmsSettings( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+
+        return LlmsSettings::save(
+            ( $params['enabled'] ?? false ) === true,
+            is_string( $params['body'] ?? null ) ? $params['body'] : ''
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function mcpCatalog( \WP_REST_Request $request ): array {
+        unset( $request );
+
+        return McpTools::catalog();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function mcpRead( \WP_REST_Request $request ): array {
+        $params  = $request->get_json_params();
+        $params  = is_array( $params ) ? $params : [];
+        $tool    = is_string( $params['tool'] ?? null ) ? $params['tool'] : '';
+        $context = isset( $params['context'] ) && is_array( $params['context'] ) ? $params['context'] : [];
+
+        return McpTools::read( $tool, $context );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function mcpWrite( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+
+        return McpTools::write(
+            is_string( $params['tool'] ?? null ) ? $params['tool'] : '',
+            isset( $params['payload'] ) && is_array( $params['payload'] ) ? $params['payload'] : [],
+            ( $params['permitted'] ?? false ) === true
+        );
+    }
+
+    /**
+     * Read-only boot payload. The provider is the null adapter, so it stays not connected.
+     *
+     * @return array<string, mixed>
+     */
+    public static function workspaceSnapshot(): array {
+        $screens = AiWorkspace::present( ( new NullLlmProvider() )->id(), PromptTracker::catalog(), null, null );
+
+        return $screens + [
+            'crawlers' => ( new AiCrawlers() )->registry( '' ),
+            'access'   => CrawlerAccess::preferences(),
+            'llms'     => LlmsSettings::present(),
+            'tools'    => McpTools::catalog(),
         ];
     }
 
