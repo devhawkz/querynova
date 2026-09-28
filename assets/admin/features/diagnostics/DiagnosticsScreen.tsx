@@ -12,6 +12,7 @@ interface Props {
 export function DiagnosticsScreen({ diagnostics, restUrl = '', nonce = '' }: Props) {
   const api = useMemo(() => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }), [restUrl, nonce]);
   const [note, setNote] = useState('');
+  const [jobs, setJobs] = useState<Array<Record<string, unknown>>>([]);
   const report = normalizeDiagnostics(diagnostics);
   const text = reportText(report);
   return (
@@ -74,6 +75,44 @@ export function DiagnosticsScreen({ diagnostics, restUrl = '', nonce = '' }: Pro
           ))}
         </ul>
       )}
+      <h2>{t('Job monitor')}</h2>
+      <p>{t('Retry puts a failed job back in the queue. The handler is not run.')}</p>
+      <button type="button" onClick={() => void loadJobs(api, restUrl !== '' && nonce !== '', setJobs, setNote)}>{t('Load jobs')}</button>
+      {jobs.length === 0 ? (
+        <p>{t('No stored jobs are on this page. A missing duration stays empty.')}</p>
+      ) : (
+        <table>
+          <caption>{t('Jobs')}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{t('Job')}</th>
+              <th scope="col">{t('Module')}</th>
+              <th scope="col">{t('Status')}</th>
+              <th scope="col">{t('Created')}</th>
+              <th scope="col">{t('Started')}</th>
+              <th scope="col">{t('Duration')}</th>
+              <th scope="col">{t('Attempts')}</th>
+              <th scope="col">{t('Correlation id')}</th>
+              <th scope="col">{t('Retry')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {jobs.map((job) => (
+              <tr key={String(job.job ?? '') + String(job.correlation_id ?? '')}>
+                <td>{cell(job.job)}</td>
+                <td>{cell(job.module)}</td>
+                <td>{cell(job.status)}</td>
+                <td>{cell(job.created)}</td>
+                <td>{cell(job.started)}</td>
+                <td>{cell(job.duration)}</td>
+                <td>{cell(job.attempts)}</td>
+                <td>{cell(job.correlation_id)}</td>
+                <td><button type="button" onClick={() => void retryJob(api, job, restUrl !== '' && nonce !== '', setNote)}>{t('Retry')}</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       <h2>{t('Migrations')}</h2>
       {report.pendingMigrations.length === 0 ? <p>{t('No pending migrations were recorded.')}</p> : <ul>{report.pendingMigrations.map((version) => <li key={version}>{version}</li>)}</ul>}
       <h2>{t('Recent errors')}</h2>
@@ -105,6 +144,46 @@ export function DiagnosticsScreen({ diagnostics, restUrl = '', nonce = '' }: Pro
       </button>
     </section>
   );
+}
+
+function cell(value: unknown): string {
+  if (value === null || value === undefined || value === '') {
+    return t('Unavailable');
+  }
+  return String(value);
+}
+
+async function loadJobs(
+  api: QueryNovaApi,
+  ready: boolean,
+  setJobs: (rows: Array<Record<string, unknown>>) => void,
+  setNote: (note: string) => void,
+): Promise<void> {
+  if (!ready) {
+    setNote(t('No stored jobs are on this page. A missing duration stays empty.'));
+    return;
+  }
+  try {
+    const body = await api.get<Record<string, unknown>>('/jobs');
+    const rows = Array.isArray(body.rows) ? body.rows.filter((row): row is Record<string, unknown> => typeof row === 'object' && row !== null) : [];
+    setJobs(rows);
+  } catch {
+    setNote(t('Jobs could not be loaded. The handler was not run.'));
+  }
+}
+
+async function retryJob(api: QueryNovaApi, job: Record<string, unknown>, ready: boolean, setNote: (note: string) => void): Promise<void> {
+  const fallback = 'Retry put the job back in the queue. The handler was not run.';
+  if (!ready) {
+    setNote(t(fallback));
+    return;
+  }
+  try {
+    const body = await api.post<Record<string, unknown>>('/jobs/retry', { id: job.id ?? 0 });
+    setNote(typeof body.note === 'string' ? body.note : t(fallback));
+  } catch {
+    setNote(t(fallback));
+  }
 }
 
 async function configure(api: QueryNovaApi, name: string, ready: boolean, setNote: (note: string) => void): Promise<void> {

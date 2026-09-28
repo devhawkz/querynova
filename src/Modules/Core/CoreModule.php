@@ -17,7 +17,11 @@ use QueryNova\Core\Hooks\HookRegistrar;
 use QueryNova\Core\Modules\AbstractModule;
 use QueryNova\Core\Security\Capability;
 use QueryNova\Infrastructure\WordPress\AdminPageRegistrar;
+use QueryNova\Infrastructure\Database\ArrayDatabase;
 use QueryNova\Infrastructure\Database\MigrationRegistrar;
+use QueryNova\Infrastructure\Database\WpdbConnection;
+use QueryNova\Infrastructure\Queue\JobMonitor;
+use QueryNova\Infrastructure\Queue\JobRepository;
 use QueryNova\Infrastructure\Database\Migrations\InitialSchemaMigration;
 use QueryNova\Infrastructure\Database\Migrations\PageExperienceMigration;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
@@ -50,6 +54,8 @@ final class CoreModule extends AbstractModule {
         $rest->route( 'GET', '/setup', [ $this, 'setup' ], Capability::MANAGE_SETTINGS );
         $rest->route( 'PUT', '/setup', [ $this, 'saveSetup' ], Capability::MANAGE_SETTINGS );
         $rest->route( 'POST', '/providers/configure', [ $this, 'configureProvider' ], Capability::MANAGE_SETTINGS );
+        $rest->route( 'GET', '/jobs', [ $this, 'jobs' ], Capability::VIEW_LOGS );
+        $rest->route( 'POST', '/jobs/retry', [ $this, 'retryJob' ], Capability::VIEW_LOGS );
     }
 
     public function registerHooks( HookRegistrar $hooks ): void {
@@ -120,6 +126,36 @@ final class CoreModule extends AbstractModule {
 
     private function wizard(): SetupWizard {
         return new SetupWizard( new \QueryNova\Infrastructure\WordPress\OptionStore() );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function jobs( \WP_REST_Request $request ): array {
+        unset( $request );
+
+        return [
+            'rows' => JobMonitor::rows( ( new JobRepository( $this->database() ) )->list( '', 20, 0 ) ),
+            'ran'  => false,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function retryJob( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+
+        return JobMonitor::retry(
+            new JobRepository( $this->database() ),
+            (int) ( $params['id'] ?? 0 ),
+            new \DateTimeImmutable( 'now' )
+        );
+    }
+
+    private function database(): ArrayDatabase|WpdbConnection {
+        return isset( $GLOBALS['wpdb'] ) ? new WpdbConnection() : new ArrayDatabase();
     }
 
     public function healthCheck(): HealthReport {
