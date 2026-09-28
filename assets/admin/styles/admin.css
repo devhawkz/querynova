@@ -69,6 +69,8 @@
 .qn-bar button:focus-visible,
 .qn-panel button:focus-visible,
 .qn-settings-nav button:focus-visible,
+.qn-search button:focus-visible,
+.qn-search input:focus-visible,
 .qn-panel a:focus-visible,
 .qn-panel input:focus-visible,
 .qn-panel select:focus-visible,
@@ -213,6 +215,40 @@
 .qn-skeleton {
   border: 1px solid var(--qn-line);
   min-height: 2.5rem;
+}
+
+.qn-search-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  padding: var(--qn-space-6);
+  background: rgb(20 24 33 / 40%);
+}
+
+.qn-search {
+  width: min(40rem, 100%);
+  max-height: calc(100vh - 4rem);
+  overflow: auto;
+  background: var(--qn-panel);
+  border: 1px solid var(--qn-line);
+  border-radius: var(--qn-radius);
+  box-shadow: var(--qn-shadow);
+  padding: var(--qn-space-4);
+}
+
+.qn-search input {
+  display: block;
+  width: 100%;
+  margin-top: var(--qn-space-2);
+  font: inherit;
+  color: var(--qn-ink);
+  background: var(--qn-panel);
+  border: 1px solid var(--qn-line);
+  border-radius: 8px;
+  padding: var(--qn-space-2) var(--qn-space-3);
 }
 
 @media (max-width: 1024px) {

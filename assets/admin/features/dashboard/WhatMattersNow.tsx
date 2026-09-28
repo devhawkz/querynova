@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { QueryNovaApi } from '../../core/api/client';
 import { Toast } from '../../components/Toast';
 import { provenanceLabel } from '../../core/provenance';
@@ -23,11 +23,19 @@ interface Props {
   nonce?: string;
   kpis?: unknown;
   loading?: boolean;
+  selectedId?: number | null;
+  selectionToken?: number;
 }
 
-export function WhatMattersNow({ actions, sections, wooCommerceActive, mode = 'simple', restUrl = '', nonce = '', kpis, loading = false }: Props) {
+export function WhatMattersNow({ actions, sections, wooCommerceActive, mode = 'simple', restUrl = '', nonce = '', kpis, loading = false, selectedId = null, selectionToken = 0 }: Props) {
   const api = useMemo(() => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }), [restUrl, nonce]);
   const [selected, setSelected] = useState<TodayAction | null>(null);
+  useEffect(() => {
+    if (selectedId == null) {
+      return;
+    }
+    setSelected(actions.find((action) => action.id === selectedId) ?? null);
+  }, [actions, selectedId, selectionToken]);
   const [note, setNote] = useState('');
   const [pending, setPending] = useState(false);
   const cards = dashboardKpis(kpis);

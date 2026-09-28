@@ -94,6 +94,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'product'           => $this->product(),
                     'category'          => $this->category(),
                     'diagnostics'       => $this->diagnostics(),
+                    'documents'         => QuickSearchIndex::catalog(),
                     'setup'             => ( new SetupWizard( new OptionStore() ) )->read( class_exists( 'WooCommerce' ) ),
                     'schemaRules'       => SchemaModule::storedRules(),
                     'settings'          => $this->settingsSnapshot(),

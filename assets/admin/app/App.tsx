@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { t } from '../i18n';
 import { AdvancedDetail } from '../features/advanced/AdvancedDetail';
@@ -17,6 +17,8 @@ import { LocalScreen } from '../features/local/LocalScreen';
 import { SeoScreen } from '../features/seo/SeoScreen';
 import { SettingsScreen } from '../features/settings/SettingsScreen';
 import { type SettingsSectionId } from '../features/settings/model';
+import { QuickSearchModal } from '../features/search/QuickSearchModal';
+import { isQuickSearchShortcut, type SearchHit } from '../features/search/quick-search';
 import { environmentBadge, NAV_ITEMS, navItem, type AdminMode, type ViewId } from './navigation';
 
 declare global {
@@ -46,6 +48,7 @@ declare global {
       reportsWorkspace?: unknown;
       localWorkspace?: unknown;
       notifications?: unknown;
+      documents?: unknown;
     };
   }
 }
@@ -57,7 +60,35 @@ export function App() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [noticesOpen, setNoticesOpen] = useState(false);
   const [settingsSection, setSettingsSection] = useState<SettingsSectionId>('general');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [opportunitySelection, setOpportunitySelection] = useState<{ id: number; token: number } | null>(null);
   const page = navItem(view);
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (!isQuickSearchShortcut(event)) {
+        return;
+      }
+      event.preventDefault();
+      setSearchOpen((open) => !open);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  function openHit(hit: SearchHit) {
+    if (hit.target.settingsSection !== undefined) {
+      setSettingsSection(hit.target.settingsSection);
+    }
+    if (hit.target.opportunityId !== undefined) {
+      setOpportunitySelection((current) => ({
+        id: hit.target.opportunityId ?? 0,
+        token: (current?.token ?? 0) + 1,
+      }));
+    }
+    setView(hit.target.view);
+    setSearchOpen(false);
+  }
   const badge = environmentBadge(boot.environment ?? '');
   return (
     <ErrorBoundary>
@@ -103,6 +134,9 @@ export function App() {
               <button type="button" aria-pressed={mode === 'advanced'} onClick={() => setMode('advanced')}>
                 {t('Advanced')}
               </button>
+              <button type="button" aria-expanded={searchOpen} onClick={() => setSearchOpen(true)}>
+                {t('Search')}
+              </button>
               <button type="button" onClick={() => setHelpOpen((open) => !open)}>
                 {t('Help')}
               </button>
@@ -120,6 +154,8 @@ export function App() {
                 sections={boot.sections}
                 wooCommerceActive={boot.wooCommerceActive === true}
                 mode={mode}
+                selectedId={opportunitySelection?.id ?? null}
+                selectionToken={opportunitySelection?.token ?? 0}
               />
             ) : null}
             {view === 'seo' ? (
@@ -179,6 +215,19 @@ export function App() {
             ) : null}
           </main>
         </div>
+        {searchOpen ? (
+          <QuickSearchModal
+            source={{
+              documents: boot.documents,
+              product: boot.product,
+              rankTracker: boot.rankTracker,
+              actions: boot.actions,
+              sections: boot.sections,
+            }}
+            onClose={() => setSearchOpen(false)}
+            onSelect={openHit}
+          />
+        ) : null}
       </div>
     </ErrorBoundary>
   );
