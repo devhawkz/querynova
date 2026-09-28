@@ -21,6 +21,7 @@ for (const path of ['querynova.php', 'uninstall.php', 'composer.json', 'composer
 }
 mkdirSync(join(stage, 'build'), { recursive: true });
 cpSync(join(root, 'build', 'admin.js'), join(stage, 'build', 'admin.js'));
+cpSync(join(root, 'build', 'admin.css'), join(stage, 'build', 'admin.css'));
 cpSync(join(root, 'build', 'channel.json'), join(stage, 'build', 'channel.json'));
 if (existsSync(join(root, 'languages'))) {
   cpSync(join(root, 'languages'), join(stage, 'languages'), { recursive: true });
@@ -45,7 +46,7 @@ for (const token of forbidden) {
     throw new Error(`Release ZIP contains ${token}`);
   }
 }
-if (!listing.includes('build/admin.js') || !listing.includes('build/channel.json') || !listing.includes('src/') || !listing.includes('vendor/autoload.php')) {
+if (!listing.includes('build/admin.js') || !listing.includes('build/admin.css') || !listing.includes('build/channel.json') || !listing.includes('src/') || !listing.includes('vendor/autoload.php')) {
   throw new Error('Release ZIP is missing the compiled admin, channel, source, or autoload.');
 }
 execFileSync('php', [join(root, 'scripts/assert-release-autoload.php'), zipPath], {

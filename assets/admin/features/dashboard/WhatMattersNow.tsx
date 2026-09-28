@@ -13,14 +13,16 @@ interface Props {
   actions: TodayAction[];
   sections: unknown;
   wooCommerceActive: boolean;
+  mode?: 'simple' | 'advanced';
 }
 
-export function WhatMattersNow({ actions, sections, wooCommerceActive }: Props) {
+export function WhatMattersNow({ actions, sections, wooCommerceActive, mode = 'simple' }: Props) {
   const visible = visibleActions(actions);
   const grouped = normalizeSections(sections);
+  const sectionsToShow = mode === 'advanced' ? SECTION_ORDER : SECTION_ORDER.filter((id) => id !== 'ai' && id !== 'recent');
   return (
     <section aria-labelledby="qn-what-matters">
-      <h1 id="qn-what-matters">{t('What Matters Now')}</h1>
+      <h2 id="qn-what-matters">{t('What Matters Now')}</h2>
       <p>{wooCommerceActive ? t('Organic revenue opportunities') : t('Organic growth opportunities')}</p>
       {visible.length === 0 ? (
         <p>{t('No measured opportunities yet. Connect Search Console or run an on-site audit to rank the next actions.')}</p>
@@ -39,20 +41,20 @@ export function WhatMattersNow({ actions, sections, wooCommerceActive }: Props) 
           ))}
         </ol>
       )}
-      {SECTION_ORDER.map((id) => {
+      {sectionsToShow.map((id) => {
         const items = grouped[id];
         return (
           <section key={id} aria-labelledby={`qn-section-${id}`}>
-            <h2 id={`qn-section-${id}`}>{t(SECTION_TITLES[id])}</h2>
+            <h3 id={`qn-section-${id}`}>{t(SECTION_TITLES[id])}</h3>
             {items.length === 0 ? (
-              <p>{t('Nothing recorded.')}</p>
+              <p>{t('No stored rows in this section. Connect a provider or run an audit before treating a gap as zero.')}</p>
             ) : (
               <ul>
                 {items.map((item) => {
                   const metric = metricLine(item.metric);
                   return (
                     <li key={item.id}>
-                      <h3>{item.title}</h3>
+                      <h4>{item.title}</h4>
                       {item.summary !== '' ? <p>{item.summary}</p> : null}
                       {metric !== null ? <p>{metric}</p> : null}
                     </li>
