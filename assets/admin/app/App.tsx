@@ -12,6 +12,7 @@ import { AnalyticsScreen } from '../features/analytics/AnalyticsScreen';
 import { RankScreen } from '../features/rank/RankScreen';
 import { ReportsScreen } from '../features/reports/ReportsScreen';
 import { LinksScreen } from '../features/links/LinksScreen';
+import { LocalScreen } from '../features/local/LocalScreen';
 import { SeoScreen } from '../features/seo/SeoScreen';
 import { SettingsScreen } from '../features/settings/SettingsScreen';
 import { type SettingsSectionId } from '../features/settings/model';
@@ -42,6 +43,7 @@ declare global {
       contentWorkspace?: unknown;
       aiWorkspace?: unknown;
       reportsWorkspace?: unknown;
+      localWorkspace?: unknown;
     };
   }
 }
@@ -135,6 +137,7 @@ export function App() {
             {view === 'content' ? <ContentScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} contentWorkspace={boot.contentWorkspace} /> : null}
             {view === 'ai' ? <AiScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} aiWorkspace={boot.aiWorkspace} /> : null}
             {view === 'reports' ? <ReportsScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} /> : null}
+            {view === 'local' ? <LocalScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} localWorkspace={boot.localWorkspace} /> : null}
             {view === 'rank' && mode === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
             {view === 'commerce' ? (
               <>
@@ -159,7 +162,7 @@ export function App() {
                 onOpenSchema={() => setView('schema')}
               />
             ) : null}
-            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' && view !== 'analytics' && view !== 'links' && view !== 'content' && view !== 'ai' && view !== 'reports' ? (
+            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' && view !== 'analytics' && view !== 'links' && view !== 'content' && view !== 'ai' && view !== 'reports' && view !== 'local' ? (
               <section>
                 <h2>{t(page.label)}</h2>
                 <p>{t(page.hint)}</p>

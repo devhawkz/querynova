@@ -22,6 +22,8 @@ use QueryNova\Modules\Experience\ExperienceModule;
 use QueryNova\Modules\Experiments\ExperimentModule;
 use QueryNova\Modules\Core\CoreModule;
 use QueryNova\Modules\Keywords\KeywordModule;
+use QueryNova\Modules\Local\LocalGate;
+use QueryNova\Modules\Local\LocalModule;
 use QueryNova\Modules\Opportunities\OpportunityModule;
 use QueryNova\Modules\Podcast\PodcastGate;
 use QueryNova\Modules\Podcast\PodcastModule;
@@ -60,6 +62,9 @@ final class ModuleCatalog {
         }
         if ( PodcastGate::enabled() ) {
             $modules[] = new PodcastModule();
+        }
+        if ( LocalGate::enabled() ) {
+            $modules[] = new LocalModule();
         }
         $modules[] = new KeywordModule();
         $modules[] = new SerpModule();

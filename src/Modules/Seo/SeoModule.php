@@ -24,6 +24,7 @@ use QueryNova\Infrastructure\Queue\JobRunner;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Redirects\Application\RedirectEngine;
 use QueryNova\Modules\Redirects\Infrastructure\RedirectRepository;
+use QueryNova\Modules\Local\LocalGate;
 use QueryNova\Modules\Podcast\PodcastGate;
 use QueryNova\Modules\Seo\Application\HeadlessDocument;
 use QueryNova\Modules\Seo\Application\ImportPreview;
@@ -111,6 +112,8 @@ final class SeoModule extends AbstractModule {
         $rest->route( 'POST', '/seo/image-alt', [ $tools, 'imageAlt' ], Capability::MANAGE_SEO );
         $rest->route( 'POST', '/seo/indexnow', [ $tools, 'indexNow' ], Capability::MANAGE_SEO );
         $rest->route( 'POST', '/podcast', [ $this, 'podcast' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/local', [ $this, 'localSeo' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/local/locations', [ $this, 'localLocation' ], Capability::MANAGE_SEO );
     }
 
     public function registerJobs( JobRegistrar $jobs ): void {
@@ -282,6 +285,31 @@ final class SeoModule extends AbstractModule {
             ( $params['enabled'] ?? false ) === true,
             ( $params['confirmed'] ?? false ) === true
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function localSeo( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+
+        return LocalGate::save(
+            ( $params['enabled'] ?? false ) === true,
+            ( $params['confirmed'] ?? false ) === true
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function localLocation( \WP_REST_Request $request ): array {
+        $params  = $request->get_json_params();
+        $params  = is_array( $params ) ? $params : [];
+        $name    = is_string( $params['name'] ?? null ) ? $params['name'] : '';
+        $address = is_string( $params['address'] ?? null ) ? $params['address'] : '';
+
+        return LocalGate::saveLocation( $name, $address, ( $params['confirmed'] ?? false ) === true );
     }
 
     private function importer(): SeoImporter {

@@ -27,6 +27,7 @@ use QueryNova\Infrastructure\WordPress\OptionStore;
 use QueryNova\Modules\Ai\AiModule;
 use QueryNova\Modules\Analytics\AnalyticsModule;
 use QueryNova\Modules\Content\ContentModule;
+use QueryNova\Modules\Local\LocalGate;
 use QueryNova\Modules\Reports\ReportModule;
 use QueryNova\Modules\Schema\SchemaModule;
 use QueryNova\Modules\Seo\Application\MetaDefaults;
@@ -102,6 +103,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'contentWorkspace'  => ContentModule::workspaceSnapshot(),
                     'aiWorkspace'       => AiModule::workspaceSnapshot(),
                     'reportsWorkspace'  => ReportModule::workspaceSnapshot(),
+                    'localWorkspace'    => LocalGate::present(),
                 ]
             ) . ';',
             'before'
