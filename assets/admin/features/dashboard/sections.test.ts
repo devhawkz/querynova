@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { metricLine, normalizeSections, primaryText, SECTION_TITLES, visibleActions, type TodayAction } from './sections';
+import { dashboardKpis, metricLine, normalizeSections, primaryText, SECTION_TITLES, visibleActions, type TodayAction } from './sections';
 
 describe('what matters now sections', () => {
   it('keeps every section empty when nothing was supplied', () => {
@@ -74,5 +74,16 @@ describe('what matters now sections', () => {
     expect(visible).toHaveLength(10);
     expect(visible[0]?.title).toBe('Action 2');
     expect(visible.map((action) => action.provenance).every((kind) => kind !== 'MEASURED')).toBe(true);
+  });
+
+  it('labels disconnected KPIs as Connect and does not turn a missing value into zero', () => {
+    const disconnected = dashboardKpis({ connected: false, metrics: { clicks: 0 } });
+    const connected = dashboardKpis({ connected: true, metrics: { clicks: 4 } });
+
+    expect(disconnected.map((card) => card.text)).toEqual(['Connect', 'Connect', 'Connect', 'Connect']);
+    expect(disconnected.every((card) => card.value === null)).toBe(true);
+    expect(connected.find((card) => card.id === 'clicks')?.text).toBe('4');
+    expect(connected.find((card) => card.id === 'revenue')?.text).toBe('Not available');
+    expect(connected.find((card) => card.id === 'revenue')?.value).toBeNull();
   });
 });

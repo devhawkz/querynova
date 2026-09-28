@@ -210,6 +210,11 @@
   padding: var(--qn-space-2) var(--qn-space-3);
 }
 
+.qn-skeleton {
+  border: 1px solid var(--qn-line);
+  min-height: 2.5rem;
+}
+
 @media (max-width: 1024px) {
   .qn-shell,
   .qn-settings {

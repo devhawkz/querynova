@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
 import { QueryNovaApi } from '../../core/api/client';
+import { Toast } from '../../components/Toast';
 import { provenanceLabel } from '../../core/provenance';
 import { t } from '../../i18n';
 import { drawerDetail, drawerResult, type DrawerAction, type DrawerDetail } from './drawer';
 import {
+  dashboardKpis,
   metricLine,
   normalizeSections,
   SECTION_ORDER,
@@ -19,12 +21,16 @@ interface Props {
   mode?: 'simple' | 'advanced';
   restUrl?: string;
   nonce?: string;
+  kpis?: unknown;
+  loading?: boolean;
 }
 
-export function WhatMattersNow({ actions, sections, wooCommerceActive, mode = 'simple', restUrl = '', nonce = '' }: Props) {
+export function WhatMattersNow({ actions, sections, wooCommerceActive, mode = 'simple', restUrl = '', nonce = '', kpis, loading = false }: Props) {
   const api = useMemo(() => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }), [restUrl, nonce]);
   const [selected, setSelected] = useState<TodayAction | null>(null);
   const [note, setNote] = useState('');
+  const [pending, setPending] = useState(false);
+  const cards = dashboardKpis(kpis);
   const visible = visibleActions(actions);
   const detail = selected === null ? null : drawerDetail(selected);
   const grouped = normalizeSections(sections);
@@ -33,6 +39,18 @@ export function WhatMattersNow({ actions, sections, wooCommerceActive, mode = 's
     <section aria-labelledby="qn-what-matters">
       <h2 id="qn-what-matters">{t('What Matters Now')}</h2>
       <p>{wooCommerceActive ? t('Organic revenue opportunities') : t('Organic growth opportunities')}</p>
+      {loading ? <p className="qn-skeleton" aria-busy="true">{t('Loading stored opportunities.')}</p> : (
+        <div className="qn-card-grid">
+          {cards.map((card) => (
+            <article className="qn-card" key={card.id}>
+              <h3>{t(card.label)}</h3>
+              <p>
+                <span className="qn-badge" data-state={card.value === null ? 'not-configured' : 'info'}>{t(card.text)}</span>
+              </p>
+            </article>
+          ))}
+        </div>
+      )}
       {visible.length === 0 ? (
         <p>{t('No measured opportunities yet. Connect Search Console or run an on-site audit to rank the next actions.')}</p>
       ) : (
@@ -79,7 +97,8 @@ export function WhatMattersNow({ actions, sections, wooCommerceActive, mode = 's
         <OpportunityDetail
           detail={detail}
           onClose={() => setSelected(null)}
-          onAct={(action) => void recordAction(api, selected.id, action, restUrl !== '' && nonce !== '', setNote)}
+          onAct={(action) => void recordAction(api, selected.id, action, restUrl !== '' && nonce !== '', setNote, setPending)}
+          pending={pending}
           note={note}
         />
       ) : null}
@@ -87,11 +106,12 @@ export function WhatMattersNow({ actions, sections, wooCommerceActive, mode = 's
   );
 }
 
-function OpportunityDetail({ detail, onClose, onAct, note }: {
+function OpportunityDetail({ detail, onClose, onAct, note, pending }: {
   detail: DrawerDetail;
   onClose: () => void;
   onAct: (action: DrawerAction) => void;
   note: string;
+  pending: boolean;
 }) {
   return (
     <section aria-labelledby="qn-opportunity-drawer">
@@ -119,7 +139,8 @@ function OpportunityDetail({ detail, onClose, onAct, note }: {
       <button type="button" onClick={() => onAct('applied')}>{t('Mark Applied')}</button>
       <button type="button" onClick={() => onAct('experiment')}>{t('Create Experiment')}</button>
       <button type="button" onClick={onClose}>{t('Close detail')}</button>
-      {note !== '' ? <p role="status">{note}</p> : null}
+      {pending ? <p className="qn-skeleton" aria-busy="true">{t('Loading stored opportunities.')}</p> : null}
+      <Toast message={note} />
     </section>
   );
 }
@@ -128,12 +149,20 @@ function field(value: string | null): string {
   return value === null ? t('Nothing stored for this field.') : value;
 }
 
-async function recordAction(api: QueryNovaApi, id: number, action: DrawerAction, ready: boolean, setNote: (note: string) => void): Promise<void> {
+async function recordAction(
+  api: QueryNovaApi,
+  id: number,
+  action: DrawerAction,
+  ready: boolean,
+  setNote: (note: string) => void,
+  setPending: (pending: boolean) => void,
+): Promise<void> {
   const local = drawerResult(true);
   if (!ready) {
     setNote(t(local.note));
     return;
   }
+  setPending(true);
   try {
     const body = await api.post<Record<string, unknown>>('/outcomes/drawer', { id, action, confirmed: true, item: {} });
     const result = body.result;
@@ -141,6 +170,8 @@ async function recordAction(api: QueryNovaApi, id: number, action: DrawerAction,
     setNote(typeof record.note === 'string' ? record.note : t(local.note));
   } catch {
     setNote(t(local.note));
+  } finally {
+    setPending(false);
   }
 }
 

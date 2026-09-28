@@ -97,6 +97,38 @@ export function primaryText(item: DashboardItem): string {
   return parts.join(' ');
 }
 
+export interface DashboardKpi {
+  id: string;
+  label: string;
+  text: string;
+  value: number | null;
+}
+
+const KPI_FIELDS = [
+  { id: 'clicks', label: 'Clicks' },
+  { id: 'impressions', label: 'Impressions' },
+  { id: 'sessions', label: 'Sessions' },
+  { id: 'revenue', label: 'Organic revenue' },
+] as const;
+
+export function dashboardKpis(input: unknown): DashboardKpi[] {
+  const record = isRecord(input) ? input : {};
+  const connected = record.connected === true;
+  const metrics = isRecord(record.metrics) ? record.metrics : {};
+  return KPI_FIELDS.map((field) => {
+    const amount = metrics[field.id];
+    if (connected && typeof amount === 'number' && Number.isFinite(amount)) {
+      return { id: field.id, label: field.label, text: String(amount), value: amount };
+    }
+    return {
+      id: field.id,
+      label: field.label,
+      text: connected ? 'Not available' : 'Connect',
+      value: null,
+    };
+  });
+}
+
 export function visibleActions(actions: TodayAction[]): TodayAction[] {
   const visible: TodayAction[] = [];
   for (const action of actions) {
@@ -109,6 +141,10 @@ export function visibleActions(actions: TodayAction[]): TodayAction[] {
     }
   }
   return visible;
+}
+
+function isRecord(input: unknown): input is Record<string, unknown> {
+  return typeof input === 'object' && input !== null;
 }
 
 function normalizeItem(row: unknown): DashboardItem | null {
