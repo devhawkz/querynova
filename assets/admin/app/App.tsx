@@ -3,11 +3,11 @@ import { ErrorBoundary } from '../components/ErrorBoundary';
 import { t } from '../i18n';
 import { AdvancedDetail } from '../features/advanced/AdvancedDetail';
 import { CategoryScreen } from '../features/categories/CategoryScreen';
-import { DiagnosticsScreen } from '../features/diagnostics/DiagnosticsScreen';
 import { ProductScreen } from '../features/products/ProductScreen';
-import { SetupScreen } from '../features/setup/SetupScreen';
 import { WhatMattersNow, type TodayAction } from '../features/dashboard/WhatMattersNow';
 import { SchemaBuilder } from '../features/schema/SchemaBuilder';
+import { SettingsScreen } from '../features/settings/SettingsScreen';
+import { type SettingsSectionId } from '../features/settings/model';
 import { environmentBadge, NAV_ITEMS, navItem, type AdminMode, type ViewId } from './navigation';
 
 declare global {
@@ -26,6 +26,7 @@ declare global {
       diagnostics?: unknown;
       setup?: unknown;
       schemaRules?: unknown;
+      settings?: unknown;
     };
   }
 }
@@ -35,6 +36,7 @@ export function App() {
   const [view, setView] = useState<ViewId>('dashboard');
   const [mode, setMode] = useState<AdminMode>('simple');
   const [helpOpen, setHelpOpen] = useState(false);
+  const [settingsSection, setSettingsSection] = useState<SettingsSectionId>('general');
   const page = navItem(view);
   const badge = environmentBadge(boot.environment ?? '');
   return (
@@ -42,7 +44,17 @@ export function App() {
       <div className="qn-shell">
         <nav aria-label="QueryNova">
           {NAV_ITEMS.map((item) => (
-            <button key={item.id} type="button" aria-current={view === item.id ? 'page' : undefined} onClick={() => setView(item.id)}>
+            <button
+              key={item.id}
+              type="button"
+              aria-current={view === item.id ? 'page' : undefined}
+              onClick={() => {
+                if (item.id === 'settings') {
+                  setSettingsSection('general');
+                }
+                setView(item.id);
+              }}
+            >
               {t(item.label)}
             </button>
           ))}
@@ -91,7 +103,10 @@ export function App() {
                 restUrl={boot.restUrl ?? ''}
                 nonce={boot.nonce ?? ''}
                 initialRules={boot.schemaRules}
-                onOpenDiagnostics={() => setView('settings')}
+                onOpenDiagnostics={() => {
+                  setSettingsSection('tools');
+                  setView('settings');
+                }}
               />
             ) : null}
             {view === 'rank' && mode === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
@@ -108,10 +123,19 @@ export function App() {
               </>
             ) : null}
             {view === 'settings' ? (
-              <>
-                <SetupScreen setup={boot.setup} restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} />
-                <DiagnosticsScreen diagnostics={boot.diagnostics} />
-              </>
+              <SettingsScreen
+                settings={boot.settings}
+                section={settingsSection}
+                onSection={setSettingsSection}
+                version={boot.version ?? ''}
+                wooCommerceActive={boot.wooCommerceActive === true}
+                schemaRules={boot.schemaRules}
+                setup={boot.setup}
+                diagnostics={boot.diagnostics}
+                restUrl={boot.restUrl ?? ''}
+                nonce={boot.nonce ?? ''}
+                onOpenSchema={() => setView('schema')}
+              />
             ) : null}
             {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' ? (
               <section>

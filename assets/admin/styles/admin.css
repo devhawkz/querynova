@@ -48,7 +48,8 @@
 
 .qn-nav button,
 .qn-bar button,
-.qn-panel button {
+.qn-panel button,
+.qn-settings-nav button {
   font: inherit;
   border-radius: 8px;
   border: 1px solid transparent;
@@ -67,6 +68,7 @@
 .qn-nav button:focus-visible,
 .qn-bar button:focus-visible,
 .qn-panel button:focus-visible,
+.qn-settings-nav button:focus-visible,
 .qn-panel a:focus-visible,
 .qn-panel input:focus-visible,
 .qn-panel select:focus-visible,
@@ -151,7 +153,8 @@
 }
 
 .qn-actions button,
-.qn-panel button[type='button'] {
+.qn-panel button[type='button'],
+.qn-settings-nav button {
   border-color: var(--qn-line);
   background: var(--qn-surface);
 }
@@ -162,12 +165,54 @@
   border-color: var(--qn-accent) !important;
 }
 
+.qn-settings {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--qn-space-4);
+  align-items: start;
+  min-width: 0;
+}
+
+.qn-settings-nav {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: var(--qn-space-1);
+  min-width: 0;
+}
+
+.qn-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--qn-space-3);
+}
+
+.qn-card {
+  min-width: 0;
+  background: var(--qn-panel);
+  border: 1px solid var(--qn-line);
+  border-radius: var(--qn-radius);
+  box-shadow: var(--qn-shadow);
+  padding: var(--qn-space-4);
+}
+
+.qn-card h3,
+.qn-card p {
+  margin-top: 0;
+}
+
+.qn-card .qn-badge {
+  margin-right: var(--qn-space-1);
+}
+
 @media (max-width: 1024px) {
-  .qn-shell {
+  .qn-shell,
+  .qn-settings {
     grid-template-columns: 1fr;
   }
 
-  .qn-nav {
+  .qn-nav,
+  .qn-settings-nav {
     flex-direction: row;
     flex-wrap: wrap;
   }

@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace QueryNova\Modules\Core;
 
 use QueryNova\Core\BuildChannel;
+use QueryNova\Core\Container\ServiceContainer;
 use QueryNova\Core\Contracts\HookSubscriberInterface;
 use QueryNova\Core\Environment\WordPressEnvironment;
 use QueryNova\Core\ModuleCatalog;
+use QueryNova\Core\Plugin;
 use QueryNova\Core\SafeMode\SafeMode;
 use QueryNova\Core\Support\SystemClock;
 use QueryNova\Infrastructure\Cli\DiagnosticsReport;
@@ -83,6 +85,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'diagnostics'       => $this->diagnostics(),
                     'setup'             => ( new SetupWizard( new OptionStore() ) )->read( class_exists( 'WooCommerce' ) ),
                     'schemaRules'       => SchemaModule::storedRules(),
+                    'settings'          => $this->settingsSnapshot(),
                 ]
             ) . ';',
             'before'
@@ -162,6 +165,23 @@ final class AdminAssets implements HookSubscriberInterface {
             unset( $exception );
 
             return CategoryScreen::emptyScreen();
+        }
+    }
+
+    /**
+     * Registries only. A boot failure leaves the module grid empty.
+     *
+     * @return array<string, mixed>
+     */
+    private function settingsSnapshot(): array {
+        $environment = new WordPressEnvironment();
+        $build       = BuildChannel::installedChannel();
+        try {
+            return SettingsCatalog::fromContainer( Plugin::container(), $environment, $build );
+        } catch ( \Throwable $exception ) {
+            unset( $exception );
+
+            return SettingsCatalog::fromContainer( new ServiceContainer(), $environment, $build );
         }
     }
 
