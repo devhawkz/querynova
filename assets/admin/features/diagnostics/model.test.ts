@@ -34,4 +34,28 @@ describe('diagnostics screen', () => {
     expect(text).not.toContain('"hits":0');
     expect(text).not.toContain('"db_version":0');
   });
+
+  it('keeps a production WordPress environment when the installed build is staging', () => {
+    const notice =
+      'Staging build is running on a production WordPress environment. This build includes additional diagnostic capabilities and is intended primarily for testing. For normal live-site operation, use the production QueryNova build.';
+    const report = normalizeDiagnostics({
+      environment: 'production',
+      querynova_build: 'staging',
+      release_channel: 'beta',
+      release_status: 'warning',
+      release_notice: notice,
+    });
+    const text = reportText(report);
+
+    expect(report.environment).toBe('production');
+    expect(report.querynovaBuild).toBe('staging');
+    expect(report.releaseChannel).toBe('beta');
+    expect(report.releaseStatus).toBe('warning');
+    expect(text).toContain('"wordpress_environment": "production"');
+    expect(text).toContain('"querynova_build": "staging"');
+    expect(text).toContain('"release_channel": "beta"');
+    expect(text).toContain('"release_status": "warning"');
+    expect(text).toContain(notice);
+    expect(text).not.toContain('"environment": "staging"');
+  });
 });

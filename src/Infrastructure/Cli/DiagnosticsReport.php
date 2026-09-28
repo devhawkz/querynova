@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Infrastructure\Cli;
 
 use QueryNova\Core\Logging\LogSanitizer;
+use QueryNova\Core\ReleaseProfile;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -83,10 +84,15 @@ final class DiagnosticsReport {
                 $pending[] = $version;
             }
         }
-        $cron = $input['cron_scheduled'] ?? null;
+        $cron    = $input['cron_scheduled'] ?? null;
+        $profile = self::profile( $input );
 
         return [
-            'environment'         => trim( (string) ( $input['environment'] ?? '' ) ),
+            'environment'         => $profile['environment'],
+            'querynova_build'     => $profile['querynova_build'],
+            'release_channel'     => $profile['release_channel'],
+            'release_status'      => $profile['release_status'],
+            'release_notice'      => $profile['release_notice'],
             'querynova_version'   => trim( (string) ( $input['querynova_version'] ?? '' ) ),
             'wp_version'          => self::nullableString( $input['wp_version'] ?? null ),
             'php_version'         => trim( (string) ( $input['php_version'] ?? PHP_VERSION ) ),
@@ -108,6 +114,35 @@ final class DiagnosticsReport {
                 'pending' => $pending,
             ],
             'recent_errors'       => $errors,
+        ];
+    }
+
+    /**
+     * A missing snapshot stays empty. A supplied WordPress environment is normalized here.
+     *
+     * @param array<string, mixed> $input
+     * @return array{environment: string, querynova_build: string, release_channel: string, release_status: string, release_notice: string|null}
+     */
+    private static function profile( array $input ): array {
+        $environment = $input['environment'] ?? null;
+        if ( ! is_string( $environment ) || trim( $environment ) === '' ) {
+            return [
+                'environment'     => '',
+                'querynova_build' => '',
+                'release_channel' => '',
+                'release_status'  => '',
+                'release_notice'  => null,
+            ];
+        }
+        $build   = is_string( $input['querynova_build'] ?? null ) ? $input['querynova_build'] : 'unknown';
+        $aligned = ReleaseProfile::assess( trim( $environment ), $build );
+
+        return [
+            'environment'     => $aligned->wordpressEnvironment(),
+            'querynova_build' => $aligned->querynovaBuild(),
+            'release_channel' => $aligned->releaseChannel(),
+            'release_status'  => $aligned->status(),
+            'release_notice'  => $aligned->notice(),
         ];
     }
 

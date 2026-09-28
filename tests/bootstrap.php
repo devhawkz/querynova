@@ -8,7 +8,7 @@
 declare(strict_types=1);
 
 define( 'ABSPATH', __DIR__ . '/Support/wordpress/' );
-define( 'QUERYNOVA_VERSION', '0.1.0' );
+define( 'QUERYNOVA_VERSION', '0.1.2' );
 define( 'QUERYNOVA_FILE', dirname( __DIR__ ) . '/querynova.php' );
 define( 'QUERYNOVA_PATH', dirname( __DIR__ ) . '/' );
 define( 'QUERYNOVA_URL', 'http://example.test/wp-content/plugins/querynova/' );

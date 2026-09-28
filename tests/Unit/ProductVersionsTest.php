@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
+use QueryNova\Core\Environment\WordPressEnvironment;
 use QueryNova\Core\ProductVersions;
 use QueryNova\Modules\Ai\Application\AiVisibility;
 use QueryNova\Modules\Content\Infrastructure\ContentRepository;
@@ -32,15 +33,19 @@ final class ProductVersionsTest extends TestCase {
         self::assertArrayNotHasKey( 'querynova.ctr_revenue_gap', $versions['methodologies'] );
     }
 
-    public function testChannelFollowsTheWordPressEnvironment(): void {
-        $versions                         = new ProductVersions();
-        $GLOBALS['querynova_environment'] = 'staging';
-        self::assertSame( 'beta', $versions->channel() );
-        $GLOBALS['querynova_environment'] = 'local';
-        self::assertSame( 'development', $versions->channel() );
+    public function testChannelFollowsTheInstalledBuild(): void {
+        $path = tempnam( sys_get_temp_dir(), 'qn-channel-' );
+        self::assertIsString( $path );
+        file_put_contents( $path, '{"channel":"staging"}' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- local temp manifest, not a remote request.
         $GLOBALS['querynova_environment'] = 'production';
-        self::assertSame( 'stable', $versions->channel() );
-        unset( $GLOBALS['querynova_environment'] );
+
+        try {
+            self::assertSame( 'beta', ( new ProductVersions( $path ) )->channel() );
+            self::assertSame( 'production', ( new WordPressEnvironment() )->getName() );
+        } finally {
+            unset( $GLOBALS['querynova_environment'] );
+            unlink( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink -- local temp manifest, not a WordPress upload.
+        }
     }
 
     public function testStatusIncludesTheVersionSet(): void {

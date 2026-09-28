@@ -42,6 +42,10 @@ final class CliCommandsTest extends TestCase {
 
         self::assertTrue( $status['ok'] );
         self::assertSame( 'QueryNova', $status['name'] );
+        self::assertSame( 'local', $report['environment'] );
+        self::assertArrayHasKey( 'querynova_build', $report );
+        self::assertArrayHasKey( 'release_channel', $report );
+        self::assertArrayHasKey( 'release_status', $report );
         self::assertNull( $report['db_version'] );
         self::assertNull( $report['woocommerce_version'] );
         self::assertNull( $report['cache']['hits'] );

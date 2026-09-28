@@ -7,6 +7,10 @@ export interface DiagnosticError {
 
 export interface DiagnosticsModel {
   environment: string;
+  querynovaBuild: string;
+  releaseChannel: string;
+  releaseStatus: string;
+  releaseNotice: string;
   querynovaVersion: string;
   wpVersion: string | null;
   phpVersion: string;
@@ -26,6 +30,10 @@ export interface DiagnosticsModel {
 export function emptyDiagnostics(): DiagnosticsModel {
   return {
     environment: '',
+    querynovaBuild: '',
+    releaseChannel: '',
+    releaseStatus: '',
+    releaseNotice: '',
     querynovaVersion: '',
     wpVersion: null,
     phpVersion: '',
@@ -50,6 +58,10 @@ export function normalizeDiagnostics(input: unknown): DiagnosticsModel {
   }
   const record = input as Record<string, unknown>;
   report.environment = text(record.environment);
+  report.querynovaBuild = text(record.querynova_build);
+  report.releaseChannel = text(record.release_channel);
+  report.releaseStatus = text(record.release_status);
+  report.releaseNotice = text(record.release_notice);
   report.querynovaVersion = text(record.querynova_version);
   report.wpVersion = optionalText(record.wp_version);
   report.phpVersion = text(record.php_version);
@@ -90,6 +102,11 @@ export function reportText(report: DiagnosticsModel): string {
   return JSON.stringify(
     {
       environment: displayValue(report.environment),
+      wordpress_environment: displayValue(report.environment),
+      querynova_build: displayValue(report.querynovaBuild),
+      release_channel: displayValue(report.releaseChannel),
+      release_status: displayValue(report.releaseStatus),
+      release_notice: report.releaseNotice === '' ? displayValue(null) : scrub(report.releaseNotice),
       querynova_version: displayValue(report.querynovaVersion),
       wp_version: displayValue(report.wpVersion),
       php_version: displayValue(report.phpVersion),

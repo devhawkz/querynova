@@ -1,5 +1,15 @@
 # Release notes
 
+## 0.1.2
+
+Plugin header version `0.1.2`. Schema version stays `202609270002`.
+
+The WordPress environment and the QueryNova build channel are separate. The WordPress environment still comes only from `wp_get_environment_type()`. The installed package is read from `build/channel.json`: production is stable, staging is beta, and development is the development channel. Diagnostics, the system report, the downloadable diagnostic report, log context, and `wp querynova diagnostics` show both.
+
+A staging build on a production WordPress environment shows a non-blocking warning and does not change the WordPress environment or `wp-config.php`. A production build on a staging WordPress environment shows an informational notice. The plugin keeps working in both cases.
+
+Observed WordPress and WooCommerce releases are unchanged from 0.1.0: WordPress 7.1.2 and WooCommerce 11.1.2 on Actions run 36388914008, commit `dbe8ec5edaed5782802597d17b3a1394c0fff0a5`. This 0.1.2 change was not part of that run.
+
 ## 0.1.0
 
 Plugin version `0.1.0`. Schema version `202609270002`. REST namespace `querynova/v1`. Text domain `querynova`.
@@ -12,7 +22,7 @@ Published methodology versions shipped with this plugin version:
 | `querynova.content_observations` | `v1` |
 | `querynova.ai_visibility_index` | `v1` |
 
-A methodology without a published version is omitted from the version description. The release channel follows the WordPress environment: development for local and development, beta for staging, and stable otherwise.
+A methodology without a published version is omitted from the version description. In 0.1.0 the release channel followed the WordPress environment: development for local and development, beta for staging, and stable otherwise. From 0.1.2 the release channel follows the installed build instead.
 
 ### Requirements
 

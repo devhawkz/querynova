@@ -14,6 +14,7 @@ use Psr\Log\LoggerTrait;
 use QueryNova\Core\Contracts\ClockInterface;
 use QueryNova\Core\Contracts\EnvironmentInterface;
 use QueryNova\Core\Logging\Handler\LogHandlerInterface;
+use QueryNova\Core\ReleaseProfile;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -33,6 +34,7 @@ final class Logger implements LoggerInterface {
         private readonly ClockInterface $clock,
         private readonly CorrelationContext $correlation,
         private string $minimumLevel,
+        private readonly ReleaseProfile $release,
     ) {
     }
 
@@ -55,6 +57,13 @@ final class Logger implements LoggerInterface {
             return;
         }
 
+        $context['wordpress_environment'] = $this->release->wordpressEnvironment();
+        $context['querynova_build']       = $this->release->querynovaBuild();
+        $context['release_channel']       = $this->release->releaseChannel();
+        $context['release_status']        = $this->release->status();
+        if ( $this->release->notice() !== null ) {
+            $context['release_notice'] = $this->release->notice();
+        }
         $context        = $this->sanitizer->sanitize( $context );
         $exceptionClass = '';
         $exceptionCode  = '';

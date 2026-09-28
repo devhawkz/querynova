@@ -21,6 +21,9 @@ final class ProductVersions {
 
     public const API = 'v1';
 
+    public function __construct( private readonly ?string $channelFile = null ) {
+    }
+
     /**
      * @return array{plugin: string, schema: string, api: string, channel: string, methodologies: array<string, string>}
      */
@@ -39,14 +42,10 @@ final class ProductVersions {
     }
 
     public function channel(): string {
-        $environment = function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production';
-        if ( in_array( $environment, [ 'local', 'development' ], true ) ) {
-            return 'development';
-        }
-        if ( $environment === 'staging' ) {
-            return 'beta';
+        if ( $this->channelFile !== null ) {
+            return ReleaseProfile::releaseChannelFor( ( new BuildChannel( $this->channelFile ) )->read()['channel'] );
         }
 
-        return 'stable';
+        return ReleaseProfile::releaseChannelFor( BuildChannel::installedChannel() );
     }
 }

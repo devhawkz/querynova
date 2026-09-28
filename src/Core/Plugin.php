@@ -90,6 +90,7 @@ final class Plugin {
         $debug       = new DebugMode( $options, $clock );
         $db          = isset( $GLOBALS['wpdb'] ) ? new WpdbConnection() : new ArrayDatabase();
         $logs        = new LogRepository( $db );
+        $release     = ReleaseProfile::assess( $environment->getName(), BuildChannel::installedChannel() );
         $logger      = new Logger(
             [
                 new FileLogHandler( self::logPath() ),
@@ -101,6 +102,7 @@ final class Plugin {
             $clock,
             $correlation,
             $debug->minimumLevel( $environment ),
+            $release,
         );
 
         $container->set( WordPressEnvironment::class, $environment );

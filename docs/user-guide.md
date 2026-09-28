@@ -78,7 +78,7 @@ A rule has a type, an id template, conditions, and property mappings. Sources ar
 
 ## Diagnostics
 
-Diagnostics shows environment, QueryNova version, WordPress version, PHP version, WooCommerce version, database version, schema version, cron, cache, modules, providers, queue counts, pending migrations, and recent errors. A missing version stays empty. Copy or download writes `querynova-diagnostics.json` with secrets removed.
+Diagnostics shows the WordPress environment, the QueryNova build, the release channel, and a status, then QueryNova version, WordPress version, PHP version, WooCommerce version, database version, schema version, cron, cache, modules, providers, queue counts, pending migrations, and recent errors. The WordPress environment comes from `wp_get_environment_type()`. The build comes from the installed package. A staging build on production WordPress shows a warning and does not change the WordPress environment. A production build on staging WordPress shows an informational notice. A missing version stays empty. Copy or download writes `querynova-diagnostics.json` with the same fields and with secrets removed. That file is the support bundle, and `wp querynova diagnostics` returns the same snapshot.
 
 ## WP-CLI
 
@@ -118,7 +118,7 @@ Safe mode loads only the core module. Enable it with the `QUERYNOVA_SAFE_MODE` c
 
 On a staging site, a stored Search Console or GA4 property, cloud site id, or provider project raises an admin warning that the identifier may still point at production. Production stays quiet. The warning does not make an analytics request.
 
-The release channel is development for local and development, beta for staging, and stable otherwise.
+The release channel follows the installed QueryNova build: stable for production, beta for staging, and development for a development build. It does not follow the WordPress environment.
 
 ## Another SEO plugin
 

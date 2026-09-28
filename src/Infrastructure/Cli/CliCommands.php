@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace QueryNova\Infrastructure\Cli;
 
+use QueryNova\Core\BuildChannel;
 use QueryNova\Core\Exceptions\ValidationException;
 use QueryNova\Core\Health\HealthRegistry;
 use QueryNova\Core\Modules\ModuleRegistry;
@@ -294,6 +295,7 @@ final class CliCommands {
         $report       = DiagnosticsReport::build(
             [
                 'environment'         => $this->environment,
+                'querynova_build'     => BuildChannel::installedChannel(),
                 'querynova_version'   => $this->version,
                 'wp_version'          => $this->wpVersion,
                 'php_version'         => PHP_VERSION,

@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace QueryNova\Modules\Core;
 
+use QueryNova\Core\BuildChannel;
 use QueryNova\Core\Contracts\HookSubscriberInterface;
+use QueryNova\Core\Environment\WordPressEnvironment;
 use QueryNova\Core\ModuleCatalog;
 use QueryNova\Core\SafeMode\SafeMode;
 use QueryNova\Core\Support\SystemClock;
@@ -66,7 +68,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'restUrl'           => esc_url_raw( rest_url( 'querynova/v1' ) ),
                     'nonce'             => wp_create_nonce( 'wp_rest' ),
                     'version'           => QUERYNOVA_VERSION,
-                    'environment'       => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
+                    'environment'       => ( new WordPressEnvironment() )->getName(),
                     'wooCommerceActive' => class_exists( 'WooCommerce' ),
                     'actions'           => $briefing['actions'],
                     'sections'          => $briefing['sections'],
@@ -180,7 +182,8 @@ final class AdminAssets implements HookSubscriberInterface {
 
             return DiagnosticsReport::build(
                 [
-                    'environment'         => function_exists( 'wp_get_environment_type' ) ? wp_get_environment_type() : 'production',
+                    'environment'         => ( new WordPressEnvironment() )->getName(),
+                    'querynova_build'     => BuildChannel::installedChannel(),
                     'querynova_version'   => QUERYNOVA_VERSION,
                     'wp_version'          => isset( $GLOBALS['wp_version'] ) ? (string) $GLOBALS['wp_version'] : null,
                     'php_version'         => PHP_VERSION,

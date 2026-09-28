@@ -1,5 +1,5 @@
 import { t } from '../../i18n';
-import { displayValue, normalizeDiagnostics, reportText } from './model';
+import { displayValue, normalizeDiagnostics, reportText, type DiagnosticsModel } from './model';
 
 interface Props {
   diagnostics: unknown;
@@ -12,8 +12,14 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
     <section aria-labelledby="qn-diagnostics">
       <h1 id="qn-diagnostics">{t('Diagnostics')}</h1>
       <dl>
-        <dt>{t('Environment')}</dt>
-        <dd>{displayValue(report.environment)}</dd>
+        <dt>{t('WordPress Environment')}</dt>
+        <dd>{displayValue(titleCase(report.environment))}</dd>
+        <dt>{t('QueryNova Build')}</dt>
+        <dd>{displayValue(titleCase(report.querynovaBuild))}</dd>
+        <dt>{t('Release Channel')}</dt>
+        <dd>{displayValue(titleCase(report.releaseChannel))}</dd>
+        <dt>{t('Status')}</dt>
+        <dd>{displayValue(statusLabel(report.releaseStatus))}</dd>
         <dt>{t('QueryNova version')}</dt>
         <dd>{displayValue(report.querynovaVersion)}</dd>
         <dt>{t('WP version')}</dt>
@@ -31,6 +37,7 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
         <dt>{t('Cache')}</dt>
         <dd>{displayValue(report.cacheAdapter)}. {t('Hits')} {displayValue(report.cacheHits)}</dd>
       </dl>
+      {report.releaseNotice === '' ? null : <p role="status">{t(report.releaseNotice)}</p>}
       <h2>{t('Modules')}</h2>
       {report.modules.length === 0 ? <p>{t('Nothing recorded.')}</p> : <ul>{report.modules.map((name) => <li key={name}>{name}</li>)}</ul>}
       <h2>{t('Providers')}</h2>
@@ -88,6 +95,26 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
       </button>
     </section>
   );
+}
+
+function titleCase(value: string): string {
+  if (value === '') {
+    return '';
+  }
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function statusLabel(status: DiagnosticsModel['releaseStatus']): string {
+  if (status === 'normal') {
+    return 'Normal';
+  }
+  if (status === 'warning') {
+    return 'Warning';
+  }
+  if (status === 'info') {
+    return 'Informational';
+  }
+  return status;
 }
 
 function downloadReport(text: string): void {

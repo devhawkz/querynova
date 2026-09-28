@@ -8,7 +8,7 @@ The logger implements `Psr\Log\LoggerInterface` and supports emergency, alert, c
 
 ## Record
 
-Each record can carry timestamp, level, channel, message, environment, plugin version, WordPress version, WooCommerce version, request id, correlation id, job id, module, provider, context, exception class, exception code, and error reference.
+Each record can carry timestamp, level, channel, message, environment, plugin version, WordPress version, WooCommerce version, request id, correlation id, job id, module, provider, context, exception class, exception code, and error reference. The record `environment` field is the WordPress environment. Context also includes `wordpress_environment`, `querynova_build`, `release_channel`, `release_status`, and `release_notice` when the build and the WordPress environment do not match.
 
 Correlation ids are UUID v4 values. Error references look like `QN-AB12CD34` and are what the admin shows instead of a raw exception.
 

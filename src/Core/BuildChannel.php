@@ -20,6 +20,12 @@ final class BuildChannel {
     public function __construct( private readonly string $path ) {
     }
 
+    public static function installedChannel(): string {
+        $path = defined( 'QUERYNOVA_PATH' ) ? QUERYNOVA_PATH . 'build/channel.json' : '';
+
+        return ( new self( $path ) )->read()['channel'];
+    }
+
     /**
      * @return array{channel: string, diagnostics: bool, debugDefault: false}
      */
