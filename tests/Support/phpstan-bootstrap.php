@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'QUERYNOVA_VERSION' ) ) {
-    define( 'QUERYNOVA_VERSION', '0.1.2' );
+    define( 'QUERYNOVA_VERSION', '0.1.3' );
 }
 
 if ( ! defined( 'QUERYNOVA_FILE' ) ) {

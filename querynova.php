@@ -3,7 +3,7 @@
  * Plugin Name: QueryNova
  * Plugin URI: https://github.com/devhawkz/querynova
  * Description: Search Intelligence to Revenue. SEO, commerce, and AI search intelligence for WordPress.
- * Version: 0.1.2
+ * Version: 0.1.3
  * Requires at least: 6.4
  * Requires PHP: 8.1
  * Author: QueryNova
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'QUERYNOVA_VERSION', '0.1.2' );
+define( 'QUERYNOVA_VERSION', '0.1.3' );
 define( 'QUERYNOVA_FILE', __FILE__ );
 define( 'QUERYNOVA_PATH', plugin_dir_path( __FILE__ ) );
 define( 'QUERYNOVA_URL', plugin_dir_url( __FILE__ ) );

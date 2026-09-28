@@ -1,5 +1,15 @@
 # Release notes
 
+## 0.1.3
+
+Plugin header version `0.1.3`. Schema version stays `202609270002`.
+
+This package is a staging build for production testing. The installed build channel stays staging, which is the beta channel, not production/stable. A staging package on a production WordPress site keeps the existing non-blocking warning. The plugin does not read or write `wp-config.php`. The WordPress environment still comes only from `wp_get_environment_type()`.
+
+Admin sparklines are CSS and SVG. They draw stored rank position, clicks or impressions, and WooCommerce revenue. A missing point stays empty and is not drawn as zero. The labels stay Measured, Attributed, Estimated, and Unavailable. No chart library is included.
+
+Observed WordPress and WooCommerce releases are unchanged: WordPress 7.1.2 and WooCommerce 11.1.2 on Actions run 36388914008, commit `dbe8ec5edaed5782802597d17b3a1394c0fff0a5`. This 0.1.3 package was not part of that run. Parity is not complete.
+
 ## 0.1.2
 
 Plugin header version `0.1.2`. Schema version stays `202609270002`.
