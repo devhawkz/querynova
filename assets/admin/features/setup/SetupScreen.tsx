@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { QueryNovaApi } from '../../core/api/client';
 import { t } from '../../i18n';
-import { draftPayload, normalizeSetup, SETUP_STEPS, setupLine, type SetupModel } from './model';
+import { draftPayload, normalizeSetup, setupLine, WIZARD_PAGES, type SetupModel } from './model';
 
 interface Props {
   setup: unknown;
@@ -12,6 +12,7 @@ interface Props {
 export function SetupScreen({ setup, restUrl, nonce }: Props) {
   const [model, setModel] = useState<SetupModel>(() => normalizeSetup(setup));
   const [message, setMessage] = useState('');
+  const [step, setStep] = useState(0);
   const api = useMemo(
     () => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }),
     [restUrl, nonce],
@@ -37,10 +38,15 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
       <p>{model.completed ? t('Setup answers are stored.') : t('Setup is not finished.')}</p>
       <p>{t('Saving records these answers. It does not connect a provider, store an API key, or start a crawl.')}</p>
       <ol>
-        {SETUP_STEPS.map((step) => (
-          <li key={step}>{t(step)}</li>
+        {WIZARD_PAGES.map((page, index) => (
+          <li key={page}>
+            <button type="button" aria-current={step === index ? 'step' : undefined} onClick={() => setStep(index)}>
+              {t(page)}
+            </button>
+          </li>
         ))}
       </ol>
+      <div hidden={step !== 0}>
       <label>
         {t('Site type')}
         <select
@@ -54,6 +60,8 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
           <option value="other">{t('Other')}</option>
         </select>
       </label>
+      </div>
+      <div hidden={step !== 1}>
       <label>
         {t('Business type')}
         <input
@@ -61,9 +69,6 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
           onChange={(event) => setModel({ ...model, businessType: event.target.value === '' ? null : event.target.value })}
         />
       </label>
-      <p>
-        {t('WooCommerce')} {model.wooCommerce === null ? t('Nothing recorded.') : model.wooCommerce ? t('Active') : t('Not active')}
-      </p>
       <label>
         {t('Organization')}
         <input
@@ -85,6 +90,8 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
           onChange={(event) => setModel({ ...model, organizationLogo: event.target.value === '' ? null : event.target.value })}
         />
       </label>
+      </div>
+      <div hidden={step !== 2}>
       <label>
         {t('Search Console')}
         <input
@@ -95,6 +102,8 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
       <p>
         {t('Search Console')} {setupLine(model.searchConsole, 'Not configured')} · {t('Not configured')}
       </p>
+      </div>
+      <div hidden={step !== 3}>
       <label>
         {t('GA4')}
         <input
@@ -105,6 +114,8 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
       <p>
         {t('GA4')} {setupLine(model.ga4, 'Not configured')} · {t('Not configured')}
       </p>
+      </div>
+      <div hidden={step !== 4}>
       <label>
         {t('SEO defaults')}
         <select
@@ -122,11 +133,21 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
         value={model.schemaEnabled}
         onChange={(schemaEnabled) => setModel({ ...model, schemaEnabled })}
       />
+      </div>
+      <div hidden={step !== 5}>
       <Choice
         label="Sitemap"
         value={model.sitemapEnabled}
         onChange={(sitemapEnabled) => setModel({ ...model, sitemapEnabled })}
       />
+      </div>
+      <div hidden={step !== 6}>
+      <p>
+        {t('WooCommerce')} {model.wooCommerce === null ? t('Not detected yet.') : model.wooCommerce ? t('Active') : t('Not active')}
+      </p>
+      <p>{t('This step does not change product URLs or indexability.')}</p>
+      </div>
+      <div hidden={step !== 7}>
       <p>
         {t('Provider setup')} {t('Not configured')}
       </p>
@@ -142,8 +163,15 @@ export function SetupScreen({ setup, restUrl, nonce }: Props) {
           onChange={(event) => setModel({ ...model, crawlerOrigin: event.target.value === '' ? null : event.target.value })}
         />
       </label>
-      <p>{model.crawlerOrigin === null ? t('Nothing recorded.') : `${model.crawlerOrigin} · ${t('Not started')}`}</p>
-      <button type="button" onClick={() => void save()}>
+      <p>{model.crawlerOrigin === null ? t('No crawler origin stored. Add one before a crawl can be queued.') : `${model.crawlerOrigin} · ${t('Not started')}`}</p>
+      </div>
+      <button type="button" onClick={() => setStep((current) => Math.max(0, current - 1))}>
+        {t('Back')}
+      </button>
+      <button type="button" onClick={() => setStep((current) => Math.min(WIZARD_PAGES.length - 1, current + 1))}>
+        {t('Next')}
+      </button>
+      <button type="button" className="qn-primary" onClick={() => void save()}>
         {t('Save setup answers')}
       </button>
       {message === '' ? null : <p role="status">{message}</p>}

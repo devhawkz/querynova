@@ -1,5 +1,16 @@
 import { t } from '../../i18n';
 
+export const WIZARD_PAGES = [
+  'Site',
+  'Business',
+  'Search engines',
+  'Analytics',
+  'SEO defaults',
+  'Sitemaps',
+  'WooCommerce',
+  'Review',
+] as const;
+
 export const SETUP_STEPS = [
   'Site type',
   'Business type',

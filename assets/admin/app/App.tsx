@@ -87,7 +87,12 @@ export function App() {
               />
             ) : null}
             {view === 'schema' ? (
-              <SchemaBuilder restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} initialRules={boot.schemaRules} />
+              <SchemaBuilder
+                restUrl={boot.restUrl ?? ''}
+                nonce={boot.nonce ?? ''}
+                initialRules={boot.schemaRules}
+                onOpenDiagnostics={() => setView('settings')}
+              />
             ) : null}
             {view === 'rank' && mode === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
             {view === 'rank' && mode === 'simple' ? (

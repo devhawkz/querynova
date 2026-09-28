@@ -39,10 +39,10 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
       </dl>
       {report.releaseNotice === '' ? null : <p role="status">{t(report.releaseNotice)}</p>}
       <h2>{t('Modules')}</h2>
-      {report.modules.length === 0 ? <p>{t('Nothing recorded.')}</p> : <ul>{report.modules.map((name) => <li key={name}>{name}</li>)}</ul>}
+      {report.modules.length === 0 ? <p>{t('No modules were recorded for this request. Open diagnostics again after the plugin finishes booting.')}</p> : <ul>{report.modules.map((name) => <li key={name}>{name}</li>)}</ul>}
       <h2>{t('Providers')}</h2>
       {report.providers.length === 0 ? (
-        <p>{t('Nothing recorded.')}</p>
+        <p>{t('No providers are connected. Connect one in setup before expecting measurements.')}</p>
       ) : (
         <ul>
           {report.providers.map((provider) => (
@@ -54,7 +54,7 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
       )}
       <h2>{t('Queue')}</h2>
       {Object.keys(report.queue).length === 0 ? (
-        <p>{t('Nothing recorded.')}</p>
+        <p>{t('No queued jobs were counted. A public request does not start a crawl.')}</p>
       ) : (
         <ul>
           {Object.entries(report.queue).map(([status, count]) => (
@@ -65,10 +65,10 @@ export function DiagnosticsScreen({ diagnostics }: Props) {
         </ul>
       )}
       <h2>{t('Migrations')}</h2>
-      {report.pendingMigrations.length === 0 ? <p>{t('Nothing recorded.')}</p> : <ul>{report.pendingMigrations.map((version) => <li key={version}>{version}</li>)}</ul>}
+      {report.pendingMigrations.length === 0 ? <p>{t('No pending migrations were recorded.')}</p> : <ul>{report.pendingMigrations.map((version) => <li key={version}>{version}</li>)}</ul>}
       <h2>{t('Recent errors')}</h2>
       {report.recentErrors.length === 0 ? (
-        <p>{t('Nothing recorded.')}</p>
+        <p>{t('No recent errors were stored.')}</p>
       ) : (
         <ul>
           {report.recentErrors.map((error) => (

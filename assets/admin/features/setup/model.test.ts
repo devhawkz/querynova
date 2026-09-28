@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { draftPayload, normalizeSetup, SETUP_STEPS, setupLine, setupPayload } from './model';
+import { draftPayload, normalizeSetup, SETUP_STEPS, setupLine, setupPayload, WIZARD_PAGES } from './model';
 
 describe('setup wizard', () => {
   it('leaves unanswered steps empty and does not show a provider as connected', () => {
@@ -12,6 +12,16 @@ describe('setup wizard', () => {
     expect(setupLine(null)).toBe('Nothing recorded.');
     expect(SETUP_STEPS).toContain('Search Console');
     expect(SETUP_STEPS).toContain('Crawler');
+    expect(WIZARD_PAGES).toEqual([
+      'Site',
+      'Business',
+      'Search engines',
+      'Analytics',
+      'SEO defaults',
+      'Sitemaps',
+      'WooCommerce',
+      'Review',
+    ]);
   });
 
   it('drops secrets from the save payload', () => {

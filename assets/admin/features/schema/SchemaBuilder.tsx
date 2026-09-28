@@ -16,9 +16,10 @@ interface Props {
   restUrl: string;
   nonce: string;
   initialRules?: unknown;
+  onOpenDiagnostics?: () => void;
 }
 
-export function SchemaBuilder({ restUrl, nonce, initialRules }: Props) {
+export function SchemaBuilder({ restUrl, nonce, initialRules, onOpenDiagnostics }: Props) {
   const api = useMemo(
     () => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }),
     [restUrl, nonce],
@@ -26,6 +27,7 @@ export function SchemaBuilder({ restUrl, nonce, initialRules }: Props) {
   const stored = initialRules !== undefined;
   const [rules, setRules] = useState<SchemaRule[]>(() => fromPayload(initialRules));
   const [message, setMessage] = useState('');
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     if (restUrl === '' || nonce === '') {
@@ -47,7 +49,7 @@ export function SchemaBuilder({ restUrl, nonce, initialRules }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [api, nonce, restUrl, stored]);
+  }, [api, attempt, nonce, restUrl, stored]);
 
   if (restUrl === '' || nonce === '') {
     return <p>{t('Schema rules are unavailable in this session.')}</p>;
@@ -246,7 +248,19 @@ export function SchemaBuilder({ restUrl, nonce, initialRules }: Props) {
       <button type="button" onClick={() => void save()}>
         {t('Save schema rules')}
       </button>
-      {message !== '' ? <p role="status">{message}</p> : null}
+      {message !== '' ? (
+        <p role="alert">
+          {message}{' '}
+          <button type="button" onClick={() => setAttempt((current) => current + 1)}>
+            {t('Retry')}
+          </button>
+          {onOpenDiagnostics ? (
+            <button type="button" onClick={onOpenDiagnostics}>
+              {t('View diagnostics')}
+            </button>
+          ) : null}
+        </p>
+      ) : null}
     </section>
   );
 }
