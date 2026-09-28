@@ -6,6 +6,7 @@ import { CategoryScreen } from '../features/categories/CategoryScreen';
 import { ProductScreen } from '../features/products/ProductScreen';
 import { WhatMattersNow, type TodayAction } from '../features/dashboard/WhatMattersNow';
 import { SchemaBuilder } from '../features/schema/SchemaBuilder';
+import { SeoScreen } from '../features/seo/SeoScreen';
 import { SettingsScreen } from '../features/settings/SettingsScreen';
 import { type SettingsSectionId } from '../features/settings/model';
 import { environmentBadge, NAV_ITEMS, navItem, type AdminMode, type ViewId } from './navigation';
@@ -27,6 +28,8 @@ declare global {
       setup?: unknown;
       schemaRules?: unknown;
       settings?: unknown;
+      metaDefaults?: unknown;
+      seoAudit?: unknown;
     };
   }
 }
@@ -98,6 +101,9 @@ export function App() {
                 mode={mode}
               />
             ) : null}
+            {view === 'seo' ? (
+              <SeoScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} metaDefaults={boot.metaDefaults} seoAudit={boot.seoAudit} />
+            ) : null}
             {view === 'schema' ? (
               <SchemaBuilder
                 restUrl={boot.restUrl ?? ''}
@@ -137,7 +143,7 @@ export function App() {
                 onOpenSchema={() => setView('schema')}
               />
             ) : null}
-            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' ? (
+            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' ? (
               <section>
                 <h2>{t(page.label)}</h2>
                 <p>{t(page.hint)}</p>

@@ -18,6 +18,9 @@ final class RobotsDirective {
     public function __construct(
         private readonly bool $index,
         private readonly bool $follow,
+        private readonly string $maxSnippet = '',
+        private readonly string $maxImagePreview = '',
+        private readonly string $maxVideoPreview = '',
     ) {
     }
 
@@ -30,7 +33,21 @@ final class RobotsDirective {
     }
 
     public function content(): string {
-        return ( $this->index ? 'index' : 'noindex' ) . ', ' . ( $this->follow ? 'follow' : 'nofollow' );
+        $parts = [
+            $this->index ? 'index' : 'noindex',
+            $this->follow ? 'follow' : 'nofollow',
+        ];
+        if ( $this->maxSnippet !== '' ) {
+            $parts[] = 'max-snippet:' . $this->maxSnippet;
+        }
+        if ( $this->maxImagePreview !== '' ) {
+            $parts[] = 'max-image-preview:' . $this->maxImagePreview;
+        }
+        if ( $this->maxVideoPreview !== '' ) {
+            $parts[] = 'max-video-preview:' . $this->maxVideoPreview;
+        }
+
+        return implode( ', ', $parts );
     }
 
     public static function fromStrings( string $index, string $follow ): self {

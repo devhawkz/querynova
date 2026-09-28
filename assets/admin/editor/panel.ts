@@ -76,6 +76,10 @@ export function renderEditor(root: HTMLElement, boot: EditorMount, mode: Mode): 
     labeled('Index', choice('robots_index', fields.robots_index, ['', 'index', 'noindex'], ['Default', 'Index', 'Noindex'], inputs)),
     robotsWarning,
     labeled('Follow', choice('robots_follow', fields.robots_follow, ['', 'follow', 'nofollow'], ['Default', 'Follow', 'Nofollow'], inputs)),
+    labeled('Max snippet', control('robots_max_snippet', 'input', fields.robots_max_snippet, inputs)),
+    labeled('Max image preview', choice('robots_max_image_preview', fields.robots_max_image_preview, ['', 'none', 'standard', 'large'], ['Default', 'None', 'Standard', 'Large'], inputs)),
+    labeled('Max video preview', control('robots_max_video_preview', 'input', fields.robots_max_video_preview, inputs)),
+    paragraph('max-snippet, max-image-preview, and max-video-preview change how much of this document a crawler may show. Empty leaves the default.'),
     labeled('Canonical URL', control('canonical', 'input', fields.canonical, inputs)),
     canonicalWarning,
   );

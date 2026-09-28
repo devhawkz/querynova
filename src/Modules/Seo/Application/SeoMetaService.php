@@ -21,16 +21,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class SeoMetaService {
 
-    public const TITLE          = 'title';
-    public const DESCRIPTION    = 'description';
-    public const CANONICAL      = 'canonical';
-    public const ROBOTS_INDEX   = 'robots_index';
-    public const ROBOTS_FOLLOW  = 'robots_follow';
-    public const OG_TITLE       = 'og_title';
-    public const OG_DESCRIPTION = 'og_description';
-    public const OG_IMAGE       = 'og_image';
-    public const TWITTER_CARD   = 'twitter_card';
-    public const FOCUS_KEYWORD  = 'focus_keyword';
+    public const TITLE                    = 'title';
+    public const DESCRIPTION              = 'description';
+    public const CANONICAL                = 'canonical';
+    public const ROBOTS_INDEX             = 'robots_index';
+    public const ROBOTS_FOLLOW            = 'robots_follow';
+    public const OG_TITLE                 = 'og_title';
+    public const OG_DESCRIPTION           = 'og_description';
+    public const OG_IMAGE                 = 'og_image';
+    public const TWITTER_CARD             = 'twitter_card';
+    public const FOCUS_KEYWORD            = 'focus_keyword';
+    public const ROBOTS_MAX_SNIPPET       = 'robots_max_snippet';
+    public const ROBOTS_MAX_IMAGE_PREVIEW = 'robots_max_image_preview';
+    public const ROBOTS_MAX_VIDEO_PREVIEW = 'robots_max_video_preview';
 
     public function __construct(
         private readonly MetaStoreInterface $meta,
@@ -55,9 +58,12 @@ final class SeoMetaService {
 
         $index  = $this->meta->get( $objectType, $objectId, self::ROBOTS_INDEX );
         $follow = $this->meta->get( $objectType, $objectId, self::ROBOTS_FOLLOW );
-        $robots = RobotsDirective::fromStrings(
-            $index !== '' ? $index : 'index',
-            $follow !== '' ? $follow : 'follow',
+        $robots = new RobotsDirective(
+            ( $index !== '' ? $index : 'index' ) !== 'noindex',
+            ( $follow !== '' ? $follow : 'follow' ) !== 'nofollow',
+            $this->meta->get( $objectType, $objectId, self::ROBOTS_MAX_SNIPPET ),
+            $this->meta->get( $objectType, $objectId, self::ROBOTS_MAX_IMAGE_PREVIEW ),
+            $this->meta->get( $objectType, $objectId, self::ROBOTS_MAX_VIDEO_PREVIEW ),
         );
 
         $ogTitle       = $this->meta->get( $objectType, $objectId, self::OG_TITLE );
@@ -107,6 +113,9 @@ final class SeoMetaService {
             self::OG_IMAGE,
             self::TWITTER_CARD,
             self::FOCUS_KEYWORD,
+            self::ROBOTS_MAX_SNIPPET,
+            self::ROBOTS_MAX_IMAGE_PREVIEW,
+            self::ROBOTS_MAX_VIDEO_PREVIEW,
         ];
     }
 
@@ -124,8 +133,18 @@ final class SeoMetaService {
         if ( $key === self::ROBOTS_FOLLOW && ! in_array( $clean, [ '', 'follow', 'nofollow' ], true ) ) {
             throw new ValidationException( 'Follow directive must be follow or nofollow.' );
         }
+        if ( in_array( $key, [ self::ROBOTS_MAX_SNIPPET, self::ROBOTS_MAX_VIDEO_PREVIEW ], true ) && ! self::isPreviewCount( $clean ) ) {
+            throw new ValidationException( 'Preview length must be empty, -1, or a whole number.' );
+        }
+        if ( $key === self::ROBOTS_MAX_IMAGE_PREVIEW && ! in_array( $clean, [ '', 'none', 'standard', 'large' ], true ) ) {
+            throw new ValidationException( 'Image preview must be empty, none, standard, or large.' );
+        }
 
         return $clean;
+    }
+
+    private static function isPreviewCount( string $value ): bool {
+        return $value === '' || $value === '-1' || preg_match( '/^\d+$/', $value ) === 1;
     }
 
     private function twitterCard( string $objectType, int $objectId ): string {

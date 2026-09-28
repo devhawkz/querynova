@@ -67,7 +67,7 @@ export function SettingsScreen({
         <section aria-labelledby="qn-settings-section">
           <h2 id="qn-settings-section">{t(current.label)}</h2>
           {section === 'general' ? <GeneralSection environment={model.wordpressEnvironment} build={model.querynovaBuild} version={version} /> : null}
-          {section === 'seo' ? <p>{t('SEO defaults are saved from Tools. This section does not change canonicals, robots, or indexability.')}</p> : null}
+          {section === 'seo' ? <p>{t('Title templates and the on-page checklist are on the SEO screen. Saving templates there does not rewrite custom titles, canonicals, or indexability.')}</p> : null}
           {section === 'titles' ? <p>{t('Title and meta templates are not edited here. Stored titles are unchanged.')}</p> : null}
           {section === 'links' ? <p>{t('Link suggestions stay Suggest Only. This screen does not insert links.')}</p> : null}
           {section === 'breadcrumbs' ? <p>{t('Breadcrumb settings, shortcodes, and blocks are not on this screen. Stored content is unchanged.')}</p> : null}

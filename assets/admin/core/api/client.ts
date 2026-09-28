@@ -41,7 +41,11 @@ export class QueryNovaApi {
     return this.send<T>('PUT', path, payload, timeoutMs);
   }
 
-  private async send<T>(method: 'GET' | 'PUT', path: string, payload: unknown, timeoutMs: number): Promise<T> {
+  async post<T>(path: string, payload: unknown, timeoutMs = 15000): Promise<T> {
+    return this.send<T>('POST', path, payload, timeoutMs);
+  }
+
+  private async send<T>(method: 'GET' | 'PUT' | 'POST', path: string, payload: unknown, timeoutMs: number): Promise<T> {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     const requestId = typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `qn-${Date.now()}`;

@@ -19,6 +19,8 @@ use QueryNova\Core\Modules\AbstractModule;
 use QueryNova\Core\Security\Capability;
 use QueryNova\Infrastructure\Database\ArrayDatabase;
 use QueryNova\Infrastructure\Database\WpdbConnection;
+use QueryNova\Infrastructure\Queue\JobRegistrar;
+use QueryNova\Infrastructure\Queue\JobRunner;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Redirects\Application\RedirectEngine;
 use QueryNova\Modules\Redirects\Infrastructure\RedirectRepository;
@@ -30,6 +32,7 @@ use QueryNova\Modules\Seo\Infrastructure\WordPressForeignMetaReader;
 use QueryNova\Modules\Seo\Infrastructure\WordPressMetaStore;
 use QueryNova\Modules\Seo\Presentation\EditorPanel;
 use QueryNova\Modules\Seo\Presentation\FrontendSeoSubscriber;
+use QueryNova\Modules\Seo\Presentation\OnPageController;
 use QueryNova\Modules\Seo\Presentation\SeoConflictNotice;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -38,13 +41,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class SeoModule extends AbstractModule {
 
+    private ?OnPageController $onPage = null;
+
     public function getName(): string {
         return 'seo';
     }
 
     public function register( ContainerInterface $container ): void {
         $container->set( SeoMetaService::class, new SeoMetaService( new WordPressMetaStore(), new TemplateRenderer() ) );
-        $features = $container->get( FeatureRegistry::class );
+        $runner       = $container->has( JobRunner::class ) ? $container->get( JobRunner::class ) : null;
+        $this->onPage = new OnPageController( $runner instanceof JobRunner ? $runner : null );
+        $features     = $container->get( FeatureRegistry::class );
         if ( $features instanceof FeatureRegistry ) {
             $features->register(
                 new Feature(
@@ -69,10 +76,35 @@ final class SeoModule extends AbstractModule {
     }
 
     public function registerRoutes( RestRegistrar $rest ): void {
+        $onPage = $this->onPage();
         $rest->route( 'GET', '/seo/meta', [ $this, 'show' ], Capability::MANAGE_SEO );
         $rest->route( 'POST', '/seo/meta', [ $this, 'update' ], Capability::MANAGE_SEO );
         $rest->route( 'PUT', '/seo/editor', [ $this->editorPanel(), 'update' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/seo/checklist', [ $onPage, 'checklist' ], Capability::MANAGE_SEO );
+        $rest->route( 'GET', '/seo/templates', [ $onPage, 'templates' ], Capability::MANAGE_SEO );
+        $rest->route( 'PUT', '/seo/templates', [ $onPage, 'saveTemplates' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/seo/audit', [ $onPage, 'startAudit' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'GET', '/seo/audit', [ $onPage, 'showAudit' ], Capability::RUN_ANALYSIS );
         $rest->route( 'POST', '/seo/import', [ $this, 'import' ], Capability::MANAGE_SEO );
+    }
+
+    public function registerJobs( JobRegistrar $jobs ): void {
+        $onPage = $this->onPage();
+        $jobs->register(
+            'querynova.seo.audit',
+            static function ( array $payload, array $job ) use ( $onPage ): void {
+                unset( $job );
+                $onPage->runAudit( $payload );
+            }
+        );
+    }
+
+    private function onPage(): OnPageController {
+        if ( ! $this->onPage instanceof OnPageController ) {
+            $this->onPage = new OnPageController();
+        }
+
+        return $this->onPage;
     }
 
     private function editorPanel(): EditorPanel {

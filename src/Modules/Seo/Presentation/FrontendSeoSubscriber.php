@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Modules\Seo\Presentation;
 
 use QueryNova\Core\Contracts\HookSubscriberInterface;
+use QueryNova\Modules\Seo\Application\MetaDefaults;
 use QueryNova\Modules\Seo\Application\SeoMetaService;
 use QueryNova\Modules\Seo\Domain\SeoDocument;
 
@@ -81,10 +82,10 @@ final class FrontendSeoSubscriber implements HookSubscriberInterface {
         $tokens         = [
             'title'    => $post instanceof \WP_Post ? $post->post_title : '',
             'excerpt'  => $post instanceof \WP_Post ? wp_strip_all_tags( $post->post_excerpt ) : '',
-            'sep'      => '-',
+            'sep'      => MetaDefaults::read()['separator'],
             'sitename' => (string) get_bloginfo( 'name' ),
         ];
-        $this->document = $this->seo->resolve( 'post', $postId, $tokens, [] );
+        $this->document = $this->seo->resolve( 'post', $postId, $tokens, MetaDefaults::templateSet( 'post' ) );
 
         return $this->document;
     }

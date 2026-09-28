@@ -6,6 +6,9 @@ export interface EditorFields {
   canonical: string;
   robots_index: string;
   robots_follow: string;
+  robots_max_snippet: string;
+  robots_max_image_preview: string;
+  robots_max_video_preview: string;
   og_title: string;
   og_description: string;
   og_image: string;
@@ -32,6 +35,9 @@ const FIELD_KEYS: (keyof EditorFields)[] = [
   'canonical',
   'robots_index',
   'robots_follow',
+  'robots_max_snippet',
+  'robots_max_image_preview',
+  'robots_max_video_preview',
   'og_title',
   'og_description',
   'og_image',
@@ -46,6 +52,9 @@ export function emptyFields(): EditorFields {
     canonical: '',
     robots_index: '',
     robots_follow: '',
+    robots_max_snippet: '',
+    robots_max_image_preview: '',
+    robots_max_video_preview: '',
     og_title: '',
     og_description: '',
     og_image: '',

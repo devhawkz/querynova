@@ -25,6 +25,8 @@ use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Queue\JobRepository;
 use QueryNova\Infrastructure\WordPress\OptionStore;
 use QueryNova\Modules\Schema\SchemaModule;
+use QueryNova\Modules\Seo\Application\MetaDefaults;
+use QueryNova\Modules\Seo\Presentation\OnPageController;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -86,6 +88,8 @@ final class AdminAssets implements HookSubscriberInterface {
                     'setup'             => ( new SetupWizard( new OptionStore() ) )->read( class_exists( 'WooCommerce' ) ),
                     'schemaRules'       => SchemaModule::storedRules(),
                     'settings'          => $this->settingsSnapshot(),
+                    'metaDefaults'      => MetaDefaults::read(),
+                    'seoAudit'          => $this->seoAudit(),
                 ]
             ) . ';',
             'before'
@@ -166,6 +170,25 @@ final class AdminAssets implements HookSubscriberInterface {
 
             return CategoryScreen::emptyScreen();
         }
+    }
+
+    /**
+     * Stored audit report only. A missing report stays unavailable.
+     *
+     * @return array<string, mixed>
+     */
+    private function seoAudit(): array {
+        $stored = get_option( OnPageController::AUDIT_OPTION, null );
+        if ( ! is_array( $stored ) ) {
+            return [
+                'name'     => 'SEO Analyzer',
+                'note'     => 'These findings do not estimate ranking impact.',
+                'status'   => 'unavailable',
+                'findings' => [],
+            ];
+        }
+
+        return $stored;
     }
 
     /**
