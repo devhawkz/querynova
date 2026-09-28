@@ -21,6 +21,7 @@ use QueryNova\Infrastructure\Database\ArrayDatabase;
 use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Content\Application\ContentIntelligence;
+use QueryNova\Modules\Content\Application\LinkBoard;
 use QueryNova\Modules\Content\Infrastructure\ContentRepository;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -65,6 +66,8 @@ final class ContentModule extends AbstractModule {
     public function registerRoutes( RestRegistrar $rest ): void {
         $rest->route( 'POST', '/content', [ $this, 'analyze' ], Capability::RUN_ANALYSIS );
         $rest->route( 'GET', '/content', [ $this, 'show' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'POST', '/content/links', [ $this, 'links' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'GET', '/content/links', [ $this, 'linksEmpty' ], Capability::RUN_ANALYSIS );
     }
 
     /**
@@ -145,6 +148,29 @@ final class ContentModule extends AbstractModule {
         }
 
         return $report;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function links( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        if ( ! is_array( $params ) ) {
+            $params = [];
+        }
+
+        return LinkBoard::present( $this->pages( $params['pages'] ?? [] ), $this->commerce( $params['suggestions'] ?? [] ) );
+    }
+
+    /**
+     * An empty board. This request does not fetch pages.
+     *
+     * @return array<string, mixed>
+     */
+    public function linksEmpty( \WP_REST_Request $request ): array {
+        unset( $request );
+
+        return LinkBoard::present( [] );
     }
 
     /**

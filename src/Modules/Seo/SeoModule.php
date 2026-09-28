@@ -34,6 +34,8 @@ use QueryNova\Modules\Seo\Presentation\EditorPanel;
 use QueryNova\Modules\Seo\Presentation\FrontendSeoSubscriber;
 use QueryNova\Modules\Seo\Presentation\OnPageController;
 use QueryNova\Modules\Seo\Presentation\SeoConflictNotice;
+use QueryNova\Modules\Seo\Presentation\SiteHead;
+use QueryNova\Modules\Seo\Presentation\SiteToolsController;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -72,6 +74,7 @@ final class SeoModule extends AbstractModule {
     public function registerHooks( HookRegistrar $hooks ): void {
         $hooks->add( new FrontendSeoSubscriber( new SeoMetaService( new WordPressMetaStore(), new TemplateRenderer() ) ) );
         $hooks->add( new SeoConflictNotice( new SeoConflictDetector() ) );
+        $hooks->add( new SiteHead() );
         $hooks->add( $this->editorPanel() );
     }
 
@@ -86,6 +89,20 @@ final class SeoModule extends AbstractModule {
         $rest->route( 'POST', '/seo/audit', [ $onPage, 'startAudit' ], Capability::RUN_ANALYSIS );
         $rest->route( 'GET', '/seo/audit', [ $onPage, 'showAudit' ], Capability::RUN_ANALYSIS );
         $rest->route( 'POST', '/seo/import', [ $this, 'import' ], Capability::MANAGE_SEO );
+        $tools = new SiteToolsController();
+        $rest->route( 'GET', '/seo/robots', [ $tools, 'robots' ], Capability::MANAGE_SEO );
+        $rest->route( 'PUT', '/seo/robots', [ $tools, 'saveRobots' ], Capability::MANAGE_SEO );
+        $rest->route( 'GET', '/seo/htaccess', [ $tools, 'htaccess' ], Capability::MANAGE_SEO );
+        $rest->route( 'PUT', '/seo/htaccess', [ $tools, 'saveHtaccess' ], Capability::MANAGE_SEO );
+        $rest->route( 'GET', '/seo/webmaster', [ $tools, 'webmaster' ], Capability::MANAGE_SEO );
+        $rest->route( 'PUT', '/seo/webmaster', [ $tools, 'saveWebmaster' ], Capability::MANAGE_SEO );
+        $rest->route( 'GET', '/seo/rss', [ $tools, 'rss' ], Capability::MANAGE_SEO );
+        $rest->route( 'PUT', '/seo/rss', [ $tools, 'saveRss' ], Capability::MANAGE_SEO );
+        $rest->route( 'GET', '/seo/breadcrumbs', [ $tools, 'breadcrumbs' ], Capability::MANAGE_SEO );
+        $rest->route( 'PUT', '/seo/breadcrumbs', [ $tools, 'saveBreadcrumbs' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/seo/breadcrumbs/preview', [ $tools, 'breadcrumbPreview' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/seo/image-alt', [ $tools, 'imageAlt' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/seo/indexnow', [ $tools, 'indexNow' ], Capability::MANAGE_SEO );
     }
 
     public function registerJobs( JobRegistrar $jobs ): void {

@@ -33,6 +33,11 @@ if ( is_file( $querynovaAutoload ) ) {
     require_once $querynovaAutoload;
 }
 
+$querynovaBreadcrumbs = __DIR__ . '/src/Modules/Seo/breadcrumbs-function.php';
+if ( is_file( $querynovaBreadcrumbs ) ) {
+    require_once $querynovaBreadcrumbs;
+}
+
 register_activation_hook( __FILE__, [ 'QueryNova\\Core\\Plugin', 'activate' ] );
 register_deactivation_hook( __FILE__, [ 'QueryNova\\Core\\Plugin', 'deactivate' ] );
 

@@ -21,6 +21,7 @@ use QueryNova\Core\Modules\AbstractModule;
 use QueryNova\Core\Security\Capability;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Schema\Application\ConnectedGraphFactory;
+use QueryNova\Modules\Schema\Application\JsonLdStudio;
 use QueryNova\Modules\Schema\Application\SchemaDocumentBuilder;
 use QueryNova\Modules\Schema\Application\SchemaRuleCodec;
 use QueryNova\Modules\Schema\Application\SchemaRuleCompiler;
@@ -106,6 +107,40 @@ final class SchemaModule extends AbstractModule {
     public function registerRoutes( RestRegistrar $rest ): void {
         $rest->route( 'GET', '/schema/rules', [ $this, 'show' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
         $rest->route( 'PUT', '/schema/rules', [ $this, 'update' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
+        $rest->route( 'GET', '/schema/templates', [ $this, 'templates' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
+        $rest->route( 'POST', '/schema/jsonld', [ $this, 'jsonld' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
+        $rest->route( 'POST', '/schema/preview', [ $this, 'preview' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function templates( \WP_REST_Request $request ): array {
+        unset( $request );
+
+        return [ 'templates' => JsonLdStudio::templates() ];
+    }
+
+    /**
+     * Import previews a rule. It does not write the rule store.
+     *
+     * @return array<string, mixed>
+     */
+    public function jsonld( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $json   = is_array( $params ) && is_string( $params['json'] ?? null ) ? $params['json'] : '';
+
+        return JsonLdStudio::import( $json );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function preview( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $rule   = is_array( $params ) && is_array( $params['rule'] ?? null ) ? $params['rule'] : [];
+
+        return JsonLdStudio::validate( $rule );
     }
 
     /**

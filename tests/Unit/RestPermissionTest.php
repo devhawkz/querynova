@@ -32,6 +32,7 @@ use QueryNova\Modules\Reports\ReportModule;
 use QueryNova\Modules\Schema\SchemaModule;
 use QueryNova\Modules\Seo\SeoModule;
 use QueryNova\Modules\Serp\SerpModule;
+use QueryNova\Modules\Sitemap\SitemapModule;
 
 final class RestPermissionTest extends TestCase {
 
@@ -61,6 +62,7 @@ final class RestPermissionTest extends TestCase {
         $modules = [
             new CoreModule(),
             new SeoModule(),
+            new SitemapModule(),
             new SchemaModule(),
             new RedirectModule(),
             new CrawlerModule(),

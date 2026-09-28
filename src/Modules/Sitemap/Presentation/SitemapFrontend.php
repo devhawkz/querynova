@@ -16,6 +16,7 @@ use QueryNova\Core\Contracts\HookSubscriberInterface;
 use QueryNova\Core\Features\FeatureRegistry;
 use QueryNova\Infrastructure\Cache\CacheInterface;
 use QueryNova\Modules\Sitemap\Application\EnabledChannels;
+use QueryNova\Modules\Sitemap\Application\SitemapChannels;
 use QueryNova\Modules\Sitemap\Application\RobotsSitemapLine;
 use QueryNova\Modules\Sitemap\Application\SitemapBuilder;
 use QueryNova\Modules\Sitemap\Application\SitemapRenderer;
@@ -124,12 +125,18 @@ final class SitemapFrontend implements HookSubscriberInterface {
     }
 
     private function renderer(): SitemapRenderer {
+        $types = SitemapChannels::limit(
+            $this->channels->types( $this->features, $this->environment, $this->settings->newsName() ),
+            SitemapChannels::localEnabled(),
+            $this->settings->newsName()
+        );
+
         return new SitemapRenderer(
             $this->builder,
             $this->catalog,
             $this->cache,
             $this->settings->generation(),
-            $this->channels->types( $this->features, $this->environment, $this->settings->newsName() ),
+            $types,
             $this->settings->newsName(),
             $this->settings->newsLanguage()
         );

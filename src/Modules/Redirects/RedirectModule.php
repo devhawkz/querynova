@@ -22,8 +22,10 @@ use QueryNova\Core\Security\Capability;
 use QueryNova\Infrastructure\Database\ArrayDatabase;
 use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
+use QueryNova\Modules\Redirects\Application\PermalinkRedirect;
 use QueryNova\Modules\Redirects\Application\RedirectCsv;
 use QueryNova\Modules\Redirects\Application\RedirectEngine;
+use QueryNova\Modules\Redirects\Application\RedirectList;
 use QueryNova\Modules\Redirects\Domain\RedirectRule;
 use QueryNova\Modules\Redirects\Infrastructure\NotFoundRepository;
 use QueryNova\Modules\Redirects\Infrastructure\RedirectRepository;
@@ -88,6 +90,9 @@ final class RedirectModule extends AbstractModule {
         $rest->route( 'POST', '/redirects/import', [ $this, 'import' ], Capability::MANAGE_SEO );
         $rest->route( 'GET', '/redirects/export', [ $this, 'export' ], Capability::MANAGE_SEO );
         $rest->route( 'GET', '/not-found', [ $this, 'notFound' ], Capability::MANAGE_SEO );
+        $rest->route( 'GET', '/redirects/list', [ $this, 'list' ], Capability::MANAGE_SEO );
+        $rest->route( 'GET', '/not-found/list', [ $this, 'notFoundList' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/redirects/permalink', [ $this, 'permalink' ], Capability::MANAGE_SEO );
     }
 
     /**
@@ -183,6 +188,76 @@ final class RedirectModule extends AbstractModule {
         }
 
         return [ 'not_found' => $this->missing->recent() ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function list( \WP_REST_Request $request ): array {
+        return RedirectList::slice(
+            $this->exportRows( $this->rules() ),
+            $this->textParam( $request, 'search' ),
+            $this->textParam( $request, 'status' ),
+            (int) $request->get_param( 'page' ),
+            (int) $request->get_param( 'per_page' )
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function notFoundList( \WP_REST_Request $request ): array {
+        $rows = $this->missing instanceof NotFoundRepository ? $this->missing->recent() : [];
+
+        return RedirectList::slice(
+            $rows,
+            $this->textParam( $request, 'search' ),
+            $this->textParam( $request, 'status' ),
+            (int) $request->get_param( 'page' ),
+            (int) $request->get_param( 'per_page' )
+        );
+    }
+
+    /**
+     * @return array<string, mixed>|\WP_Error
+     */
+    public function permalink( \WP_REST_Request $request ): array|\WP_Error {
+        $params    = $request->get_json_params();
+        $params    = is_array( $params ) ? $params : [];
+        $from      = is_string( $params['from'] ?? null ) ? $params['from'] : '';
+        $to        = is_string( $params['to'] ?? null ) ? $params['to'] : '';
+        $confirmed = ( $params['confirmed'] ?? false ) === true;
+        $plan      = PermalinkRedirect::plan( $from, $to, $confirmed );
+        if ( $plan['created'] !== true ) {
+            $plan['stored'] = false;
+
+            return $plan;
+        }
+        if ( ! $this->engine instanceof RedirectEngine || ! $this->redirects instanceof RedirectRepository ) {
+            return new \WP_Error( 'querynova_redirects_unavailable', 'Redirects are unavailable.', [ 'status' => 500 ] );
+        }
+        try {
+            $rule = new RedirectRule(
+                0,
+                $this->engine->normalizeSource( $from, false ),
+                $this->engine->normalizeTarget( $to, 301 ),
+                301,
+                false
+            );
+            $this->engine->assertSafe( $this->redirects->all(), $rule );
+            $plan['id']     = $this->redirects->save( $rule );
+            $plan['stored'] = true;
+        } catch ( ValidationException $exception ) {
+            return new \WP_Error( 'querynova_invalid_redirect', $exception->getMessage(), [ 'status' => 400 ] );
+        }
+
+        return $plan;
+    }
+
+    private function textParam( \WP_REST_Request $request, string $key ): string {
+        $value = $request->get_param( $key );
+
+        return is_string( $value ) ? $value : '';
     }
 
     /**

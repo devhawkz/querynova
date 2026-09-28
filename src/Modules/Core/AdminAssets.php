@@ -28,6 +28,7 @@ use QueryNova\Modules\Analytics\AnalyticsModule;
 use QueryNova\Modules\Schema\SchemaModule;
 use QueryNova\Modules\Seo\Application\MetaDefaults;
 use QueryNova\Modules\Seo\Presentation\OnPageController;
+use QueryNova\Modules\Seo\Presentation\SiteToolsController;
 use QueryNova\Modules\Serp\Application\RankTracker;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -94,6 +95,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'seoAudit'          => $this->seoAudit(),
                     'analytics'         => $this->analytics(),
                     'rankTracker'       => RankTracker::catalog(),
+                    'siteTools'         => SiteToolsController::snapshot(),
                 ]
             ) . ';',
             'before'

@@ -8,6 +8,7 @@ import { WhatMattersNow, type TodayAction } from '../features/dashboard/WhatMatt
 import { SchemaBuilder } from '../features/schema/SchemaBuilder';
 import { AnalyticsScreen } from '../features/analytics/AnalyticsScreen';
 import { RankScreen } from '../features/rank/RankScreen';
+import { LinksScreen } from '../features/links/LinksScreen';
 import { SeoScreen } from '../features/seo/SeoScreen';
 import { SettingsScreen } from '../features/settings/SettingsScreen';
 import { type SettingsSectionId } from '../features/settings/model';
@@ -34,6 +35,7 @@ declare global {
       seoAudit?: unknown;
       analytics?: unknown;
       rankTracker?: unknown;
+      siteTools?: unknown;
     };
   }
 }
@@ -123,6 +125,7 @@ export function App() {
               />
             ) : null}
             {view === 'rank' ? <RankScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} rankTracker={boot.rankTracker} /> : null}
+            {view === 'links' ? <LinksScreen restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} siteTools={boot.siteTools} /> : null}
             {view === 'rank' && mode === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
             {view === 'commerce' ? (
               <>
@@ -142,10 +145,12 @@ export function App() {
                 diagnostics={boot.diagnostics}
                 restUrl={boot.restUrl ?? ''}
                 nonce={boot.nonce ?? ''}
+                siteTools={boot.siteTools}
+                mode={mode}
                 onOpenSchema={() => setView('schema')}
               />
             ) : null}
-            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' && view !== 'analytics' ? (
+            {view !== 'dashboard' && view !== 'schema' && view !== 'rank' && view !== 'commerce' && view !== 'settings' && view !== 'seo' && view !== 'analytics' && view !== 'links' ? (
               <section>
                 <h2>{t(page.label)}</h2>
                 <p>{t(page.hint)}</p>

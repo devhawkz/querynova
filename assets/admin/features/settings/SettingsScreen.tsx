@@ -1,5 +1,7 @@
 import { DiagnosticsScreen } from '../diagnostics/DiagnosticsScreen';
 import { SetupScreen } from '../setup/SetupScreen';
+import { BreadcrumbFields, HtaccessFields, ImageAltFields, SitemapFields, WebmasterFields } from './SiteToolForms';
+import { type AdminMode } from '../../app/navigation';
 import { t } from '../../i18n';
 import {
   featureStatus,
@@ -23,6 +25,8 @@ interface Props {
   diagnostics: unknown;
   restUrl: string;
   nonce: string;
+  siteTools: unknown;
+  mode: AdminMode;
   onOpenSchema: () => void;
 }
 
@@ -37,6 +41,8 @@ export function SettingsScreen({
   diagnostics,
   restUrl,
   nonce,
+  siteTools,
+  mode,
   onOpenSchema,
 }: Props) {
   const model = normalizeSettings(settings);
@@ -69,24 +75,24 @@ export function SettingsScreen({
           {section === 'general' ? <GeneralSection environment={model.wordpressEnvironment} build={model.querynovaBuild} version={version} /> : null}
           {section === 'seo' ? <p>{t('Title templates and the on-page checklist are on the SEO screen. Saving templates there does not rewrite custom titles, canonicals, or indexability.')}</p> : null}
           {section === 'titles' ? <p>{t('Title and meta templates are not edited here. Stored titles are unchanged.')}</p> : null}
-          {section === 'links' ? <p>{t('Link suggestions stay Suggest Only. This screen does not insert links.')}</p> : null}
-          {section === 'breadcrumbs' ? <p>{t('Breadcrumb settings, shortcodes, and blocks are not on this screen. Stored content is unchanged.')}</p> : null}
-          {section === 'images' ? <p>{t('This screen does not write ALT text, including text that was entered manually.')}</p> : null}
+          {section === 'links' ? <p>{t('Link suggestions stay Suggest Only. Open Links to review the graph. This screen does not insert links.')}</p> : null}
+          {section === 'breadcrumbs' ? <BreadcrumbFields restUrl={restUrl} nonce={nonce} siteTools={siteTools} mode={mode} /> : null}
+          {section === 'images' ? <ImageAltFields restUrl={restUrl} nonce={nonce} siteTools={siteTools} mode={mode} /> : null}
           {section === 'sitemaps' ? (
             <>
               <FeatureList features={featuresFor(model, 'sitemap')} empty={t('No sitemap features are registered.')} />
-              <p>{t('This screen does not write sitemap files. A feature marked Off stays off.')}</p>
+              <SitemapFields restUrl={restUrl} nonce={nonce} siteTools={siteTools} mode={mode} />
             </>
           ) : null}
           {section === 'schema' ? <SchemaSection rules={schemaRules} onOpenSchema={onOpenSchema} /> : null}
-          {section === 'webmaster' ? <p>{t('Verification codes are not stored on this screen. Search engines stay not connected.')}</p> : null}
+          {section === 'webmaster' ? <WebmasterFields restUrl={restUrl} nonce={nonce} siteTools={siteTools} mode={mode} /> : null}
           {section === 'woocommerce' ? <WooSection active={wooCommerceActive} /> : null}
           {section === 'local' ? <LocalSection registered={hasModule(model, 'local')} /> : null}
           {section === 'analytics' ? <p>{t('Search Console and GA4 are on the Analytics screen. Disconnected stays Not connected. This screen does not invent clicks, impressions, sessions, or revenue.')}</p> : null}
           {section === 'providers' ? <p>{t('Providers are not configured. This screen does not invent metrics.')}</p> : null}
           {section === 'ai' ? <AiSection features={featuresFor(model, 'ai')} /> : null}
           {section === 'roles' ? <RolesSection roles={model.roles} /> : null}
-          {section === 'advanced' ? <AdvancedSection /> : null}
+          {section === 'advanced' ? <HtaccessFields restUrl={restUrl} nonce={nonce} siteTools={siteTools} mode={mode} /> : null}
           {section === 'tools' ? (
             <>
               <p>{t('Setup stores answers only. Diagnostics reads the current snapshot. Neither tool rewrites live SEO data.')}</p>
@@ -220,13 +226,3 @@ function RolesSection({ roles }: { roles: { role: string; capabilities: string[]
   );
 }
 
-function AdvancedSection() {
-  return (
-    <>
-      <p>
-        <span className="qn-badge" data-state="warning">{t('Warning')}</span>
-      </p>
-      <p>{t('robots.txt, .htaccess, image ALT, URL bases, and automatic redirects are not edited here. Nothing on this screen writes those files or changes live URLs.')}</p>
-    </>
-  );
-}
