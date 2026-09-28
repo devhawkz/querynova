@@ -2,6 +2,18 @@ import { SCHEMA_TYPES } from './rules';
 
 export const SPEAKABLE_NOTE = 'Speakable is included only for an article or post with a headline and a CSS selector. It is not added to every page.';
 
+export function videoDocument(title: string, contentUrl: string): { fetched: false; saved: false; ready: boolean; note: string } {
+  const ready = title.trim() !== '' && /^https?:\/\//i.test(contentUrl.trim());
+  return {
+    fetched: false,
+    saved: false,
+    ready,
+    note: ready
+      ? 'Video markup uses the supplied fields. Remote pages are not fetched and the sitemap was not published.'
+      : 'Video markup needs a supplied title and a content or embed URL. Remote pages are not fetched.',
+  };
+}
+
 export const SCHEMA_TEMPLATES = [
   { id: 'article', label: 'Article', type: 'Article', properties: ['headline', 'description'] },
   { id: 'product', label: 'Product', type: 'Product', properties: ['name', 'description'] },

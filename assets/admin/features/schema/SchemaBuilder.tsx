@@ -11,7 +11,7 @@ import {
   toPayload,
   type SchemaRule,
 } from './rules';
-import { previewImport, SCHEMA_TEMPLATES, SPEAKABLE_NOTE, templateProperties } from './studio';
+import { previewImport, SCHEMA_TEMPLATES, SPEAKABLE_NOTE, templateProperties, videoDocument } from './studio';
 
 interface Props {
   restUrl: string;
@@ -31,6 +31,8 @@ export function SchemaBuilder({ restUrl, nonce, initialRules, onOpenDiagnostics 
   const [attempt, setAttempt] = useState(0);
   const [jsonLd, setJsonLd] = useState('');
   const [importNote, setImportNote] = useState('');
+  const [videoTitle, setVideoTitle] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
 
   useEffect(() => {
     if (restUrl === '' || nonce === '') {
@@ -53,6 +55,20 @@ export function SchemaBuilder({ restUrl, nonce, initialRules, onOpenDiagnostics 
       cancelled = true;
     };
   }, [api, attempt, nonce, restUrl, stored]);
+
+  async function buildVideo() {
+    const local = videoDocument(videoTitle, videoUrl);
+    if (!local.ready) {
+      setMessage(t(local.note));
+      return;
+    }
+    try {
+      const body = await api.post<Record<string, unknown>>('/schema/video', { title: videoTitle, content_url: videoUrl });
+      setMessage(typeof body.note === 'string' ? body.note : t(local.note));
+    } catch {
+      setMessage(t(local.note));
+    }
+  }
 
   if (restUrl === '' || nonce === '') {
     return <p>{t('Schema rules are unavailable in this session.')}</p>;
@@ -137,6 +153,17 @@ export function SchemaBuilder({ restUrl, nonce, initialRules, onOpenDiagnostics 
         )}
       </p>
       <p>{t(SPEAKABLE_NOTE)}</p>
+      <h2>{t('Video')}</h2>
+      <p>{t(videoDocument(videoTitle, videoUrl).note)}</p>
+      <label>
+        {t('Video title')}
+        <input value={videoTitle} onChange={(event) => setVideoTitle(event.target.value)} />
+      </label>
+      <label>
+        {t('Content URL')}
+        <input value={videoUrl} onChange={(event) => setVideoUrl(event.target.value)} />
+      </label>
+      <button type="button" onClick={() => void buildVideo()}>{t('Build video markup')}</button>
       <h2>{t('Templates')}</h2>
       <p>{t('Each template adds only its own properties. Empty fields are not added.')}</p>
       {SCHEMA_TEMPLATES.map((template) => (

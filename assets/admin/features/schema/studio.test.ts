@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { previewImport, SCHEMA_TEMPLATES, SPEAKABLE_NOTE, templateProperties } from './studio';
+import { previewImport, SCHEMA_TEMPLATES, SPEAKABLE_NOTE, templateProperties, videoDocument } from './studio';
 import { SCHEMA_TYPES } from './rules';
 
 describe('schema studio', () => {
@@ -13,6 +13,8 @@ describe('schema studio', () => {
     expect(fields).toBeLessThan(60);
     expect(SCHEMA_TYPES).not.toContain('Speakable');
     expect(SPEAKABLE_NOTE).toContain('headline and a CSS selector');
+    expect(videoDocument('Pour', 'https://example.test/lager.mp4').fetched).toBe(false);
+    expect(videoDocument('Pour', '').ready).toBe(false);
   });
 
   it('previews supplied JSON-LD properties and does not save', () => {

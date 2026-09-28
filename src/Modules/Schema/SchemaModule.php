@@ -22,6 +22,7 @@ use QueryNova\Core\Security\Capability;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Schema\Application\ConnectedGraphFactory;
 use QueryNova\Modules\Schema\Application\JsonLdStudio;
+use QueryNova\Modules\Schema\Application\VideoDocument;
 use QueryNova\Modules\Schema\Application\SchemaDocumentBuilder;
 use QueryNova\Modules\Schema\Application\SchemaRuleCodec;
 use QueryNova\Modules\Schema\Application\SchemaRuleCompiler;
@@ -110,6 +111,16 @@ final class SchemaModule extends AbstractModule {
         $rest->route( 'GET', '/schema/templates', [ $this, 'templates' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
         $rest->route( 'POST', '/schema/jsonld', [ $this, 'jsonld' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
         $rest->route( 'POST', '/schema/preview', [ $this, 'preview' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
+        $rest->route( 'POST', '/schema/video', [ $this, 'video' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function video( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+
+        return VideoDocument::build( is_array( $params ) ? $params : [] );
     }
 
     /**
