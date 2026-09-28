@@ -243,6 +243,46 @@ final class ContentIntelligence {
     }
 
     /**
+     * Important topics that are missing from the supplied document. This does not crawl.
+     *
+     * @param list<array{topic: string, classification: string|null, on_our_page: bool|null, on_top_3: bool|null, on_top_10: bool|null}> $coverage
+     * @return array{status: string, topics: list<string>|null, note: string}
+     */
+    public function gap( array $coverage ): array {
+        if ( $coverage === [] ) {
+            return [
+                'status' => ProvenanceKind::Unavailable->value,
+                'topics' => null,
+                'note'   => 'A gap needs supplied topics. QueryNova did not crawl.',
+            ];
+        }
+        $measured = false;
+        $missing  = [];
+        foreach ( $coverage as $row ) {
+            if ( $row['classification'] === null ) {
+                continue;
+            }
+            $measured = true;
+            if ( $row['classification'] === 'important' && $row['on_our_page'] === false ) {
+                $missing[] = $row['topic'];
+            }
+        }
+        if ( ! $measured ) {
+            return [
+                'status' => ProvenanceKind::Unavailable->value,
+                'topics' => null,
+                'note'   => 'Gap needs supplied top results. QueryNova did not crawl.',
+            ];
+        }
+
+        return [
+            'status' => ProvenanceKind::Measured->value,
+            'topics' => $missing,
+            'note'   => 'Topics marked important that are absent from the supplied document. This is not a score.',
+        ];
+    }
+
+    /**
      * Evidence checklist. There is no combined E-E-A-T score.
      *
      * @param array<string, bool|null> $supplied

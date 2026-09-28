@@ -20,7 +20,10 @@ use QueryNova\Core\Security\Capability;
 use QueryNova\Infrastructure\Database\ArrayDatabase;
 use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
+use QueryNova\Modules\Content\Application\ContentAutomation;
+use QueryNova\Modules\Content\Application\ContentDrafts;
 use QueryNova\Modules\Content\Application\ContentIntelligence;
+use QueryNova\Modules\Content\Application\ContentWorkspace;
 use QueryNova\Modules\Content\Application\LinkBoard;
 use QueryNova\Modules\Content\Infrastructure\ContentRepository;
 
@@ -68,6 +71,10 @@ final class ContentModule extends AbstractModule {
         $rest->route( 'GET', '/content', [ $this, 'show' ], Capability::RUN_ANALYSIS );
         $rest->route( 'POST', '/content/links', [ $this, 'links' ], Capability::RUN_ANALYSIS );
         $rest->route( 'GET', '/content/links', [ $this, 'linksEmpty' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'GET', '/content/workspace', [ $this, 'workspace' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'POST', '/content/drafts', [ $this, 'drafts' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'POST', '/content/model', [ $this, 'model' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'POST', '/content/automation', [ $this, 'automation' ], Capability::RUN_ANALYSIS );
     }
 
     /**
@@ -122,6 +129,7 @@ final class ContentModule extends AbstractModule {
         }
         $topics    = $this->strings( $input['topics'] ?? [] );
         $requested = $input['language'] ?? null;
+        $coverage  = $this->intelligence->coverage( $html, $topics, $this->strings( $input['top_three'] ?? [] ), $this->strings( $input['top_ten'] ?? [] ) );
         $report    = [
             'fetched'           => false,
             'language'          => LanguageResolver::fromWordPress()->context( is_string( $requested ) ? $requested : null ),
@@ -129,7 +137,8 @@ final class ContentModule extends AbstractModule {
             'analysis'          => $this->intelligence->analyze( $html, (string) ( $input['keyword'] ?? '' ), $topics ),
             'information_gain'  => $this->intelligence->informationGain( $html ),
             'product_gain'      => $this->intelligence->productGain( $html ),
-            'coverage'          => $this->intelligence->coverage( $html, $topics, $this->strings( $input['top_three'] ?? [] ), $this->strings( $input['top_ten'] ?? [] ) ),
+            'coverage'          => $coverage,
+            'gap'               => $this->intelligence->gap( $coverage ),
             'evidence'          => $this->intelligence->evidence( $html, $this->flags( $input['evidence'] ?? [] ) ),
             'entities'          => $this->intelligence->entities( $html, $this->entities( $input['entities'] ?? [] ) ),
             'topical_authority' => $this->intelligence->topicalAuthority( $this->authority( $input['authority'] ?? [] ) ),
@@ -171,6 +180,70 @@ final class ContentModule extends AbstractModule {
         unset( $request );
 
         return LinkBoard::present( [] );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function workspace( \WP_REST_Request $request ): array {
+        unset( $request );
+
+        return self::workspaceSnapshot();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function drafts( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+        $kind   = is_string( $params['kind'] ?? null ) ? $params['kind'] : '';
+        $text   = is_string( $params['text'] ?? null ) ? $params['text'] : '';
+        if ( ( $params['action'] ?? '' ) === 'generate' ) {
+            return ContentDrafts::generate( $kind, $text );
+        }
+
+        return ContentDrafts::store( $kind, $text );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function model( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+        $model  = is_string( $params['model_id'] ?? null ) ? $params['model_id'] : '';
+
+        return ContentDrafts::saveModel( $model );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function automation( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+
+        return ContentAutomation::apply(
+            is_string( $params['rule'] ?? null ) ? $params['rule'] : '',
+            ( $params['enabled'] ?? false ) === true
+        );
+    }
+
+    /**
+     * Read-only boot payload. It does not analyze a document or call a model.
+     *
+     * @return array<string, mixed>
+     */
+    public static function workspaceSnapshot(): array {
+        return [
+            'brief'        => ContentWorkspace::present( null ),
+            'model'        => ContentDrafts::connection(),
+            'drafts'       => ContentDrafts::recent(),
+            'automation'   => ContentAutomation::present(),
+            'published'    => false,
+            'page_changed' => false,
+        ];
     }
 
     /**

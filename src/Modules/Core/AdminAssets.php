@@ -25,6 +25,7 @@ use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Queue\JobRepository;
 use QueryNova\Infrastructure\WordPress\OptionStore;
 use QueryNova\Modules\Analytics\AnalyticsModule;
+use QueryNova\Modules\Content\ContentModule;
 use QueryNova\Modules\Schema\SchemaModule;
 use QueryNova\Modules\Seo\Application\MetaDefaults;
 use QueryNova\Modules\Seo\Presentation\OnPageController;
@@ -96,6 +97,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'analytics'         => $this->analytics(),
                     'rankTracker'       => RankTracker::catalog(),
                     'siteTools'         => SiteToolsController::snapshot(),
+                    'contentWorkspace'  => ContentModule::workspaceSnapshot(),
                 ]
             ) . ';',
             'before'
