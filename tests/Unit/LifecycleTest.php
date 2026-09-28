@@ -14,6 +14,7 @@ use QueryNova\Core\Lifecycle;
 use QueryNova\Core\Plugin;
 use QueryNova\Core\Requirements;
 use QueryNova\Infrastructure\Database\Schema;
+use QueryNova\Infrastructure\WordPress\CapabilityRegistrar;
 
 final class LifecycleTest extends TestCase {
 
@@ -27,6 +28,67 @@ final class LifecycleTest extends TestCase {
         self::assertContains( 'QueryNova requires the OpenSSL extension.', $missing );
         self::assertFalse( $requirements->requiresWooCommerce() );
         self::assertSame( [], $requirements->evaluate( '8.3.0', '6.6', true, true ) );
+    }
+
+    public function testActivationResolvesTheCapabilityRegistrar(): void {
+        $GLOBALS['wp_version'] = '6.6'; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- activation reads the WordPress version global.
+        $GLOBALS['wpdb']       = new class() { // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- test double so activation can migrate.
+            public string $prefix = 'wp_';
+
+            public int $insert_id = 1;
+
+            public function query( string $sql ): bool {
+                unset( $sql );
+
+                return true;
+            }
+
+            /**
+             * @param array<string, mixed> $data
+             */
+            public function insert( string $table, array $data ): int {
+                unset( $table, $data );
+
+                return 1;
+            }
+
+            public function prepare( string $sql, mixed ...$args ): string {
+                unset( $args );
+
+                return $sql;
+            }
+
+            /**
+             * @return list<array<string, mixed>>
+             */
+            public function get_results( string $sql, string $output ): array {
+                unset( $sql, $output );
+
+                return [];
+            }
+
+            public function get_var( string $sql ): ?string {
+                unset( $sql );
+
+                return null;
+            }
+        };
+
+        $reset = \Closure::bind(
+            static function (): void {
+                self::$container = null;
+            },
+            null,
+            Plugin::class
+        );
+
+        try {
+            Plugin::activate();
+            self::assertTrue( Plugin::container()->has( CapabilityRegistrar::class ) );
+        } finally {
+            $reset();
+            unset( $GLOBALS['wpdb'], $GLOBALS['wp_version'] );
+        }
     }
 
     public function testDefaultsKeepAnExplicitCleanupChoice(): void {

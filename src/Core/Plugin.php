@@ -122,6 +122,7 @@ final class Plugin {
         $container->set( HookRegistrar::class, $hooks );
         $container->set( RestRegistrar::class, $rest );
         $container->set( JobRegistrar::class, $jobs );
+        $container->set( CapabilityRegistrar::class, $capabilities );
         $container->set( MigrationRegistrar::class, $migrations );
         $container->set( AdminPageRegistrar::class, $admin );
         $container->set( LogRepository::class, $logs );
