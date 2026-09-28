@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { QueryNovaApi } from '../../core/api/client';
 import { t } from '../../i18n';
-import { displayValue, normalizeDiagnostics, providerCard, reportText, type DiagnosticsModel } from './model';
+import { DIAGNOSTIC_CARDS, displayValue, normalizeDiagnostics, providerCard, reportText, type DiagnosticsModel } from './model';
 
 interface Props {
   diagnostics: unknown;
@@ -26,63 +26,76 @@ export function DiagnosticsScreen({ diagnostics, restUrl = '', nonce = '' }: Pro
   return (
     <section aria-labelledby="qn-diagnostics">
       <h1 id="qn-diagnostics">{t('Diagnostics')}</h1>
-      <dl>
-        <dt>{t('WordPress Environment')}</dt>
-        <dd>{displayValue(titleCase(report.environment))}</dd>
-        <dt>{t('QueryNova Build')}</dt>
-        <dd>{displayValue(titleCase(report.querynovaBuild))}</dd>
-        <dt>{t('Release Channel')}</dt>
-        <dd>{displayValue(titleCase(report.releaseChannel))}</dd>
-        <dt>{t('Status')}</dt>
-        <dd>{displayValue(statusLabel(report.releaseStatus))}</dd>
-        <dt>{t('QueryNova version')}</dt>
-        <dd>{displayValue(report.querynovaVersion)}</dd>
-        <dt>{t('WP version')}</dt>
-        <dd>{displayValue(report.wpVersion)}</dd>
-        <dt>{t('PHP version')}</dt>
-        <dd>{displayValue(report.phpVersion)}</dd>
-        <dt>{t('WooCommerce version')}</dt>
-        <dd>{displayValue(report.wooCommerceVersion)}</dd>
-        <dt>{t('DB version')}</dt>
-        <dd>{displayValue(report.dbVersion)}</dd>
-        <dt>{t('Schema version')}</dt>
-        <dd>{displayValue(report.schemaVersion)}</dd>
-        <dt>{t('Cron')}</dt>
-        <dd>{displayValue(report.cronScheduled)}</dd>
-        <dt>{t('Cache')}</dt>
-        <dd>{displayValue(report.cacheAdapter)}. {t('Hits')} {displayValue(report.cacheHits)}</dd>
-      </dl>
-      {report.releaseNotice === '' ? null : <p role="status">{t(report.releaseNotice)}</p>}
-      <h2>{t('Modules')}</h2>
-      {report.modules.length === 0 ? <p>{t('No modules were recorded for this request. Open diagnostics again after the plugin finishes booting.')}</p> : <ul>{report.modules.map((name) => <li key={name}>{name}</li>)}</ul>}
-      <h2>{t('Providers')}</h2>
-      {report.providers.length === 0 ? (
-        <p>{t('No providers are connected. Connect one in setup before expecting measurements.')}</p>
-      ) : (
-        report.providers.map((provider) => {
-          const card = providerCard(provider.name, provider.state);
-          return (
-            <fieldset key={provider.name}>
-              <legend>{provider.name}</legend>
-              <p><span className="qn-badge" data-state="not-configured">{t(card.state)}</span></p>
-              <button type="button" onClick={() => void configure(api, provider.name, restUrl !== '' && nonce !== '', setNote)}>{t('Configure')}</button>
-            </fieldset>
-          );
-        })
-      )}
+      <div className="qn-card-grid">
+        <article className="qn-card">
+          <h2>{t(cardTitle('environment'))}</h2>
+          <dl>
+            <dt>{t('WordPress Environment')}</dt>
+            <dd>{displayValue(titleCase(report.environment))}</dd>
+            <dt>{t('QueryNova Build')}</dt>
+            <dd>{displayValue(titleCase(report.querynovaBuild))}</dd>
+            <dt>{t('Release Channel')}</dt>
+            <dd>{displayValue(titleCase(report.releaseChannel))}</dd>
+            <dt>{t('Status')}</dt>
+            <dd>{displayValue(statusLabel(report.releaseStatus))}</dd>
+          </dl>
+          {report.releaseNotice === '' ? null : <p role="status">{t(report.releaseNotice)}</p>}
+        </article>
+        <article className="qn-card">
+          <h2>{t(cardTitle('health'))}</h2>
+          <dl>
+            <dt>{t('QueryNova version')}</dt>
+            <dd>{displayValue(report.querynovaVersion)}</dd>
+            <dt>{t('WP version')}</dt>
+            <dd>{displayValue(report.wpVersion)}</dd>
+            <dt>{t('PHP version')}</dt>
+            <dd>{displayValue(report.phpVersion)}</dd>
+            <dt>{t('WooCommerce version')}</dt>
+            <dd>{displayValue(report.wooCommerceVersion)}</dd>
+            <dt>{t('DB version')}</dt>
+            <dd>{displayValue(report.dbVersion)}</dd>
+            <dt>{t('Schema version')}</dt>
+            <dd>{displayValue(report.schemaVersion)}</dd>
+            <dt>{t('Cron')}</dt>
+            <dd>{displayValue(report.cronScheduled)}</dd>
+            <dt>{t('Cache')}</dt>
+            <dd>{displayValue(report.cacheAdapter)}. {t('Hits')} {displayValue(report.cacheHits)}</dd>
+          </dl>
+          {report.modules.length === 0 ? <p>{t('No modules were recorded for this request. Open diagnostics again after the plugin finishes booting.')}</p> : <ul>{report.modules.map((name) => <li key={name}>{name}</li>)}</ul>}
+        </article>
+        <article className="qn-card">
+          <h2>{t(cardTitle('jobs'))}</h2>
+          {Object.keys(report.queue).length === 0 ? (
+            <p>{t('No queued jobs were counted. A public request does not start a crawl.')}</p>
+          ) : (
+            <ul>
+              {Object.entries(report.queue).map(([status, count]) => (
+                <li key={status}>
+                  {status} {count}
+                </li>
+              ))}
+            </ul>
+          )}
+        </article>
+        <article className="qn-card">
+          <h2>{t(cardTitle('providers'))}</h2>
+          {report.providers.length === 0 ? (
+            <p>{t('No providers are connected. Connect one in setup before expecting measurements.')}</p>
+          ) : (
+            report.providers.map((provider) => {
+              const card = providerCard(provider.name, provider.state);
+              return (
+                <fieldset key={provider.name}>
+                  <legend>{provider.name}</legend>
+                  <p><span className="qn-badge" data-state="not-configured">{t(card.state)}</span></p>
+                  <button type="button" onClick={() => void configure(api, provider.name, restUrl !== '' && nonce !== '', setNote)}>{t('Configure')}</button>
+                </fieldset>
+              );
+            })
+          )}
+        </article>
+      </div>
       {note !== '' ? <p role="status">{note}</p> : null}
-      <h2>{t('Queue')}</h2>
-      {Object.keys(report.queue).length === 0 ? (
-        <p>{t('No queued jobs were counted. A public request does not start a crawl.')}</p>
-      ) : (
-        <ul>
-          {Object.entries(report.queue).map(([status, count]) => (
-            <li key={status}>
-              {status} {count}
-            </li>
-          ))}
-        </ul>
-      )}
       <h2>{t('Job monitor')}</h2>
       <p>{t('Retry puts a failed job back in the queue. The handler is not run.')}</p>
       <button type="button" onClick={() => void loadJobs(api, restUrl !== '' && nonce !== '', setJobs, setNote)}>{t('Load jobs')}</button>
@@ -284,6 +297,10 @@ async function configure(api: QueryNovaApi, name: string, ready: boolean, setNot
   } catch {
     setNote(t(fallback));
   }
+}
+
+function cardTitle(id: (typeof DIAGNOSTIC_CARDS)[number]['id']): string {
+  return DIAGNOSTIC_CARDS.find((card) => card.id === id)?.title ?? id;
 }
 
 function titleCase(value: string): string {

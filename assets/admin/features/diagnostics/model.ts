@@ -1,5 +1,12 @@
 import { t } from '../../i18n';
 
+export const DIAGNOSTIC_CARDS = [
+  { id: 'environment', title: 'Environment' },
+  { id: 'health', title: 'Health' },
+  { id: 'jobs', title: 'Jobs' },
+  { id: 'providers', title: 'Providers' },
+] as const;
+
 export interface DiagnosticError {
   message: string;
   reference: string;

@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { displayValue, normalizeDiagnostics, providerCard, reportText } from './model';
+import { DIAGNOSTIC_CARDS, displayValue, normalizeDiagnostics, providerCard, reportText } from './model';
 
 describe('diagnostics screen', () => {
+  it('groups diagnostics into environment, health, jobs, and provider cards', () => {
+    expect(DIAGNOSTIC_CARDS.map((card) => card.id)).toEqual(['environment', 'health', 'jobs', 'providers']);
+    const report = normalizeDiagnostics({ environment: 'production', querynova_build: 'staging' });
+    expect(report.environment).toBe('production');
+    expect(report.querynovaBuild).toBe('staging');
+  });
+
   it('shows an unconfigured provider as Not connected and does not call it', () => {
     const card = providerCard('search_console', 'not_configured');
     expect(card.state).toBe('Not connected');
