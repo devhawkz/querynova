@@ -59,9 +59,23 @@ final class SeoMetaServiceTest extends TestCase {
     }
 
     public function testSaveRejectsANonHttpCanonical(): void {
-        $service = new SeoMetaService( new ArrayMetaStore(), new TemplateRenderer() );
-        $this->expectException( \QueryNova\Core\Exceptions\ValidationException::class );
-        $service->save( 'post', 4, [ SeoMetaService::CANONICAL => 'javascript:alert(1)' ] );
+        $store   = new ArrayMetaStore();
+        $service = new SeoMetaService( $store, new TemplateRenderer() );
+        try {
+            $service->save(
+                'post',
+                4,
+                [
+                    SeoMetaService::TITLE     => 'Keep me off the store',
+                    SeoMetaService::CANONICAL => 'javascript:alert(1)',
+                ]
+            );
+            self::fail( 'Expected the canonical to be rejected.' );
+        } catch ( \QueryNova\Core\Exceptions\ValidationException $exception ) {
+            self::assertSame( 'Canonical and image values must be http or https URLs.', $exception->getMessage() );
+        }
+        self::assertSame( '', $service->stored( 'post', 4, SeoMetaService::TITLE ) );
+        self::assertSame( '', $service->stored( 'post', 4, SeoMetaService::CANONICAL ) );
     }
 
     public function testRobotsStringsRoundTrip(): void {

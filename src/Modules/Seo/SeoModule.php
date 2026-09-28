@@ -28,6 +28,7 @@ use QueryNova\Modules\Seo\Application\SeoMetaService;
 use QueryNova\Modules\Seo\Domain\TemplateRenderer;
 use QueryNova\Modules\Seo\Infrastructure\WordPressForeignMetaReader;
 use QueryNova\Modules\Seo\Infrastructure\WordPressMetaStore;
+use QueryNova\Modules\Seo\Presentation\EditorPanel;
 use QueryNova\Modules\Seo\Presentation\FrontendSeoSubscriber;
 use QueryNova\Modules\Seo\Presentation\SeoConflictNotice;
 
@@ -64,12 +65,18 @@ final class SeoModule extends AbstractModule {
     public function registerHooks( HookRegistrar $hooks ): void {
         $hooks->add( new FrontendSeoSubscriber( new SeoMetaService( new WordPressMetaStore(), new TemplateRenderer() ) ) );
         $hooks->add( new SeoConflictNotice( new SeoConflictDetector() ) );
+        $hooks->add( $this->editorPanel() );
     }
 
     public function registerRoutes( RestRegistrar $rest ): void {
         $rest->route( 'GET', '/seo/meta', [ $this, 'show' ], Capability::MANAGE_SEO );
         $rest->route( 'POST', '/seo/meta', [ $this, 'update' ], Capability::MANAGE_SEO );
+        $rest->route( 'PUT', '/seo/editor', [ $this->editorPanel(), 'update' ], Capability::MANAGE_SEO );
         $rest->route( 'POST', '/seo/import', [ $this, 'import' ], Capability::MANAGE_SEO );
+    }
+
+    private function editorPanel(): EditorPanel {
+        return new EditorPanel( new SeoMetaService( new WordPressMetaStore(), new TemplateRenderer() ) );
     }
 
     /**

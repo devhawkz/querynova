@@ -83,7 +83,20 @@ final class SeoMetaService {
      * @param array<string, string> $fields
      */
     public function save( string $objectType, int $objectId, array $fields ): void {
-        $allowed = [
+        $clean = [];
+        foreach ( $fields as $key => $value ) {
+            $clean[ $key ] = $this->clean( $key, $value );
+        }
+        foreach ( $clean as $key => $value ) {
+            $this->meta->set( $objectType, $objectId, $key, $value );
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    public static function keys(): array {
+        return [
             self::TITLE,
             self::DESCRIPTION,
             self::CANONICAL,
@@ -95,22 +108,24 @@ final class SeoMetaService {
             self::TWITTER_CARD,
             self::FOCUS_KEYWORD,
         ];
-        foreach ( $fields as $key => $value ) {
-            if ( ! in_array( $key, $allowed, true ) ) {
-                throw new ValidationException( 'Unknown SEO field.' );
-            }
-            $clean = trim( wp_strip_all_tags( $value ) );
-            if ( in_array( $key, [ self::CANONICAL, self::OG_IMAGE ], true ) && $clean !== '' && ! $this->isHttpUrl( $clean ) ) {
-                throw new ValidationException( 'Canonical and image values must be http or https URLs.' );
-            }
-            if ( $key === self::ROBOTS_INDEX && ! in_array( $clean, [ '', 'index', 'noindex' ], true ) ) {
-                throw new ValidationException( 'Index directive must be index or noindex.' );
-            }
-            if ( $key === self::ROBOTS_FOLLOW && ! in_array( $clean, [ '', 'follow', 'nofollow' ], true ) ) {
-                throw new ValidationException( 'Follow directive must be follow or nofollow.' );
-            }
-            $this->meta->set( $objectType, $objectId, $key, $clean );
+    }
+
+    private function clean( string $key, string $value ): string {
+        if ( ! in_array( $key, self::keys(), true ) ) {
+            throw new ValidationException( 'Unknown SEO field.' );
         }
+        $clean = trim( wp_strip_all_tags( $value ) );
+        if ( in_array( $key, [ self::CANONICAL, self::OG_IMAGE ], true ) && $clean !== '' && ! $this->isHttpUrl( $clean ) ) {
+            throw new ValidationException( 'Canonical and image values must be http or https URLs.' );
+        }
+        if ( $key === self::ROBOTS_INDEX && ! in_array( $clean, [ '', 'index', 'noindex' ], true ) ) {
+            throw new ValidationException( 'Index directive must be index or noindex.' );
+        }
+        if ( $key === self::ROBOTS_FOLLOW && ! in_array( $clean, [ '', 'follow', 'nofollow' ], true ) ) {
+            throw new ValidationException( 'Follow directive must be follow or nofollow.' );
+        }
+
+        return $clean;
     }
 
     private function twitterCard( string $objectType, int $objectId ): string {

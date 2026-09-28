@@ -25,10 +25,13 @@ export default defineConfig(({ mode }) => ({
     emptyOutDir: true,
     sourcemap: mode === 'development',
     rollupOptions: {
-      input: 'assets/admin/app/main.tsx',
+      input: {
+        admin: 'assets/admin/app/main.tsx',
+        editor: 'assets/admin/editor/main.ts',
+      },
       output: {
-        entryFileNames: 'admin.js',
-        assetFileNames: 'admin.[ext]',
+        entryFileNames: '[name].js',
+        assetFileNames: '[name].[ext]',
       },
     },
   },

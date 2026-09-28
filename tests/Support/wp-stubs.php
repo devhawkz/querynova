@@ -245,7 +245,9 @@ if ( ! function_exists( 'add_role' ) ) {
 }
 
 if ( ! function_exists( 'current_user_can' ) ) {
-    function current_user_can( string $capability ): bool {
+    function current_user_can( string $capability, mixed ...$extra ): bool {
+        unset( $extra );
+
         return in_array( $capability, $GLOBALS['qn_caps'] ?? [], true );
     }
 }
