@@ -24,6 +24,7 @@ use QueryNova\Infrastructure\Queue\JobRunner;
 use QueryNova\Infrastructure\Rest\RestRegistrar;
 use QueryNova\Modules\Redirects\Application\RedirectEngine;
 use QueryNova\Modules\Redirects\Infrastructure\RedirectRepository;
+use QueryNova\Modules\Podcast\PodcastGate;
 use QueryNova\Modules\Seo\Application\ImportPreview;
 use QueryNova\Modules\Seo\Application\SeoConflictDetector;
 use QueryNova\Modules\Seo\Application\SeoImporter;
@@ -34,6 +35,7 @@ use QueryNova\Modules\Seo\Infrastructure\WordPressMetaStore;
 use QueryNova\Modules\Seo\Presentation\EditorPanel;
 use QueryNova\Modules\Seo\Presentation\FrontendSeoSubscriber;
 use QueryNova\Modules\Seo\Presentation\OnPageController;
+use QueryNova\Modules\Seo\Presentation\PostListColumnsSubscriber;
 use QueryNova\Modules\Seo\Presentation\SeoConflictNotice;
 use QueryNova\Modules\Seo\Presentation\SiteHead;
 use QueryNova\Modules\Seo\Presentation\SiteToolsController;
@@ -76,6 +78,7 @@ final class SeoModule extends AbstractModule {
         $hooks->add( new FrontendSeoSubscriber( new SeoMetaService( new WordPressMetaStore(), new TemplateRenderer() ) ) );
         $hooks->add( new SeoConflictNotice( new SeoConflictDetector() ) );
         $hooks->add( new SiteHead() );
+        $hooks->add( new PostListColumnsSubscriber() );
         $hooks->add( $this->editorPanel() );
     }
 
@@ -105,6 +108,7 @@ final class SeoModule extends AbstractModule {
         $rest->route( 'POST', '/seo/breadcrumbs/preview', [ $tools, 'breadcrumbPreview' ], Capability::MANAGE_SEO );
         $rest->route( 'POST', '/seo/image-alt', [ $tools, 'imageAlt' ], Capability::MANAGE_SEO );
         $rest->route( 'POST', '/seo/indexnow', [ $tools, 'indexNow' ], Capability::MANAGE_SEO );
+        $rest->route( 'POST', '/podcast', [ $this, 'podcast' ], Capability::MANAGE_SEO );
     }
 
     public function registerJobs( JobRegistrar $jobs ): void {
@@ -256,6 +260,19 @@ final class SeoModule extends AbstractModule {
         }
 
         return $objects;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function podcast( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+
+        return PodcastGate::save(
+            ( $params['enabled'] ?? false ) === true,
+            ( $params['confirmed'] ?? false ) === true
+        );
     }
 
     private function importer(): SeoImporter {

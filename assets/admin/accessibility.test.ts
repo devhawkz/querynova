@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const sources = import.meta.glob('./**/*.tsx', {
@@ -21,7 +23,16 @@ describe('admin accessibility', () => {
       expect(source).not.toMatch(/outline\s*:\s*(none|0)\b/);
       assertNamedFields(source, file);
       assertNamedButtons(source, file);
+      expect(source).not.toMatch(/tabindex\s*=\s*["']-1["']/i);
+      expect(source).not.toMatch(/tabIndex=\{-1\}/);
     }
+  });
+
+  it('keeps a visible keyboard focus outline in the admin stylesheet', () => {
+    const css = readFileSync(resolve('assets/admin/styles/admin.css'), 'utf8');
+    expect(css).toContain(':focus-visible');
+    expect(css).toMatch(/outline:\s*2px solid/);
+    expect(css).not.toMatch(/outline\s*:\s*(none|0)\b/);
   });
 });
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { channelFlags, htaccessVisibility, indexNowPlan, linkPresentation, ROBOTS_NOTE, SITEMAP_CHANNELS } from './model';
+import { channelFlags, htaccessVisibility, indexNowPlan, linkPresentation, linkSettingsPlan, podcastPlan, ROBOTS_NOTE, SITEMAP_CHANNELS } from './model';
 
 describe('site tools', () => {
   it('keeps suggestions on Suggest Only', () => {
@@ -23,6 +23,19 @@ describe('site tools', () => {
     expect(plan.queued).toEqual(['https://example.test/a']);
     expect(plan.skipped).toEqual(['https://example.test/b']);
     expect(plan.requested).toBe(false);
+  });
+
+  it('keeps link defaults off and publishes nothing for podcast', () => {
+    const held = linkSettingsPlan({ new_tab: true, auto_insert: true }, false);
+    const stored = linkSettingsPlan({ new_tab: true }, true);
+    expect(held.stored).toBe(false);
+    expect(held.inserted).toBe(false);
+    expect(held.applied).toBe(false);
+    expect(stored.inserted).toBe(false);
+    expect(stored.note).toContain('Nothing is inserted');
+    expect(podcastPlan(true, false).stored).toBe(false);
+    expect(podcastPlan(true, true).published).toBe(false);
+    expect(podcastPlan(false, true).enabled).toBe(false);
   });
 
   it('keeps news and KML off until they are configured', () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { previewImport, SCHEMA_TEMPLATES, templateProperties } from './studio';
+import { previewImport, SCHEMA_TEMPLATES, SPEAKABLE_NOTE, templateProperties } from './studio';
+import { SCHEMA_TYPES } from './rules';
 
 describe('schema studio', () => {
   it('offers three template cards and does not dump blank fields', () => {
@@ -10,6 +11,8 @@ describe('schema studio', () => {
     const fields = SCHEMA_TEMPLATES.reduce((count, template) => count + template.properties.length, 0);
     expect(fields).toBe(5);
     expect(fields).toBeLessThan(60);
+    expect(SCHEMA_TYPES).not.toContain('Speakable');
+    expect(SPEAKABLE_NOTE).toContain('headline and a CSS selector');
   });
 
   it('previews supplied JSON-LD properties and does not save', () => {

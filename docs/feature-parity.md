@@ -52,21 +52,39 @@ A module name is not proof. WordPress 7.1.2, WooCommerce 11.1.2, and the admin b
 | Role manager | Edit role caps in the admin | `RoleMap`, `RoleCatalog` | IMPLEMENTED | Administrator, SEO Manager, Content Editor, Commerce Manager, and Developer stay on the fixed map, shown per area. A custom role is stored only after confirmation and is not applied to WordPress | Reports screen custom role | `RestPermissionTest`, `tests/Unit/ReportDeskTest.php` | WordPress roles were not changed. The screen was not opened in wp-admin |
 | Import / export | Yoast, Rank Math, AIOSEO preview, settings export | `SeoImporter`, `ImportPreview`, `SettingsTransfer` | IMPLEMENTED | Import still accepts 50 objects. Preview returns imported, skipped, and failed and does not write. Settings export and import cover schedule, white label, and roles, one section at a time | Reports screen preview and section transfer | `tests/Unit/SeoImportTest.php`, `tests/Unit/ReportDeskTest.php` | The other plugin is not disabled. Posts are not rewritten by the preview or the section import. The screen was not opened in wp-admin |
 | Local SEO | CPT, block, shortcode, locator, only when enabled | Schema `LocalBusiness` type | PARTIAL | Type can be emitted | No locations module | `SchemaGraphTest` | |
-| Podcast | Only when enabled | — | MISSING | — | — | — | |
+| Podcast | Only when enabled | `PodcastModule`, `PodcastGate` | IMPLEMENTED | The module is omitted unless `querynova_podcast_enabled` is exactly true. Safe mode also omits it. A string does not enable it. Status leaves episodes null and does not publish | Links screen checkbox. Confirm starts unchecked | `tests/Unit/SurfaceGapsTest.php`, `assets/admin/features/links/model.test.ts` | Nothing is published. The screen was not opened in wp-admin |
 | Headless SEO REST | Secured metadata, canonical, robots, schema, social | `GET /seo/meta` | PARTIAL | Meta endpoint for a post id | No headless contract test beyond the service | `SeoMetaServiceTest` | |
-| Post list columns and Quick Edit | Title, description, index, focus keyword | — | MISSING | — | — | — | |
+| Post list columns and Quick Edit | Title, description, index, focus keyword | `PostListColumns` | IMPLEMENTED | Columns are title, description, indexability, and focus keyword. Quick Edit stores only those four, and only after confirmation, and only when WordPress meta updates exist. Unit tests do not define that function, so `written` stays false | Posts and pages list columns and a Quick Edit box | `tests/Unit/SurfaceGapsTest.php` | The list was not opened in wp-admin |
 | Content decay and cannibalization | Reports | Keyword cannibalization, content observations | PARTIAL | Detection from supplied rows | No report screen | `KeywordTest` | |
 | Opportunity drawer | Accept, dismiss, mark applied, experiment. Does not change the page until applied | Outcomes | PARTIAL | Accept and apply endpoints. Apply does not change the page | Dashboard list, no drawer | `tests/Unit/OutcomeTest.php` | |
 | Provider cards | Connected, not configured, degraded | Null adapters | PARTIAL | Diagnostics lists providers as not configured | Text list | `Diagnostics` model test | |
 | Job monitor | List, retry | Jobs table, WP-CLI | PARTIAL | Retry requeues and does not run | No monitor | `tests/Unit/JobRunnerTest.php`, `CliCommandsTest` | |
 | Log viewer | Secret-free | Log repository and sanitizer | PARTIAL | Redaction before storage | Diagnostics recent errors only | `LogSanitizerTest` | |
-| Speakable | Only where valid | — | MISSING | — | — | — | |
+| Speakable | Only where valid | `SpeakableSchema` | IMPLEMENTED | Returns a node only for an article or post that has both a headline and a CSS selector. Other types and empty or invalid selectors return null. Speakable is not in `SchemaTypes::all()` | Schema builder note | `tests/Unit/SurfaceGapsTest.php`, `assets/admin/features/schema/studio.test.ts` | It is not added to every page. The screen was not opened in wp-admin |
 | Video schema and video sitemap | VideoObject and video sitemap | Schema and sitemap | PARTIAL | Both can be emitted | No video settings | `SchemaGraphTest`, `SitemapTest` | |
-| Global link settings | Safe defaults | — | MISSING | — | — | — | |
+| Global link settings | Safe defaults | `LinkSettings` | IMPLEMENTED | A missing option keeps new tab, nofollow, and automatic insertion off. A confirmed save stores the option. `applied` and `inserted` stay false | Links screen. Confirm starts unchecked | `tests/Unit/SurfaceGapsTest.php`, `assets/admin/features/links/model.test.ts` | Nothing is inserted. The screen was not opened in wp-admin |
 | DataTable | Server pagination, sort, filter, bulk | List endpoints with limits | PARTIAL | Several repositories page | No shared table component | Commerce bulk tests | |
 | Notification center and toasts | In-plugin, not wp-admin spam | Admin notices for staging data, build channel, SEO conflict | PARTIAL | Those notices are non-blocking | No in-plugin center | `StagingDataWarningTest`, `BuildChannelNoticeTest` | |
-| Quick search | Ctrl/Cmd-K | — | MISSING | — | — | — | Skipped until it is off the critical path |
+| Quick search | Ctrl/Cmd-K | — | MISSING | — | — | — | Skipped in Phase 14 so podcast, post-list columns, speakable, and global link settings could land. It is still not in the admin |
 | Charts | Trend charts | — | MISSING | — | — | — | No chart library. Phase 8 shows supplied trends in a table. A decision is required before adding a chart library |
 | WordPress environment vs build | Separate | `ReleaseProfile` | VERIFIED | `wp_get_environment_type()` only. Build from `build/channel.json` | Diagnostics shows both. Staging on production warns | `ReleaseProfileTest`, `LoggerReleaseContextTest` | Does not write `wp-config.php` |
+
+## Manual wp-admin checklist
+
+These screens were not opened in wp-admin for this pass. None of them are marked VERIFIED. The only observed admin browser pass opened What Matters Now, on Actions run 36388914008 at `dbe8ec5edaed5782802597d17b3a1394c0fff0a5`.
+
+- [ ] Dashboard, including an empty catalog and a large catalog
+- [ ] Setup wizard and Diagnostics
+- [ ] Settings, including Advanced .htaccess on Apache and its absence on Nginx
+- [ ] SEO, titles, and the audit
+- [ ] Schema builder, including a speakable article and a document that must stay without speakable
+- [ ] Links, redirects, 404s, robots.txt, global link settings, and podcast left off
+- [ ] Analytics and Rank Tracking
+- [ ] Commerce product and category workspaces
+- [ ] Content drafts
+- [ ] AI Visibility
+- [ ] Reports, schedule, white label, custom role, import preview, and settings transfer
+- [ ] Posts and pages list columns and Quick Edit, confirmed and unconfirmed
+- [ ] Keyboard path through the left nav, visible focus, and labeled fields
 
 Parity is not complete. The rows marked MISSING or PARTIAL are still open.

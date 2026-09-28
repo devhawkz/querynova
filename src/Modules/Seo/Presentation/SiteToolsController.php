@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace QueryNova\Modules\Seo\Presentation;
 
 use QueryNova\Modules\Content\Application\LinkBoard;
+use QueryNova\Modules\Content\Application\LinkSettings;
+use QueryNova\Modules\Podcast\PodcastGate;
 use QueryNova\Modules\Seo\Application\Breadcrumbs;
 use QueryNova\Modules\Seo\Application\HtaccessEditor;
 use QueryNova\Modules\Seo\Application\ImageAlt;
@@ -38,14 +40,16 @@ final class SiteToolsController {
         $news = ( new SitemapSettings() )->newsName();
 
         return [
-            'sitemaps'    => SitemapChannels::read( SitemapChannels::localEnabled(), $news ),
-            'robots'      => RobotsEditor::read(),
-            'webmaster'   => WebmasterCodes::read(),
-            'rss'         => RssSupplement::read(),
-            'breadcrumbs' => Breadcrumbs::read(),
-            'links'       => LinkBoard::present( [] ),
-            'server'      => HtaccessEditor::serverSoftware(),
-            'note'        => 'Opening this screen does not write files, ALT text, redirects, or sitemap rewrites.',
+            'sitemaps'      => SitemapChannels::read( SitemapChannels::localEnabled(), $news ),
+            'robots'        => RobotsEditor::read(),
+            'webmaster'     => WebmasterCodes::read(),
+            'rss'           => RssSupplement::read(),
+            'breadcrumbs'   => Breadcrumbs::read(),
+            'links'         => LinkBoard::present( [] ),
+            'link_settings' => LinkSettings::present(),
+            'podcast'       => PodcastGate::present(),
+            'server'        => HtaccessEditor::serverSoftware(),
+            'note'          => 'Opening this screen does not write files, ALT text, redirects, or sitemap rewrites.',
         ];
     }
 

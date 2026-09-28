@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { QueryNovaApi } from '../../core/api/client';
 import { t } from '../../i18n';
-import { indexNowPlan, linkPresentation, listText, ROBOTS_NOTE } from './model';
+import { indexNowPlan, linkPresentation, linkSettingsPlan, listText, podcastPlan, ROBOTS_NOTE } from './model';
 
 interface Props {
   restUrl: string;
@@ -35,6 +35,12 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
   const [after, setAfter] = useState(textField(stored.rss, 'after'));
   const [indexUrls, setIndexUrls] = useState('');
   const [noindexUrls, setNoindexUrls] = useState('');
+  const [newTab, setNewTab] = useState(boolField(stored.link_settings, 'new_tab'));
+  const [nofollow, setNofollow] = useState(boolField(stored.link_settings, 'nofollow'));
+  const [autoInsert, setAutoInsert] = useState(boolField(stored.link_settings, 'auto_insert'));
+  const [linkConfirm, setLinkConfirm] = useState(false);
+  const [podcastEnabled, setPodcastEnabled] = useState(boolField(stored.podcast, 'enabled'));
+  const [podcastConfirm, setPodcastConfirm] = useState(false);
   const [message, setMessage] = useState('');
   const presentation = linkPresentation(board);
   const boardRecord = isRecord(board) ? board : {};
@@ -137,6 +143,39 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
     }).catch(() => {
       setMessage(t(plan.note));
     });
+  }
+
+  async function saveLinkSettings() {
+    const local = linkSettingsPlan({ new_tab: newTab, nofollow, auto_insert: autoInsert }, linkConfirm);
+    if (!linkConfirm || !ready) {
+      setMessage(t(local.note));
+      return;
+    }
+    try {
+      const body = await api.post<Record<string, unknown>>('/content/link-settings', {
+        new_tab: newTab,
+        nofollow,
+        auto_insert: autoInsert,
+        confirmed: true,
+      });
+      setMessage(typeof body.note === 'string' ? body.note : t(local.note));
+    } catch {
+      setMessage(t('Link settings were not stored. Nothing is inserted.'));
+    }
+  }
+
+  async function savePodcast() {
+    const local = podcastPlan(podcastEnabled, podcastConfirm);
+    if (!podcastConfirm || !ready) {
+      setMessage(t(local.note));
+      return;
+    }
+    try {
+      const body = await api.post<Record<string, unknown>>('/podcast', { enabled: podcastEnabled, confirmed: true });
+      setMessage(typeof body.note === 'string' ? body.note : t(local.note));
+    } catch {
+      setMessage(t('Podcast was not changed. Nothing was published.'));
+    }
   }
 
   return (
@@ -260,6 +299,38 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
         <textarea value={noindexUrls} onChange={(event) => setNoindexUrls(event.target.value)} />
       </label>
       <button type="button" onClick={planIndexNow}>{t('Plan IndexNow')}</button>
+
+      <h3>{t('Link settings')}</h3>
+      <p>{t('New tab, nofollow, and automatic insertion stay off until you confirm. Nothing is inserted.')}</p>
+      <label>
+        <input type="checkbox" checked={newTab} onChange={(event) => setNewTab(event.target.checked)} />
+        {t('Open in a new tab')}
+      </label>
+      <label>
+        <input type="checkbox" checked={nofollow} onChange={(event) => setNofollow(event.target.checked)} />
+        {t('Add nofollow')}
+      </label>
+      <label>
+        <input type="checkbox" checked={autoInsert} onChange={(event) => setAutoInsert(event.target.checked)} />
+        {t('Insert links automatically')}
+      </label>
+      <label>
+        <input type="checkbox" checked={linkConfirm} onChange={(event) => setLinkConfirm(event.target.checked)} />
+        {t('Confirm link settings')}
+      </label>
+      <button type="button" onClick={() => void saveLinkSettings()}>{t('Store link settings')}</button>
+
+      <h3>{t('Podcast')}</h3>
+      <p>{t('Podcast stays off until this option is exactly true. Nothing is published.')}</p>
+      <label>
+        <input type="checkbox" checked={podcastEnabled} onChange={(event) => setPodcastEnabled(event.target.checked)} />
+        {t('Enable podcast')}
+      </label>
+      <label>
+        <input type="checkbox" checked={podcastConfirm} onChange={(event) => setPodcastConfirm(event.target.checked)} />
+        {t('Confirm podcast')}
+      </label>
+      <button type="button" onClick={() => void savePodcast()}>{t('Store podcast')}</button>
       {message !== '' ? <p role="status">{message}</p> : null}
     </section>
   );

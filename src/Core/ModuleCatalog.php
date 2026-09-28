@@ -23,6 +23,8 @@ use QueryNova\Modules\Experiments\ExperimentModule;
 use QueryNova\Modules\Core\CoreModule;
 use QueryNova\Modules\Keywords\KeywordModule;
 use QueryNova\Modules\Opportunities\OpportunityModule;
+use QueryNova\Modules\Podcast\PodcastGate;
+use QueryNova\Modules\Podcast\PodcastModule;
 use QueryNova\Modules\Opportunities\OutcomeModule;
 use QueryNova\Modules\Crawler\CrawlerModule;
 use QueryNova\Modules\Redirects\RedirectModule;
@@ -55,6 +57,9 @@ final class ModuleCatalog {
         $modules[] = new CommerceModule();
         if ( EddModule::present() ) {
             $modules[] = new EddModule();
+        }
+        if ( PodcastGate::enabled() ) {
+            $modules[] = new PodcastModule();
         }
         $modules[] = new KeywordModule();
         $modules[] = new SerpModule();

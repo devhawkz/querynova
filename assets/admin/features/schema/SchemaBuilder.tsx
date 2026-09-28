@@ -11,7 +11,7 @@ import {
   toPayload,
   type SchemaRule,
 } from './rules';
-import { previewImport, SCHEMA_TEMPLATES, templateProperties } from './studio';
+import { previewImport, SCHEMA_TEMPLATES, SPEAKABLE_NOTE, templateProperties } from './studio';
 
 interface Props {
   restUrl: string;
@@ -136,6 +136,7 @@ export function SchemaBuilder({ restUrl, nonce, initialRules, onOpenDiagnostics 
           'WebSite, Organization, WebPage, article, product, offer, and breadcrumb entities are connected automatically. Rules add more entities. Empty values are left out. They are not sent as zero.',
         )}
       </p>
+      <p>{t(SPEAKABLE_NOTE)}</p>
       <h2>{t('Templates')}</h2>
       <p>{t('Each template adds only its own properties. Empty fields are not added.')}</p>
       {SCHEMA_TEMPLATES.map((template) => (

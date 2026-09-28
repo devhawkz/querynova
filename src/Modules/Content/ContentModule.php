@@ -25,6 +25,7 @@ use QueryNova\Modules\Content\Application\ContentDrafts;
 use QueryNova\Modules\Content\Application\ContentIntelligence;
 use QueryNova\Modules\Content\Application\ContentWorkspace;
 use QueryNova\Modules\Content\Application\LinkBoard;
+use QueryNova\Modules\Content\Application\LinkSettings;
 use QueryNova\Modules\Content\Infrastructure\ContentRepository;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -75,6 +76,7 @@ final class ContentModule extends AbstractModule {
         $rest->route( 'POST', '/content/drafts', [ $this, 'drafts' ], Capability::RUN_ANALYSIS );
         $rest->route( 'POST', '/content/model', [ $this, 'model' ], Capability::RUN_ANALYSIS );
         $rest->route( 'POST', '/content/automation', [ $this, 'automation' ], Capability::RUN_ANALYSIS );
+        $rest->route( 'POST', '/content/link-settings', [ $this, 'linkSettings' ], Capability::MANAGE_SEO );
     }
 
     /**
@@ -180,6 +182,21 @@ final class ContentModule extends AbstractModule {
         unset( $request );
 
         return LinkBoard::present( [] );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function linkSettings( \WP_REST_Request $request ): array {
+        $params = $request->get_json_params();
+        $params = is_array( $params ) ? $params : [];
+
+        return LinkSettings::save(
+            ( $params['new_tab'] ?? false ) === true,
+            ( $params['nofollow'] ?? false ) === true,
+            ( $params['auto_insert'] ?? false ) === true,
+            ( $params['confirmed'] ?? false ) === true
+        );
     }
 
     /**

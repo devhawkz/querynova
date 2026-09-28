@@ -96,6 +96,48 @@ export function indexNowPlan(urls: string[], noindex: string[]): { queued: strin
   };
 }
 
+export function linkSettingsPlan(
+  flags: { new_tab?: boolean; nofollow?: boolean; auto_insert?: boolean },
+  confirmed: boolean,
+): { new_tab: boolean; nofollow: boolean; auto_insert: boolean; applied: false; inserted: false; stored: boolean; note: string } {
+  const next = {
+    new_tab: flags.new_tab === true,
+    nofollow: flags.nofollow === true,
+    auto_insert: flags.auto_insert === true,
+    applied: false as const,
+    inserted: false as const,
+  };
+  if (!confirmed) {
+    return {
+      ...next,
+      stored: false,
+      note: 'Global link settings stay unchanged until you confirm. Nothing is inserted.',
+    };
+  }
+  return {
+    ...next,
+    stored: true,
+    note: 'Global link settings are stored. Nothing is inserted.',
+  };
+}
+
+export function podcastPlan(enabled: boolean, confirmed: boolean): { stored: boolean; enabled: boolean; published: false; note: string } {
+  if (!confirmed) {
+    return {
+      stored: false,
+      enabled: false,
+      published: false,
+      note: 'Podcast stays unchanged until you confirm. Nothing was published.',
+    };
+  }
+  return {
+    stored: true,
+    enabled,
+    published: false,
+    note: enabled ? 'Podcast is enabled. Nothing was published.' : 'Podcast stays off. Nothing was published.',
+  };
+}
+
 export function linkPresentation(board: unknown): { mode: string; inserted: boolean; note: string } {
   const record = isRecord(board) ? board : {};
   return {

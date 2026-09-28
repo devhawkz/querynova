@@ -1,5 +1,7 @@
 import { SCHEMA_TYPES } from './rules';
 
+export const SPEAKABLE_NOTE = 'Speakable is included only for an article or post with a headline and a CSS selector. It is not added to every page.';
+
 export const SCHEMA_TEMPLATES = [
   { id: 'article', label: 'Article', type: 'Article', properties: ['headline', 'description'] },
   { id: 'product', label: 'Product', type: 'Product', properties: ['name', 'description'] },
