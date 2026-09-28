@@ -15,6 +15,7 @@ use QueryNova\Core\Contracts\HookSubscriberInterface;
 use QueryNova\Core\Environment\WordPressEnvironment;
 use QueryNova\Core\ModuleCatalog;
 use QueryNova\Core\Plugin;
+use QueryNova\Core\ReleaseProfile;
 use QueryNova\Core\SafeMode\SafeMode;
 use QueryNova\Core\Support\SystemClock;
 use QueryNova\Infrastructure\Cli\DiagnosticsReport;
@@ -31,6 +32,7 @@ use QueryNova\Modules\Local\LocalGate;
 use QueryNova\Modules\Reports\ReportModule;
 use QueryNova\Modules\Schema\SchemaModule;
 use QueryNova\Modules\Seo\Application\MetaDefaults;
+use QueryNova\Modules\Seo\Application\SeoConflictDetector;
 use QueryNova\Modules\Seo\Presentation\OnPageController;
 use QueryNova\Modules\Seo\Presentation\SiteToolsController;
 use QueryNova\Modules\Serp\Application\RankTracker;
@@ -104,6 +106,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'aiWorkspace'       => AiModule::workspaceSnapshot(),
                     'reportsWorkspace'  => ReportModule::workspaceSnapshot(),
                     'localWorkspace'    => LocalGate::present(),
+                    'notifications'     => $this->notifications(),
                 ]
             ) . ';',
             'before'
@@ -274,5 +277,26 @@ final class AdminAssets implements HookSubscriberInterface {
 
             return DiagnosticsReport::build( [] );
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function notifications(): array {
+        $environment = ( new WordPressEnvironment() )->getName();
+        $staging     = ( new StagingDataWarning() )->detect(
+            $environment,
+            ( new SetupWizard( new OptionStore() ) )->read( class_exists( 'WooCommerce' ) )
+        );
+        $profile     = ReleaseProfile::assess( $environment, BuildChannel::installedChannel() );
+        $detector    = new SeoConflictDetector();
+        $conflict    = $detector->detect( $detector->activePlugins() );
+
+        return NotificationCenter::collect(
+            $staging['warnings'],
+            $profile->notice(),
+            $profile->status(),
+            $conflict['plugins']
+        );
     }
 }

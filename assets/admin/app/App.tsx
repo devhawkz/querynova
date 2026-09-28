@@ -12,6 +12,7 @@ import { AnalyticsScreen } from '../features/analytics/AnalyticsScreen';
 import { RankScreen } from '../features/rank/RankScreen';
 import { ReportsScreen } from '../features/reports/ReportsScreen';
 import { LinksScreen } from '../features/links/LinksScreen';
+import { NotificationPanel } from '../features/notifications/NotificationPanel';
 import { LocalScreen } from '../features/local/LocalScreen';
 import { SeoScreen } from '../features/seo/SeoScreen';
 import { SettingsScreen } from '../features/settings/SettingsScreen';
@@ -44,6 +45,7 @@ declare global {
       aiWorkspace?: unknown;
       reportsWorkspace?: unknown;
       localWorkspace?: unknown;
+      notifications?: unknown;
     };
   }
 }
@@ -53,6 +55,7 @@ export function App() {
   const [view, setView] = useState<ViewId>('dashboard');
   const [mode, setMode] = useState<AdminMode>('simple');
   const [helpOpen, setHelpOpen] = useState(false);
+  const [noticesOpen, setNoticesOpen] = useState(false);
   const [settingsSection, setSettingsSection] = useState<SettingsSectionId>('general');
   const page = navItem(view);
   const badge = environmentBadge(boot.environment ?? '');
@@ -103,9 +106,13 @@ export function App() {
               <button type="button" onClick={() => setHelpOpen((open) => !open)}>
                 {t('Help')}
               </button>
+              <button type="button" aria-expanded={noticesOpen} onClick={() => setNoticesOpen((open) => !open)}>
+                {t('Notifications')}
+              </button>
             </div>
           </header>
           {helpOpen ? <p role="status">{t(page.hint)}</p> : null}
+          {noticesOpen ? <NotificationPanel notifications={boot.notifications} /> : null}
           <main>
             {view === 'dashboard' ? (
               <WhatMattersNow
