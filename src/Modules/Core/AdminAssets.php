@@ -22,6 +22,7 @@ use QueryNova\Infrastructure\Database\MigrationRegistrar;
 use QueryNova\Infrastructure\Database\WpdbConnection;
 use QueryNova\Infrastructure\Queue\JobRepository;
 use QueryNova\Infrastructure\WordPress\OptionStore;
+use QueryNova\Modules\Schema\SchemaModule;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
@@ -77,6 +78,7 @@ final class AdminAssets implements HookSubscriberInterface {
                     'category'          => $this->category(),
                     'diagnostics'       => $this->diagnostics(),
                     'setup'             => ( new SetupWizard( new OptionStore() ) )->read( class_exists( 'WooCommerce' ) ),
+                    'schemaRules'       => SchemaModule::storedRules(),
                 ]
             ) . ';',
             'before'

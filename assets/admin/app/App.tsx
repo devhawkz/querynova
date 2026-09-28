@@ -24,6 +24,7 @@ declare global {
       category?: unknown;
       diagnostics?: unknown;
       setup?: unknown;
+      schemaRules?: unknown;
     };
   }
 }
@@ -57,7 +58,9 @@ export function App() {
         </button>
       </nav>
       <main>
-        {view === 'schema' ? <SchemaBuilder restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} /> : null}
+        {view === 'schema' ? (
+          <SchemaBuilder restUrl={boot.restUrl ?? ''} nonce={boot.nonce ?? ''} initialRules={boot.schemaRules} />
+        ) : null}
         {view === 'advanced' ? <AdvancedDetail advanced={boot.advanced} /> : null}
         {view === 'product' ? <ProductScreen product={boot.product} /> : null}
         {view === 'category' ? <CategoryScreen category={boot.category} /> : null}

@@ -1,3 +1,5 @@
+import { apiErrorDetail } from '../../core/api/client';
+
 export const SCHEMA_TYPES = [
   'WebSite',
   'Organization',
@@ -57,6 +59,16 @@ export function emptyRule(type: (typeof SCHEMA_TYPES)[number] = 'Course'): Schem
     conditions: [],
     mappings: [{ property: 'name', source: 'wordpress', key: 'title' }],
   };
+}
+
+export function schemaLoadMessage(error: unknown, hadStoredRules: boolean): string {
+  const detail = apiErrorDetail(error);
+  if (hadStoredRules) {
+    const lead = 'Stored schema rules are shown. Refreshing them from the server failed.';
+    return detail === '' ? lead : `${lead} ${detail}`;
+  }
+  const lead = 'Schema rules could not be loaded.';
+  return detail === '' ? lead : `${lead} ${detail}`;
 }
 
 export function fromPayload(input: unknown): SchemaRule[] {

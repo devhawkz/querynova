@@ -7,6 +7,7 @@ import {
   SCHEMA_OPERATORS,
   SCHEMA_SOURCES,
   SCHEMA_TYPES,
+  schemaLoadMessage,
   toPayload,
   type SchemaRule,
 } from './rules';
@@ -14,14 +15,16 @@ import {
 interface Props {
   restUrl: string;
   nonce: string;
+  initialRules?: unknown;
 }
 
-export function SchemaBuilder({ restUrl, nonce }: Props) {
+export function SchemaBuilder({ restUrl, nonce, initialRules }: Props) {
   const api = useMemo(
     () => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }),
     [restUrl, nonce],
   );
-  const [rules, setRules] = useState<SchemaRule[]>([]);
+  const stored = initialRules !== undefined;
+  const [rules, setRules] = useState<SchemaRule[]>(() => fromPayload(initialRules));
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -36,15 +39,15 @@ export function SchemaBuilder({ restUrl, nonce }: Props) {
           setRules(fromPayload(body.rules));
         }
       })
-      .catch(() => {
+      .catch((error: unknown) => {
         if (!cancelled) {
-          setMessage(t('Schema rules could not be loaded.'));
+          setMessage(t(schemaLoadMessage(error, stored)));
         }
       });
     return () => {
       cancelled = true;
     };
-  }, [api, nonce, restUrl]);
+  }, [api, nonce, restUrl, stored]);
 
   if (restUrl === '' || nonce === '') {
     return <p>{t('Schema rules are unavailable in this session.')}</p>;

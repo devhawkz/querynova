@@ -34,6 +34,20 @@ final class CapabilityRegistrar {
                 $role->add_cap( $capability );
             }
         }
+        $this->refreshCurrentUser();
+    }
+
+    /**
+     * Caps are copied onto the user before init. Additions in this request must be visible to REST.
+     */
+    private function refreshCurrentUser(): void {
+        if ( ! function_exists( 'wp_get_current_user' ) ) {
+            return;
+        }
+        $user = wp_get_current_user();
+        if ( is_object( $user ) && method_exists( $user, 'get_role_caps' ) ) {
+            $user->get_role_caps();
+        }
     }
 
     private function label( string $roleName ): string {

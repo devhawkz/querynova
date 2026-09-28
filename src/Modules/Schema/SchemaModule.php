@@ -77,8 +77,18 @@ final class SchemaModule extends AbstractModule {
         if ( ! $features instanceof FeatureRegistry || ! $environment instanceof WordPressEnvironment ) {
             return;
         }
-        $commerce   = class_exists( 'WooCommerce' ) ? new WooCommerceReader() : new NullCommerceReader();
-        $this->head = new SchemaHead(
+        try {
+            $this->head = $this->headFor( $store, $features, $environment );
+        } catch ( \Throwable $exception ) {
+            $this->head = null;
+            unset( $exception );
+        }
+    }
+
+    private function headFor( SchemaRuleStore $store, FeatureRegistry $features, WordPressEnvironment $environment ): SchemaHead {
+        $commerce = class_exists( 'WooCommerce' ) ? new WooCommerceReader() : new NullCommerceReader();
+
+        return new SchemaHead(
             new SchemaDocumentBuilder( new ConnectedGraphFactory(), new SchemaRuleCompiler() ),
             $store,
             new WordPressContentSnapshot( $commerce ),
@@ -94,8 +104,8 @@ final class SchemaModule extends AbstractModule {
     }
 
     public function registerRoutes( RestRegistrar $rest ): void {
-        $rest->route( 'GET', '/schema/rules', [ $this, 'show' ], Capability::MANAGE_SEO );
-        $rest->route( 'PUT', '/schema/rules', [ $this, 'update' ], Capability::MANAGE_SEO );
+        $rest->route( 'GET', '/schema/rules', [ $this, 'show' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
+        $rest->route( 'PUT', '/schema/rules', [ $this, 'update' ], Capability::MANAGE_SEO, [ Capability::MANAGE_SETTINGS ] );
     }
 
     /**
@@ -124,6 +134,17 @@ final class SchemaModule extends AbstractModule {
         $this->rules->replace( $rules );
 
         return [ 'rules' => $this->codec->export( $rules ) ];
+    }
+
+    /**
+     * Rules already stored for this site. An unreadable option stays an empty list.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public static function storedRules(): array {
+        $codec = new SchemaRuleCodec();
+
+        return $codec->export( ( new OptionSchemaRuleStore( $codec ) )->all() );
     }
 
     /**

@@ -15,34 +15,51 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class RestRegistrar {
 
-    /** @var list<array{method: string, route: string, callback: callable, capability: string}> */
+    /** @var list<array{method: string, route: string, callback: callable, capability: string, capabilities: list<string>}> */
     private array $routes = [];
 
     /**
      * @param callable(\WP_REST_Request): mixed $callback
+     * @param list<string>                      $also Capabilities that also grant this route. The screen capability is the usual extra.
      */
-    public function route( string $method, string $route, callable $callback, string $capability ): void {
+    public function route( string $method, string $route, callable $callback, string $capability, array $also = [] ): void {
+        $capabilities = [];
+        foreach ( array_merge( [ $capability ], $also ) as $name ) {
+            if ( is_string( $name ) && $name !== '' && ! in_array( $name, $capabilities, true ) ) {
+                $capabilities[] = $name;
+            }
+        }
         $this->routes[] = [
-            'method'     => $method,
-            'route'      => $route,
-            'callback'   => $callback,
-            'capability' => $capability,
+            'method'       => $method,
+            'route'        => $route,
+            'callback'     => $callback,
+            'capability'   => $capability,
+            'capabilities' => $capabilities,
         ];
     }
 
     /**
-     * @return list<array{method: string, route: string, callback: callable, capability: string}>
+     * @return list<array{method: string, route: string, callback: callable, capability: string, capabilities: list<string>}>
      */
     public function routes(): array {
         return $this->routes;
     }
 
     public function allowed( string $capability ): bool {
-        if ( $capability === '' ) {
-            return false;
+        return $this->allowedAny( [ $capability ] );
+    }
+
+    /**
+     * @param list<string> $capabilities
+     */
+    public function allowedAny( array $capabilities ): bool {
+        foreach ( $capabilities as $capability ) {
+            if ( $capability !== '' && current_user_can( $capability ) ) {
+                return true;
+            }
         }
 
-        return current_user_can( $capability );
+        return false;
     }
 
     public function register(): void {
@@ -57,7 +74,7 @@ final class RestRegistrar {
 							'methods'             => $route['method'],
 							'callback'            => $route['callback'],
 							'permission_callback' => function () use ( $route ): bool {
-								return $this->allowed( $route['capability'] );
+								return $this->allowedAny( $route['capabilities'] );
 							},
                         ]
 					);

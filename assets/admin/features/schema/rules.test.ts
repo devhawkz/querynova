@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fromPayload, toPayload } from './rules';
+import { fromPayload, schemaLoadMessage, toPayload } from './rules';
 
 describe('schema rules', () => {
   it('drops unknown types and keeps a linked course', () => {
@@ -34,5 +34,18 @@ describe('schema rules', () => {
     ]);
 
     expect(rules).toEqual([]);
+  });
+
+  it('keeps the server status when a refresh fails after stored rules were provided', () => {
+    const message = schemaLoadMessage(
+      { status: 401, message: 'Sorry, you are not allowed to do that.', errorReference: 'QN-AB12CD34' },
+      true,
+    );
+
+    expect(message).toContain('Stored schema rules are shown.');
+    expect(message).toContain('HTTP 401');
+    expect(message).toContain('Sorry, you are not allowed to do that.');
+    expect(message).toContain('QN-AB12CD34');
+    expect(schemaLoadMessage({}, false)).toBe('Schema rules could not be loaded.');
   });
 });
