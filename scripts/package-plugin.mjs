@@ -1,6 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { cpSync, mkdirSync, readFileSync, rmSync, existsSync } from 'node:fs';
-import { join, dirname, sep } from 'node:path';
+import { cpSync, mkdirSync, rmSync, existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -26,15 +26,11 @@ if (existsSync(join(root, 'languages'))) {
   cpSync(join(root, 'languages'), join(stage, 'languages'), { recursive: true });
 }
 
-const composer = spawnSync('composer', ['--version'], { encoding: 'utf8' });
-if (composer.status === 0) {
-  execFileSync('composer', ['install', '--no-dev', '--no-interaction', '--prefer-dist', '--no-progress'], {
-    cwd: stage,
-    stdio: 'inherit',
-  });
-} else {
-  copyProductionVendor(root, stage);
-}
+const composer = composerInvocation();
+execFileSync(composer[0], [...composer.slice(1), 'install', '--no-dev', '--no-interaction', '--prefer-dist', '--no-progress'], {
+  cwd: stage,
+  stdio: 'inherit',
+});
 
 rmSync(zipPath, { force: true });
 execFileSync('zip', ['-r', '-X', zipPath, 'querynova'], {
@@ -49,29 +45,23 @@ for (const token of forbidden) {
     throw new Error(`Release ZIP contains ${token}`);
   }
 }
-if (!listing.includes('build/admin.js') || !listing.includes('build/channel.json') || !listing.includes('src/')) {
-  throw new Error('Release ZIP is missing the compiled admin, channel, or source.');
+if (!listing.includes('build/admin.js') || !listing.includes('build/channel.json') || !listing.includes('src/') || !listing.includes('vendor/autoload.php')) {
+  throw new Error('Release ZIP is missing the compiled admin, channel, source, or autoload.');
 }
+execFileSync('php', [join(root, 'scripts/assert-release-autoload.php'), zipPath], {
+  stdio: 'inherit',
+});
 
 console.log(zipPath);
 
-function copyProductionVendor(projectRoot, destination) {
-  const installed = JSON.parse(readFileSync(join(projectRoot, 'vendor/composer/installed.json'), 'utf8'));
-  const devNames = new Set(installed['dev-package-names'] ?? []);
-  const blockedRoots = new Set(['bin']);
-  for (const name of devNames) {
-    blockedRoots.add(name.split('/')[0] ?? name);
+function composerInvocation() {
+  const onPath = spawnSync('composer', ['--version'], { encoding: 'utf8' });
+  if (onPath.status === 0) {
+    return ['composer'];
   }
-  const vendorRoot = join(projectRoot, 'vendor');
-  cpSync(vendorRoot, join(destination, 'vendor'), {
-    recursive: true,
-    filter: (source) => {
-      if (source === vendorRoot) {
-        return true;
-      }
-      const relative = source.slice(vendorRoot.length + 1);
-      const top = relative.split(sep)[0] ?? '';
-      return !blockedRoots.has(top);
-    },
-  });
+  const phar = process.env.COMPOSER_PHAR;
+  if (phar && existsSync(phar)) {
+    return ['php', phar];
+  }
+  throw new Error('composer is not on PATH. Set COMPOSER_PHAR to a composer.phar. The package script will not copy a dev vendor tree, because that autoload still requires packages omitted from the ZIP.');
 }
