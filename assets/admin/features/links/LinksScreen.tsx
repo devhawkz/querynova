@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { DataTable } from '../../components/DataTable';
+import { textCell } from '../../components/data-table';
 import { QueryNovaApi } from '../../core/api/client';
 import { t } from '../../i18n';
 import { indexNowPlan, linkPresentation, linkSettingsPlan, listText, podcastPlan, ROBOTS_NOTE } from './model';
@@ -17,10 +19,8 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
   const [broken, setBroken] = useState('');
   const [redirectSearch, setRedirectSearch] = useState('');
   const [redirectStatus, setRedirectStatus] = useState('');
-  const [redirectPage, setRedirectPage] = useState(1);
   const [redirects, setRedirects] = useState<ListPage>({ rows: [], total: 0, page: 1, pages: 0 });
   const [missingSearch, setMissingSearch] = useState('');
-  const [missingPage, setMissingPage] = useState(1);
   const [missing, setMissing] = useState<ListPage>({ rows: [], total: 0, page: 1, pages: 0 });
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
@@ -71,7 +71,6 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
     }
     const body = await api.get<unknown>(`/redirects/list?search=${encodeURIComponent(redirectSearch)}&status=${encodeURIComponent(redirectStatus)}&page=${page}&per_page=20`);
     setRedirects(readList(body));
-    setRedirectPage(page);
   }
 
   async function loadMissing(page: number) {
@@ -80,7 +79,6 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
     }
     const body = await api.get<unknown>(`/not-found/list?search=${encodeURIComponent(missingSearch)}&page=${page}&per_page=20`);
     setMissing(readList(body));
-    setMissingPage(page);
   }
 
   async function savePermalink() {
@@ -213,10 +211,18 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
         <input value={redirectStatus} onChange={(event) => setRedirectStatus(event.target.value)} />
       </label>
       <button type="button" onClick={() => void loadRedirects(1)}>{t('Search')}</button>
-      <RowTable rows={redirects.rows} empty={t('No redirects match this search.')} />
-      <p>{t('Page')} {redirects.page} / {Math.max(redirects.pages, 1)} · {redirects.total}</p>
-      <button type="button" onClick={() => void loadRedirects(Math.max(1, redirectPage - 1))}>{t('Previous page')}</button>
-      <button type="button" onClick={() => void loadRedirects(redirectPage + 1)}>{t('Next page')}</button>
+      <DataTable
+        caption={t('Redirects')}
+        columns={storedColumns()}
+        rows={redirects.rows}
+        page={redirects.page}
+        perPage={20}
+        total={redirects.total}
+        empty={t('No redirects match this search.')}
+        previousLabel={t('Previous page')}
+        nextLabel={t('Next page')}
+        onPage={(page) => void loadRedirects(page)}
+      />
 
       <h3>{t('404 monitor')}</h3>
       <label>
@@ -224,10 +230,18 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
         <input value={missingSearch} onChange={(event) => setMissingSearch(event.target.value)} />
       </label>
       <button type="button" onClick={() => void loadMissing(1)}>{t('Filter 404s')}</button>
-      <RowTable rows={missing.rows} empty={t('No 404s match this search. A 404 does not create a redirect.')} />
-      <p>{t('Page')} {missing.page} / {Math.max(missing.pages, 1)} · {missing.total}</p>
-      <button type="button" onClick={() => void loadMissing(Math.max(1, missingPage - 1))}>{t('Previous 404 page')}</button>
-      <button type="button" onClick={() => void loadMissing(missingPage + 1)}>{t('Next 404 page')}</button>
+      <DataTable
+        caption={t('404 monitor')}
+        columns={storedColumns()}
+        rows={missing.rows}
+        page={missing.page}
+        perPage={20}
+        total={missing.total}
+        empty={t('No 404s match this search. A 404 does not create a redirect.')}
+        previousLabel={t('Previous 404 page')}
+        nextLabel={t('Next 404 page')}
+        onPage={(page) => void loadMissing(page)}
+      />
 
       <h3>{t('Permalink change')}</h3>
       <p>{t('A redirect is not created until you confirm it.')}</p>
@@ -336,31 +350,12 @@ export function LinksScreen({ restUrl, nonce, siteTools }: Props) {
   );
 }
 
-function RowTable({ rows, empty }: { rows: Record<string, unknown>[]; empty: string }) {
-  if (rows.length === 0) {
-    return <p>{empty}</p>;
-  }
-  return (
-    <table>
-      <caption>{t('Results')}</caption>
-      <thead>
-        <tr>
-          <th scope="col">{t('Source')}</th>
-          <th scope="col">{t('Target')}</th>
-          <th scope="col">{t('Status')}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map((row, index) => (
-          <tr key={`${String(row.source ?? row.url ?? index)}-${index}`}>
-            <td>{String(row.source ?? row.url ?? '')}</td>
-            <td>{String(row.target ?? '')}</td>
-            <td>{String(row.status ?? '')}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
+function storedColumns() {
+  return [
+    { label: t('Source'), value: (row: Record<string, unknown>) => textCell(row, ['source', 'url']) },
+    { label: t('Target'), value: (row: Record<string, unknown>) => textCell(row, ['target']) },
+    { label: t('Status'), value: (row: Record<string, unknown>) => textCell(row, ['status']) },
+  ];
 }
 
 interface ListPage {
