@@ -13,6 +13,14 @@ export function DiagnosticsScreen({ diagnostics, restUrl = '', nonce = '' }: Pro
   const api = useMemo(() => new QueryNovaApi({ restUrl, nonce, version: '', environment: '' }), [restUrl, nonce]);
   const [note, setNote] = useState('');
   const [jobs, setJobs] = useState<Array<Record<string, unknown>>>([]);
+  const [logLevel, setLogLevel] = useState('');
+  const [logChannel, setLogChannel] = useState('');
+  const [logModule, setLogModule] = useState('');
+  const [logProvider, setLogProvider] = useState('');
+  const [logDate, setLogDate] = useState('');
+  const [logReference, setLogReference] = useState('');
+  const [logCorrelation, setLogCorrelation] = useState('');
+  const [logRows, setLogRows] = useState<Array<Record<string, unknown>>>([]);
   const report = normalizeDiagnostics(diagnostics);
   const text = reportText(report);
   return (
@@ -115,6 +123,57 @@ export function DiagnosticsScreen({ diagnostics, restUrl = '', nonce = '' }: Pro
       )}
       <h2>{t('Migrations')}</h2>
       {report.pendingMigrations.length === 0 ? <p>{t('No pending migrations were recorded.')}</p> : <ul>{report.pendingMigrations.map((version) => <li key={version}>{version}</li>)}</ul>}
+      <h2>{t('Log viewer')}</h2>
+      <p>{t('Filters stay inside QueryNova. Secrets are omitted.')}</p>
+      <label>
+        {t('Level')}
+        <input value={logLevel} onChange={(event) => setLogLevel(event.target.value)} />
+      </label>
+      <label>
+        {t('Channel')}
+        <input value={logChannel} onChange={(event) => setLogChannel(event.target.value)} />
+      </label>
+      <label>
+        {t('Module')}
+        <input value={logModule} onChange={(event) => setLogModule(event.target.value)} />
+      </label>
+      <label>
+        {t('Provider')}
+        <input value={logProvider} onChange={(event) => setLogProvider(event.target.value)} />
+      </label>
+      <label>
+        {t('Date')}
+        <input value={logDate} onChange={(event) => setLogDate(event.target.value)} />
+      </label>
+      <label>
+        {t('Error reference')}
+        <input value={logReference} onChange={(event) => setLogReference(event.target.value)} />
+      </label>
+      <label>
+        {t('Correlation id')}
+        <input value={logCorrelation} onChange={(event) => setLogCorrelation(event.target.value)} />
+      </label>
+      <button
+        type="button"
+        onClick={() => void loadLogs(api, restUrl !== '' && nonce !== '', {
+          level: logLevel,
+          channel: logChannel,
+          module: logModule,
+          provider: logProvider,
+          date: logDate,
+          error_reference: logReference,
+          correlation_id: logCorrelation,
+        }, setLogRows, setNote)}
+      >
+        {t('Filter logs')}
+      </button>
+      {logRows.length === 0 ? <p>{t('No log rows match these filters.')}</p> : (
+        <ul>
+          {logRows.map((row) => (
+            <li key={`${String(row.error_reference ?? '')}-${String(row.message ?? '')}`}>{cell(row.message)} {cell(row.error_reference)}</li>
+          ))}
+        </ul>
+      )}
       <h2>{t('Recent errors')}</h2>
       {report.recentErrors.length === 0 ? (
         <p>{t('No recent errors were stored.')}</p>
@@ -183,6 +242,33 @@ async function retryJob(api: QueryNovaApi, job: Record<string, unknown>, ready: 
     setNote(typeof body.note === 'string' ? body.note : t(fallback));
   } catch {
     setNote(t(fallback));
+  }
+}
+
+async function loadLogs(
+  api: QueryNovaApi,
+  ready: boolean,
+  filters: Record<string, string>,
+  setRows: (rows: Array<Record<string, unknown>>) => void,
+  setNote: (note: string) => void,
+): Promise<void> {
+  if (!ready) {
+    setNote(t('The log viewer omits secrets.'));
+    return;
+  }
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value.trim() !== '') {
+      params.set(key, value.trim());
+    }
+  }
+  try {
+    const body = await api.get<Record<string, unknown>>(`/logs?${params.toString()}`);
+    const rows = Array.isArray(body.rows) ? body.rows.filter((row): row is Record<string, unknown> => typeof row === 'object' && row !== null) : [];
+    setRows(rows);
+    setNote(typeof body.note === 'string' ? body.note : t('The log viewer omits secrets.'));
+  } catch {
+    setNote(t('Logs could not be filtered. Secrets are omitted.'));
   }
 }
 

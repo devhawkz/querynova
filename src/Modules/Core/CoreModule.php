@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace QueryNova\Modules\Core;
 
 use QueryNova\Core\Container\ContainerInterface;
+use QueryNova\Core\Logging\LogViewer;
 use QueryNova\Core\ProductVersions;
 use QueryNova\Core\Health\HealthReport;
 use QueryNova\Core\Health\HealthStatus;
@@ -56,6 +57,7 @@ final class CoreModule extends AbstractModule {
         $rest->route( 'POST', '/providers/configure', [ $this, 'configureProvider' ], Capability::MANAGE_SETTINGS );
         $rest->route( 'GET', '/jobs', [ $this, 'jobs' ], Capability::VIEW_LOGS );
         $rest->route( 'POST', '/jobs/retry', [ $this, 'retryJob' ], Capability::VIEW_LOGS );
+        $rest->route( 'GET', '/logs', [ $this, 'logs' ], Capability::VIEW_LOGS );
     }
 
     public function registerHooks( HookRegistrar $hooks ): void {
@@ -152,6 +154,20 @@ final class CoreModule extends AbstractModule {
             (int) ( $params['id'] ?? 0 ),
             new \DateTimeImmutable( 'now' )
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function logs( \WP_REST_Request $request ): array {
+        $filters = [];
+        foreach ( [ 'level', 'channel', 'module', 'provider', 'date', 'error_reference', 'correlation_id' ] as $key ) {
+            $value           = $request->get_param( $key );
+            $filters[ $key ] = is_string( $value ) ? $value : '';
+        }
+        $repository = new \QueryNova\Infrastructure\Database\LogRepository( $this->database() );
+
+        return LogViewer::filter( $repository->search( $filters, 50, 0 ), $filters );
     }
 
     private function database(): ArrayDatabase|WpdbConnection {
